@@ -186,6 +186,29 @@ public class PUN2_GameLobby : MonoBehaviourPunCallbacks
         PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
         return roomName;
     }
+
+    public bool joinRoomWithName(string joinName)
+    {
+        joiningRoom = true;
+
+        //Set our Player name
+        PhotonNetwork.NickName = playerName;
+
+        //Join the Room
+        print("clickedJoinRoom");
+       
+        foreach (var roomInfo in createdRooms)
+        {
+            if (roomInfo.Name == joinName)
+            {
+                //it is a legit room
+                PhotonNetwork.JoinRoom(joinName);
+                return true;
+            }
+        }
+        joiningRoom = false;
+        return false;
+    }
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
         Debug.Log("OnCreateRoomFailed got called. This can happen if the room exists (even if not visible). Try another room name.");
