@@ -1,0 +1,13 @@
+{
+    "name": "PunDemos.DemoHubEditor",
+    "references": [
+        "PhotonUnityNetworking",
+        "PhotonRealtime",
+        "UnityEditor.UI",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}

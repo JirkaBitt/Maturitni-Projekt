@@ -1,0 +1,12 @@
+{
+    "name": "PunDemos.DemoSlotcarEditor",
+    "references": [
+        "PhotonUnityNetworking.Demos",
+        "UnityEditor.UI",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}

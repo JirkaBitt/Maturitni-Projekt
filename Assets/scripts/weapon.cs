@@ -1,0 +1,20 @@
+using System.Collections;
+using System.Collections.Generic;
+using Photon.Pun;
+using UnityEngine;
+
+public abstract class weapon : MonoBehaviour
+{
+    //abstract class is used because every script(axeWeapon, swordWeapon) of a weapon(gameobject) is of type weapon(this script) and we then assign it the specific script of the right weapon type
+    
+    public GameObject weaponGameobject;
+    public int photonID;
+    public string type;
+
+    public bool triggerLaunch;
+    //abstract Use is here that we can call it not matter the type of weapon, it will run the override use on the lowest level of the script chain(axeWeapon)
+    public abstract void Use();
+    public abstract void launchEnemy(GameObject enemy, Vector3 launchVector, float force);
+    //in launch enemy we will call RPC for addforce
+    public abstract void addForce(int photonViewID, Vector3 launchVector, float force);
+}
