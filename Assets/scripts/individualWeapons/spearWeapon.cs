@@ -102,6 +102,7 @@ public class spearWeapon : meleeWeapon
     {
         Animator animator = gameObject.GetComponent<Animator>();
         animator.SetTrigger("chargeSpear");
+        addTrail(gameObject);
     }
 
     [PunRPC]
@@ -116,6 +117,7 @@ public class spearWeapon : meleeWeapon
     {
         Animator animator = gameObject.GetComponent<Animator>();
         animator.speed = 1;
+        addTrail(gameObject);
     }
    
     

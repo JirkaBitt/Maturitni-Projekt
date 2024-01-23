@@ -21,13 +21,8 @@ public class chooseLevel : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        /*
-        Button create = createButton.GetComponent<Button>();
-        create.clicked += () => SceneManager.LoadScene("createPrefabs");
-
-        Button join = joinButton.GetComponent<Button>();
-        join.clicked += joinRoom;
-        */
+        Application.targetFrameRate = 60;
+        
     }
     
     // Update is called once per frame

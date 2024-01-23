@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 8569649081576005266}
   - component: {fileID: 981546225470404864}
   - component: {fileID: -3411767473166386014}
+  - component: {fileID: 8189507295202197787}
   m_Layer: 0
   m_Name: axe
   m_TagString: weapon
@@ -150,6 +151,7 @@ MonoBehaviour:
   photonID: 0
   type: 
   triggerLaunch: 0
+  weap: {fileID: 0}
 --- !u!60 &8569649081576005266
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -352,3 +354,18 @@ MonoBehaviour:
   hasAnimation: 1
   startScale: {x: 0.40144008, y: 0.40144008, z: 0.40144008}
   name: Axe
+--- !u!114 &8189507295202197787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7613326741600582470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e43038e21e4ec4baab5a508f4431a383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trailDurationSeconds: 0.2
+  oneCopyDuration: 0.05
+  numberOfCopies: 20

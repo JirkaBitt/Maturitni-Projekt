@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
 public class swordWeapon : meleeWeapon
@@ -11,11 +12,8 @@ public class swordWeapon : meleeWeapon
     public override void Use()
     {
         //attack
-        triggerLaunch = true;
-        Animator animator = gameObject.GetComponent<Animator>();
-        animator.SetTrigger("swordAttack");
-        
-       
+        PhotonView photonView = gameObject.GetPhotonView();
+        photonView.RPC("playAnimation",RpcTarget.All);
     }
     Vector3 computeLaunchVector()
     {
@@ -60,5 +58,13 @@ public class swordWeapon : meleeWeapon
 
             }
         }
+    }
+    [PunRPC]
+    void playAnimation()
+    {
+        triggerLaunch = true;
+        Animator animator = gameObject.GetComponent<Animator>();
+        animator.SetTrigger("swordAttack");
+        addTrail(gameObject);
     }
 }

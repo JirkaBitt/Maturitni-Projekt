@@ -17,4 +17,10 @@ public abstract class weapon : MonoBehaviour
     public abstract void launchEnemy(GameObject enemy, Vector3 launchVector, float force);
     //in launch enemy we will call RPC for addforce
     public abstract void addForce(int photonViewID, Vector3 launchVector, float force);
+
+    public void addTrail(GameObject weapon)
+    {
+        CreateTrail trailScript = weapon.GetComponent<CreateTrail>();
+        trailScript.createTrail();
+    }
 }

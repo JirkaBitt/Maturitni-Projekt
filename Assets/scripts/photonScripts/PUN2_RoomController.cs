@@ -45,7 +45,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         }
         else
         {
-             spawnPoint = findRespawnPositions();
+            spawnPoint = findRespawnPositions();
             if (PhotonNetwork.IsMasterClient)
             {
                 //fetch created assets
@@ -118,6 +118,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
     }
     public override void OnJoinedRoom()
     {
+        /*
         base.OnJoinedRoom();
 
         //we have to wait until we are in room, it can take some time
@@ -139,7 +140,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         //call rpc buffered so it runs even for players that join later
         //we have to call it on the photonview of the roomcontroller because that is the only one with namePlayer function
         photonView.RPC("namePlayer",RpcTarget.AllBuffered,playerView.ViewID,PhotonNetwork.LocalPlayer.UserId);
-
+        */
     }
 
     public void joinedFromCreate()
@@ -160,9 +161,24 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         camScript.enabled = true;
         camScript.player = player;
         camScript.rb = player.GetComponent<Rigidbody2D>();
+        camScript.updatePlayers();
         //call rpc buffered so it runs even for players that join later
         //we have to call it on the photonview of the roomcontroller because that is the only one with namePlayer function
         CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(PhotonNetwork.LocalPlayer.UserId, playerView.ViewID);
+    }
+
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        base.OnPlayerEnteredRoom(newPlayer);
+        cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
+        camScript.updatePlayers();
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        base.OnPlayerLeftRoom(otherPlayer);
+        cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
+        camScript.updatePlayers();
     }
 
     IEnumerator spawnWeapon()
@@ -217,15 +233,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         //iterate for every platform
         foreach (var platform in ground)
         {
-            //find min and max values of ground.x
-            Transform platformTransform = platform.transform;
-            /*
-            if (platform.GetComponent<BoxCollider2D>() != null)
-            {
-                coll = platform.GetComponent<BoxCollider2D>();
-            }
-            */
-
+            
             PolygonCollider2D coll = platform.GetComponent<PolygonCollider2D>();
             //retrieve paths from collider
             List<Tuple<Vector2, Vector2>> pathPoints = new List<Tuple<Vector2, Vector2>>();
@@ -332,21 +340,4 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
 
         return new Tuple<Vector2, Vector2>(minX, maxX);
     }
-    /*
-    public void addData(GameObject gObject)
-    {
-        Dictionary<string, Object> dict = new Dictionary<string, Object>();
-        Texture2D tex = gObject.GetComponent<SpriteRenderer>().sprite.texture;
-        Vector2 textureSize = new Vector2(tex.width, tex.height);
-        PolygonCollider2D coll = gObject.GetComponent<PolygonCollider2D>();
-        Vector2[][] paths = new Vector2[][coll.pathCount];
-        for(int i = 0; i < coll.pathCount;i++)
-        {
-            paths[i] = coll.GetPath(i);
-        }
-        Byte[] texBytes = tex.EncodeToPNG();
-        
-    }
-    */
-
 }

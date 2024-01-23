@@ -38,6 +38,8 @@ public class analyzeImage : MonoBehaviour
     private Texture2D finderTexture;
     //reloadThese is a list of highlighted pixels that should be reset in the next frame
     private List<pixel> reloadThese = new List<pixel>();
+    //this is a holder for the previous position of our mouse when we make the assets, it is used in receiveskipped
+    private Vector2 previousRaycastPos = Vector2.zero;
     //assetNames is an array of assets we want to create
     public string[] assetNames = new[] { "Arena","Character","Sword","Axe","Spear","Gun","Projectile","Bomb" };
     //assetIndex is an int that points to the current asset
@@ -836,8 +838,9 @@ public class analyzeImage : MonoBehaviour
         recolorFrames();
         //highligth pixels or frames
         castRaycast();
-        
     }
+    
+
     public void startGame()
     {
         //create room and return the room name
@@ -845,14 +848,7 @@ public class analyzeImage : MonoBehaviour
         {
             //remove white pixels
             pref.finalize(gameObject);
-          //  pref.removeWhitePixels();
-            /*
-            pref.DefaultGameObject.SetActive(true);
-            if (pool != null)
-            {
-                pool.ResourceCache.Add(pref.name, pref.DefaultGameObject);
-            }
-            */
+         
         }
         //this ensures that the assets stay there when we start the game
        
@@ -891,6 +887,7 @@ public class analyzeImage : MonoBehaviour
     //refresh slate makes every pixel in the canvas white again
     public void refreshSlate(string assetName)
     {
+        previousRaycastPos = Vector2.zero;
         foreach (var pix in gameLevelPixels)
         {
             pix.finalColor = Color.white;
@@ -903,17 +900,6 @@ public class analyzeImage : MonoBehaviour
     //remake allows the user to refresh the slate at the current asset and draw again
     public void remake()
     {
-        /*
-        int childCount = sceneAssets.transform.childCount;
-        if (childCount > 0)
-        {
-            //destroy the created asset
-            Destroy(sceneAssets.transform.GetChild(childCount - 1).gameObject);
-            
-            //showCropper(finderTexture, generateAsset, assetNames[assetIndex]);
-            refreshSlate(assetNames[assetIndex]);
-        }
-        */
         refreshSlate(assetNames[assetIndex]);
     }
     public void remakeClicked()
@@ -1095,8 +1081,19 @@ public class analyzeImage : MonoBehaviour
             if (hitPixel.CompareTag("pixel") && !displayed)
             {
                 List<RaycastHit2D> allHits = new List<RaycastHit2D>();
-                
-                allHits.AddRange(Physics2D.CircleCastAll(hitPixel.transform.position, Mathf.Abs(toolRadius / 2), Vector2.zero));
+                //if we move too fast we skip the pixels, so we retrieve them using this function
+                if (previousRaycastPos != Vector2.zero && previousRaycastPos != (Vector2)hitPixel.transform.position)
+                {
+                    //we are moving the cursor
+                    allHits.AddRange(addSkippedPixels(previousRaycastPos, hitPixel.transform.position));
+                }
+                else
+                {
+                    //we have to add the pixels if we are stationary and not moving the cursor
+                    allHits.AddRange(Physics2D.CircleCastAll(hitPixel.transform.position, Mathf.Abs(toolRadius / 2), Vector2.zero));
+                }
+                //save the previous pos
+                previousRaycastPos = hitPixel.transform.position;
                 //we have to add hit2d because if toolradius is 0 then we dont have any pixels, so add the default one
                 allHits.Add(hit2D);
                 
@@ -1115,7 +1112,6 @@ public class analyzeImage : MonoBehaviour
                     if (Input.GetMouseButton(0))
                     {
                         //we have selected this pixel, change it color
-                        Color currentColor = pixelClass.finalColor;
                         if (currentTool == "Eraser")
                         {
                             //change the color to white
@@ -1154,6 +1150,40 @@ public class analyzeImage : MonoBehaviour
                 }
             }
         }
+    }
+
+    RaycastHit2D[] addSkippedPixels(Vector2 origin, Vector2 end)
+    {
+        //get the pixels in line from where we were and where we are now
+        RaycastHit2D[] skipped = Physics2D.LinecastAll(origin, end);
+        Vector2[] skippedPositions = new Vector2[skipped.Length];
+        //retrieve pixels position
+        for(int i = 0; i < skipped.Length; i++)
+        {
+            skippedPositions[i] = skipped[i].collider.gameObject.transform.position;
+        }
+        //cast the raycast around the pixels 
+        List<RaycastHit2D> addThese = new List<RaycastHit2D>();
+        
+        addThese.AddRange(skipped);
+        foreach (var hit in skippedPositions)
+        {
+            //RaycastHit2D[] allHits = Physics2D.CircleCastAll(hit, Mathf.Abs(toolRadius / 2), Vector2.zero);
+            addThese.AddRange(Physics2D.CircleCastAll(hit, Mathf.Abs(toolRadius / 2), Vector2.zero));
+            //do not check for duplicates, it gets laggy and much slower
+            /*
+            foreach (var pixelHit in allHits)
+            {
+                //check if we are not adding duplicates
+                if (!addThese.Contains(pixelHit))
+                {
+                    addThese.Add(pixelHit);
+                }
+            }
+            */
+        }
+
+        return addThese.ToArray();
     }
     //reload specific pixels will reset the color of supplied list of pixels in the slate
     void reloadSpecificPixels()

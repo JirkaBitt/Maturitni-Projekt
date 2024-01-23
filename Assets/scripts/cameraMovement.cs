@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 public class cameraMovement : MonoBehaviourPunCallbacks
 {
-    private GameObject[] players;
+    public GameObject[] players;
     public GameObject player;
     Camera mainCamera;
 
@@ -16,35 +16,23 @@ public class cameraMovement : MonoBehaviourPunCallbacks
     // private CharacterController playerController;
    public Rigidbody2D rb;
 
-    private Vector3 cameraStartPosition;
+   
 
    
     // Start is called before the first frame update
     void Start()
     {
         players = GameObject.FindGameObjectsWithTag("Player");
-        /*
-        foreach (var onePlayer in players)
-        {
-            //pixels have player tag as well so we only want the parents
-            if (onePlayer.transform.parent == null)
-            {
-                if (onePlayer.GetComponent<PhotonView>().IsMine)
-                {
-                    player = onePlayer;
-                }
-            }
-        }
-        rb = player.GetComponent<Rigidbody2D>();
-        */
         mainCamera = Camera.main;
-        cameraStartPosition = mainCamera.transform.position;
-        
+        //move camera to player
+        Vector2 toPlayer = player.transform.position - mainCamera.transform.position;
+        mainCamera.transform.position += (Vector3)toPlayer;
+
     }
 
     
 
-    public override void OnJoinedRoom()
+    /*public override void OnJoinedRoom()
     {
         //we have to wait before we instantiate the player
         players = returnPlayers();
@@ -59,7 +47,7 @@ public class cameraMovement : MonoBehaviourPunCallbacks
         mainCamera = Camera.main;
         cameraStartPosition = mainCamera.transform.position;
     }
-
+*/
     // Update is called once per frame
     void Update()
     {
@@ -111,24 +99,13 @@ public class cameraMovement : MonoBehaviourPunCallbacks
 
     }
 
-    GameObject[] returnPlayers()
+    public void  updatePlayers()
     {
-        //we dont want the pixels, only the parent
-        List<GameObject> returnPlayers = new List<GameObject>();
-        GameObject[] allGO = GameObject.FindGameObjectsWithTag("Player");
-        foreach (var GO in allGO)
-        {
-           // if (GO.transform.parent == null)
-          //  {
-                returnPlayers.Add(GO);
-          //  }
-        }
-
-        return returnPlayers.ToArray();
+        players = GameObject.FindGameObjectsWithTag("Player");
     }
     void updateCameraZoom()
     {
-        players = returnPlayers();
+       // players = returnPlayers();
         
         float cameraSize = 0;
        
@@ -140,7 +117,8 @@ public class cameraMovement : MonoBehaviourPunCallbacks
             
         }
         //we want to divide cameraSize with playercount so it reflects an avarage value
-        cameraSize = cameraSize / (players.Length * cameraZoomDivider);
+        //-1 because our player is a part of players as well
+        cameraSize = cameraSize / ((players.Length) * cameraZoomDivider);
         //5 is default value
         cameraSize += 5;
         //move the camera further from players to capture all players

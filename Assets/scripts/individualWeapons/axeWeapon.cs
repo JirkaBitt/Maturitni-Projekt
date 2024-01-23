@@ -82,6 +82,7 @@ public class axeWeapon : meleeWeapon
     {
         Animator animator = gameObject.GetComponent<Animator>();
         animator.SetTrigger("axeAttack");
+        addTrail(gameObject);
     }
     
 

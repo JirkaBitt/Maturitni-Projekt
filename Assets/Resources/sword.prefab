@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: -6127386830209147294}
   - component: {fileID: -3376597893866383866}
   - component: {fileID: 1548233630652361100}
+  - component: {fileID: 3568233135924671263}
   m_Layer: 0
   m_Name: sword
   m_TagString: weapon
@@ -290,6 +291,7 @@ MonoBehaviour:
   photonID: 0
   type: 
   triggerLaunch: 0
+  weap: {fileID: 0}
 --- !u!114 &-3376597893866383866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -320,3 +322,18 @@ MonoBehaviour:
   hasAnimation: 1
   startScale: {x: 0.38128, y: 0.38128, z: 0.38128}
   name: Sword
+--- !u!114 &3568233135924671263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8223472603371931765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e43038e21e4ec4baab5a508f4431a383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trailDurationSeconds: 0.2
+  oneCopyDuration: 0.05
+  numberOfCopies: 15

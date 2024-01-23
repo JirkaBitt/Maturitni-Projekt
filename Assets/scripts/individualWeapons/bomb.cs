@@ -21,6 +21,7 @@ public class bomb : consumableWeapons
     {
         GameObject player = transform.parent.gameObject;
         throwWeapon(200);
+        addTrail(gameObject);
         //update all scripts
         playerStats stats = player.GetComponent<playerStats>();
         stats.currentWeapon = null;
@@ -28,13 +29,11 @@ public class bomb : consumableWeapons
         pickscript.isHoldingWeapon = false;
         pickscript.currentWeapon = null;
         //detonate the weapon
-         StartCoroutine(blowUp(3));
+        StartCoroutine(blowUp(3));
     }
     IEnumerator blowUp(int timeDetonate)
     {
         yield return new WaitForSeconds(timeDetonate);
-
-      
         
         Collider2D coll = gameObject.GetComponent<Collider2D>();
         Rigidbody2D rb = gameObject.GetComponent<Rigidbody2D>();

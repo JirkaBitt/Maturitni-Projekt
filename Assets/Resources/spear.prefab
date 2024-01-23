@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: -323706872553721705}
   - component: {fileID: -7052051438802640176}
   - component: {fileID: 330208460792472872}
+  - component: {fileID: 8215671648459717851}
   m_Layer: 0
   m_Name: spear
   m_TagString: weapon
@@ -379,6 +380,7 @@ MonoBehaviour:
   photonID: 0
   type: 
   triggerLaunch: 0
+  weap: {fileID: 0}
 --- !u!114 &-7052051438802640176
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -409,3 +411,18 @@ MonoBehaviour:
   hasAnimation: 1
   startScale: {x: 0.4, y: 0.4, z: 0.4}
   name: Spear
+--- !u!114 &8215671648459717851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6776103268096950887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e43038e21e4ec4baab5a508f4431a383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trailDurationSeconds: 0.2
+  oneCopyDuration: 0.05
+  numberOfCopies: 15

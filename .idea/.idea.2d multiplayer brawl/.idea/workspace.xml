@@ -2,9 +2,25 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0ac32aa4-67f8-4e2d-a9d8-bfc02d86cdb5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.2d multiplayer brawl/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.2d multiplayer brawl/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/GameLevel.unity" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/GameLevel.unity.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/GameLobby.unity" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/GameLobby.unity.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/axe.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/axe.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/bombWeapon.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/bombWeapon.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/spear.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/spear.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/sword.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/sword.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/ChooseLevel.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/ChooseLevel.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/analyzeImage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/analyzeImage.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/chooseLevel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/chooseLevel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/photonScripts/PUN2_GameLobby.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/photonScripts/PUN2_GameLobby.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/scripts/cameraMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/cameraMovement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/scripts/individualWeapons/axeWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/individualWeapons/axeWeapon.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/scripts/individualWeapons/bomb.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/individualWeapons/bomb.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/scripts/individualWeapons/spearWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/individualWeapons/spearWeapon.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/scripts/individualWeapons/swordWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/individualWeapons/swordWeapon.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/scripts/photonScripts/PUN2_RoomController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/photonScripts/PUN2_RoomController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/scripts/weapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/weapon.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -13,11 +29,13 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/CreatePrefab.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/playerStats.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SendGameobjects.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/axeAnimation.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/chooseLevel.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/scripts/CreateTrail.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/scripts/assetInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/scripts/checkPlayerBounds.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/scripts/consumableWeapons.cs" root0="FORCE_HIGHLIGHTING" />
@@ -110,7 +128,7 @@
       <workItem from="1700475080542" duration="85295000" />
       <workItem from="1702035331585" duration="166000" />
       <workItem from="1702035525605" duration="89369000" />
-      <workItem from="1704791986103" duration="19121000" />
+      <workItem from="1704791986103" duration="36481000" />
     </task>
     <servers />
   </component>
