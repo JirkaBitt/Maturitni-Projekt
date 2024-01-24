@@ -8,9 +8,9 @@ public class CreateTrail : MonoBehaviour
 
     public float trailDurationSeconds;
 
-    public float oneCopyDuration;
-
     public int numberOfCopies;
+
+    public bool fadeSprite = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,11 +18,16 @@ public class CreateTrail : MonoBehaviour
         Texture2D tex = rend.sprite.texture;
         
         Color[] texColors = tex.GetPixels();
-        for (int i = 0; i < texColors.Length; i++)
+        float texLength = texColors.Length;
+        for (int i = 0; i < texLength; i++)
         {
             if (texColors[i] == Color.black)
             {
                 texColors[i] = Color.white;
+                if (fadeSprite)
+                {
+                     texColors[i].a = i * (1 / texLength);
+                }
             }
         }
 
@@ -48,7 +53,7 @@ public class CreateTrail : MonoBehaviour
         copy.transform.rotation = transform.rotation;
         copy.transform.localScale = transform.localScale;
         //we are reassigning them because it is faster, the script does not have to search for the global variable
-        float lifetime = oneCopyDuration;
+        float lifetime = 0;
         float lifetimeDuration = trailDurationSeconds;
         while (lifetime < lifetimeDuration)
         {

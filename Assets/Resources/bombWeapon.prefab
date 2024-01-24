@@ -216,5 +216,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   trailDurationSeconds: 1.2
-  oneCopyDuration: 0.08
-  numberOfCopies: 30
+  numberOfCopies: 60
+  fadeSprite: 0

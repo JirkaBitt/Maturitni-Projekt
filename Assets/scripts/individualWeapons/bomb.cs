@@ -27,7 +27,6 @@ public class bomb : consumableWeapons
         stats.currentWeapon = null;
         pickWeapon pickscript = player.GetComponent<pickWeapon>();
         pickscript.isHoldingWeapon = false;
-        pickscript.currentWeapon = null;
         //detonate the weapon
         StartCoroutine(blowUp(3));
     }

@@ -7,8 +7,8 @@ public abstract class weapon : MonoBehaviour
 {
     //abstract class is used because every script(axeWeapon, swordWeapon) of a weapon(gameobject) is of type weapon(this script) and we then assign it the specific script of the right weapon type
     
-    public GameObject weaponGameobject;
-    public int photonID;
+   // public GameObject weaponGameobject;
+   // public int photonID;
     public string type;
 
     public bool triggerLaunch;
