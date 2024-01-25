@@ -102,8 +102,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae7cbf017e1a44040aaee5cbb475f461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponGameobject: {fileID: 0}
-  photonID: 0
   type: 
   triggerLaunch: 0
   explosionPrefab: {fileID: 4914716930404006884, guid: aed12c224fbc8704d8eaa07a52e88f44, type: 3}
@@ -215,6 +213,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e43038e21e4ec4baab5a508f4431a383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trailDurationSeconds: 1.2
-  numberOfCopies: 60
+  trailDurationSeconds: 0.4
+  numberOfCopies: 70
   fadeSprite: 0

@@ -138,7 +138,8 @@ public class playerMovement : MonoBehaviour
     IEnumerator performDash()
     {
         dashAvailable = false;
-
+        
+        gameObject.GetComponent<CreateTrail>().createTrail();
         if (playerFacing == "right")
         {
             //dash right

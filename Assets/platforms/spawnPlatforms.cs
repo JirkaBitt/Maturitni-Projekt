@@ -31,7 +31,9 @@ public class spawnPlatforms : MonoBehaviour
                 float randomX = Random.Range(minX, maxX);
                 GameObject platform = Instantiate(platforms[randomIndex]);
                 platform.SetActive(true);
-                float randomSpeed = Random.Range(0.3f, 1f);
+                
+                float randomSpeed = Random.Range(0.4f, 1f);
+                platform.transform.localScale *= randomSpeed;
                 platform.GetComponent<floatUpwards>().speed = randomSpeed;
 
                 Vector3 pos = platform.transform.position;

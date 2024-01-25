@@ -237,8 +237,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41ff3566e1edc4b9b98153668e6b74ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponGameobject: {fileID: 0}
-  photonID: 0
   type: 
   triggerLaunch: 0
   bulletPrefab: {fileID: 5475411863845466111, guid: 9e592f867a71e4ad6b807e97c1fa02e4, type: 3}

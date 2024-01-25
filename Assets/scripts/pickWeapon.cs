@@ -14,6 +14,8 @@ public class pickWeapon : MonoBehaviour
     private weapon weaponScript;
 
     private bool alreadyUsing = false;
+
+    private GameObject lifeBar;
     //private weapon_Sync _weaponSync;
     // Start is called before the first frame update
     void Start()
@@ -28,12 +30,8 @@ public class pickWeapon : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.E) && isHoldingWeapon)
             {
                 //drop the weapon
-                PhotonView photonView = PhotonView.Get(this);
-                //RPC allows us to run a function on network gameobjects
-                //we cannot send gameobject in RPC so we have to use photonviewID
-                int weaponID = gameObject.transform.GetChild(0).gameObject.GetPhotonView().ViewID;
-                photonView.RPC("dropWeapon", RpcTarget.AllBuffered,weaponID);
-
+                 drop(false);
+                 return;
             }
             //ontriggerenter changes the isInRange and we only have to check it here
             if (isInRange)
@@ -93,6 +91,7 @@ public class pickWeapon : MonoBehaviour
         }
         //move the weapon closer to the player
         weaponX.transform.position = playerX.transform.position + new Vector3(-facingDirection, 0.2f, 0);
+        changeLifeBarToPlayer(weaponX);
         //we have to switch this to false bcs otherwise we cannot drop the weapon
         weaponInRange = null;
         isInRange = false;
@@ -103,6 +102,7 @@ public class pickWeapon : MonoBehaviour
         //find weapon based on photonId
         GameObject weaponX = PhotonView.Find(weaponID).gameObject;
         weaponX.transform.parent = null;
+        changeLifeBarToWeapon(weaponX);
         //start playing the idle animation again
         Animator animator = weaponX.GetComponent<Animator>();
         animator.SetBool("isPicked", false);
@@ -136,6 +136,31 @@ public class pickWeapon : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         alreadyUsing = false;
+    }
+    //this func is called when the lifetime of the weapon runs out
+    public void drop(bool delete)
+    {
+        PhotonView photonView = PhotonView.Get(this);
+        //RPC allows us to run a function on network gameobjects
+        //we cannot send gameobject in RPC so we have to use photonviewID
+        GameObject weapon = gameObject.transform.GetChild(0).gameObject;
+        int weaponID = weapon.GetPhotonView().ViewID;
+        photonView.RPC("dropWeapon", RpcTarget.AllBuffered,weaponID);
+
+        if (delete)
+        {
+            PhotonNetwork.Destroy(weapon);
+        }
+    }
+    //change the parent so that the bar does not move with the weapon when attacking
+    public void changeLifeBarToPlayer(GameObject weapon)
+    {
+        lifeBar = weapon.transform.GetChild(0).gameObject;
+        lifeBar.transform.parent = gameObject.transform;
+    }
+    public void changeLifeBarToWeapon(GameObject weapon)
+    {
+        lifeBar.transform.parent = weapon.transform;
     }
    
 }

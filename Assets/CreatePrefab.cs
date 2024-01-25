@@ -14,6 +14,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
     private Vector3[] spawns;
     public GameObject controller;
     public GameObject scenebounds;
+    public GameObject lifeBar;
     DefaultPool pool = PhotonNetwork.PrefabPool as DefaultPool;
 
     public int numberOfCreated = 0;
@@ -112,6 +113,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
         DefaultGameObject.name = nameRPC;
         //defaultParent.transform.parent = objectPrefab.transform.parent;
         //check if default parent has children, if yes then destroy them
+        /*
         int childCount = DefaultGameObject.transform.childCount;
 
         if (childCount != 0)
@@ -122,7 +124,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
                 Destroy(DefaultGameObject.transform.GetChild(j).gameObject);
             }
         }
-
+*/
         //remove collider and SpriteRenderer
 
         if (DefaultGameObject.GetComponent<PolygonCollider2D>() != null)
@@ -139,6 +141,13 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
       
         Vector2 defSize = new Vector2(info.width, info.height);
         ResizeAssets(DefaultGameObject,defSize);
+        if (DefaultGameObject.CompareTag("weapon"))
+        {
+            //spawn the life bar and move it to the weapon
+            GameObject bar = Instantiate(lifeBar);
+            bar.transform.position = DefaultGameObject.transform.position + new Vector3(0, 1.2f, 0);
+            bar.transform.parent = DefaultGameObject.transform;
+        }
         //player is facing the wrong direction
         if (DefaultGameObject.CompareTag("Player"))
         {

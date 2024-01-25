@@ -376,8 +376,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f57db82c9e0804ee1b98e3bf410efd68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponGameobject: {fileID: 0}
-  photonID: 0
   type: 
   triggerLaunch: 0
   weap: {fileID: 0}
@@ -424,5 +422,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   trailDurationSeconds: 0.2
-  oneCopyDuration: 0.05
   numberOfCopies: 15
+  fadeSprite: 1

@@ -37,33 +37,9 @@ public abstract class meleeWeapon : weapon
       stats.percentage += (int)(force/6  + force * stats.percentage/200);
       
       Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();
+      //add trail behind the enemy
+      enemy.GetComponent<CreateTrail>().createTrail();
+      rb.AddForce(launchVector * (force*10 + stats.percentage*2));
+   }
    
-      rb.AddForce(launchVector * (force*6 + stats.percentage*2));
-   }
-
-   IEnumerator trackPreviousPositions()
-   {
-      bool play = true;
-      //tracked is for knowning if we waited enough and are tracking all 5 positions
-      int tracked = 0;
-      while (play)
-      {
-         //we need this placeholder to save the information of previous positions to move them up
-         Vector3[] placeHolders = previousPositions;
-         if (tracked < 5)
-         {
-            //wait two frames
-            yield return null;
-            yield return null;
-            previousPositions[tracked] = weap.transform.position;
-            tracked++;
-         }
-         //track the new position and reassign the previous ones
-         previousPositions[0] = weap.transform.position;
-         for (int i = 1; i < 5; i++)
-         {
-            previousPositions[i] = previousPositions[i - 1];
-         }
-      }
-   }
 }
