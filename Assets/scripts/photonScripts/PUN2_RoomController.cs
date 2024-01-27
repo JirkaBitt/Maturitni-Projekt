@@ -107,7 +107,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
             percentageStyle.normal.textColor = Color.white;
             //find the stats with userId
             playerStats stats = GameObject.Find(PhotonNetwork.PlayerList[i].UserId).GetComponent<playerStats>();
-            GUI.Label(new Rect(60 + i * 200, Screen.height - 180, 100, 50), PhotonNetwork.PlayerList[i].NickName + "\n" + stats.percentage+" %" + "\n" + "Knockouts: " + stats.Knockouts, percentageStyle);
+            GUI.Label(new Rect(60 + i * 200, Screen.height - 180, 100, 50), PhotonNetwork.PlayerList[i].NickName + "\n" + stats.percentage+" %"  + "   KO: " + stats.Knockouts, percentageStyle);
         }
     }
   
@@ -164,7 +164,9 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         camScript.updatePlayers();
         //call rpc buffered so it runs even for players that join later
         //we have to call it on the photonview of the roomcontroller because that is the only one with namePlayer function
-        CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(PhotonNetwork.LocalPlayer.UserId, playerView.ViewID);
+        CreatePrefab createScript = CreatePrefabs.GetComponent<CreatePrefab>();
+        createScript.renamePlayer(PhotonNetwork.LocalPlayer.UserId, playerView.ViewID);
+        createScript.changePlayer(player);
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)

@@ -19,6 +19,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using UnityEngine.ProBuilder;
 using UnityEngine.ProBuilder.MeshOperations;
+using UnityEngine.SceneManagement;
 using Color = UnityEngine.Color;
 
 using Screen = UnityEngine.Screen;
@@ -71,6 +72,8 @@ public class analyzeImage : MonoBehaviour
     public GameObject slate;
 
     public GameObject assetDisplayText;
+    //this is if we only want the character
+    public bool onlyCharacter = false;
     class prefab
     {
         public string name;
@@ -299,7 +302,7 @@ public class analyzeImage : MonoBehaviour
             }
         }
         //find next corner works with direction, pixel index and corner index to determine the next index of the corner and the direction we want to continue
-        public void finalize(GameObject empty)
+        public void finalize()
         {
             GameObject def = Instantiate(DefaultGameObject);
             def.transform.parent = objectPrefab.transform.parent;
@@ -355,7 +358,7 @@ public class analyzeImage : MonoBehaviour
         foreach (var pref in assetPrefabs)
         {
             //remove white pixels
-            pref.finalize(gameObject);
+            pref.finalize();
          
         }
         //this ensures that the assets stay there when we start the game
@@ -366,6 +369,33 @@ public class analyzeImage : MonoBehaviour
         //this function creates a room and returns its name
         string roomName = lobby.createRoomWithoutUI();
         Console.WriteLine("roomName " + roomName);
+    }
+
+    public void joinGame()
+    {
+        
+        Destroy(slate);
+        foreach (var pref in assetPrefabs)
+        {
+            //remove white pixels
+            pref.finalize();
+         
+        }
+        //this ensures that the assets stay there when we start the game
+        DontDestroyOnLoad(sceneAssets);
+        sceneAssets.SetActive(true);
+        PUN2_GameLobby lobby = photonLobby.GetComponent<PUN2_GameLobby>();
+        //this function creates a room and returns its name
+        GameObject roomName = GameObject.FindWithTag("roomName");
+        
+        bool result = lobby.joinRoomWithName(roomName.name);
+
+        if (!result)
+        {
+           // SceneManager.LoadScene("ChooseLevel");
+           print("failed to join!!!!!!!!");
+        }
+       
     }
     //create slate is called at the start and creates a canvas of pixels to draw to
     public void createSlate()
@@ -537,7 +567,15 @@ public class analyzeImage : MonoBehaviour
             print("we have created all assets");
             //all assets have been created
             //now start the game 
-            finalizeAssets();
+            if (onlyCharacter)
+            {
+                joinGame();
+            }
+            else
+            {
+                finalizeAssets();
+            }
+            
         }
     }
     void castRaycast()

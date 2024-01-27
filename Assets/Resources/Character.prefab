@@ -195,6 +195,7 @@ MonoBehaviour:
   isInRange: 0
   weaponInRange: {fileID: 0}
   isHoldingWeapon: 0
+  currentWeapon: {fileID: 0}
 --- !u!114 &8789724482984602352
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5215,6 +5216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e43038e21e4ec4baab5a508f4431a383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trailDurationSeconds: 0.3
+  oneCopyDuration: 0.3
   numberOfCopies: 30
   fadeSprite: 0
+  trailColor: {r: 1, g: 0, b: 0.11461401, a: 1}

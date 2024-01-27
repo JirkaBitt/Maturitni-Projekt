@@ -12,6 +12,7 @@ TagManager:
   - frame
   - pixel
   - created
+  - roomName
   layers:
   - Default
   - TransparentFX

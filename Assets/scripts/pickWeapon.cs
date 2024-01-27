@@ -16,6 +16,8 @@ public class pickWeapon : MonoBehaviour
     private bool alreadyUsing = false;
 
     private GameObject lifeBar;
+
+    public GameObject currentWeapon;
     //private weapon_Sync _weaponSync;
     // Start is called before the first frame update
     void Start()
@@ -29,8 +31,9 @@ public class pickWeapon : MonoBehaviour
         
             if (Input.GetKeyDown(KeyCode.E) && isHoldingWeapon)
             {
+               
                 //drop the weapon
-                 drop(false);
+                 drop(false, currentWeapon);
                  return;
             }
             //ontriggerenter changes the isInRange and we only have to check it here
@@ -62,7 +65,9 @@ public class pickWeapon : MonoBehaviour
         //Find the Gameobjects based on ID
         isHoldingWeapon = true;
         GameObject weaponX = PhotonView.Find(weaponID).gameObject;
+        //GameObject housing = weaponX.transform.parent.gameObject;
         GameObject playerX = PhotonView.Find(playerID).gameObject;
+       
         //assign values to our script
         weaponScript = weaponX.GetComponent<weapon>();
         //weaponScript.weaponGameobject = weaponX;
@@ -71,6 +76,7 @@ public class pickWeapon : MonoBehaviour
         Animator animator = weaponX.GetComponent<Animator>();
         animator.SetBool("isPicked", true);
         //assign plaer as parent so that weapon moves with him
+       // weaponX.transform.parent = playerX.transform;
         weaponX.transform.parent = playerX.transform;
         //send info to playerStats
         playerStats stats = playerX.GetComponent<playerStats>();
@@ -83,45 +89,62 @@ public class pickWeapon : MonoBehaviour
         {
             //rotate left
             weaponX.transform.rotation = Quaternion.Euler(0,180,0);
+            //housing.transform.rotation = Quaternion.Euler(0,180,0);
         }
         if (facingDirection < 0)
         {
             //rotate right
             weaponX.transform.rotation = Quaternion.Euler(0,0,0);
+            //housing.transform.rotation = Quaternion.Euler(0,0,0);
         }
         //move the weapon closer to the player
+        //weaponX.transform.position = playerX.transform.position + new Vector3(-facingDirection, 0.2f, 0);
         weaponX.transform.position = playerX.transform.position + new Vector3(-facingDirection, 0.2f, 0);
         changeLifeBarToPlayer(weaponX);
         //we have to switch this to false bcs otherwise we cannot drop the weapon
         weaponInRange = null;
         isInRange = false;
+        currentWeapon = weaponX;
     }
-    [PunRPC] public void dropWeapon(int weaponID)
+    [PunRPC] public void dropWeapon(int weaponID,bool delete)
     {
         //remove the weapon from parent
         //find weapon based on photonId
         GameObject weaponX = PhotonView.Find(weaponID).gameObject;
         weaponX.transform.parent = null;
-        changeLifeBarToWeapon(weaponX);
-        //start playing the idle animation again
-        Animator animator = weaponX.GetComponent<Animator>();
-        animator.SetBool("isPicked", false);
+        lifeBar.transform.parent = null;
+        if (!delete)
+        {
+            StartCoroutine(changeLifeBarToWeapon(weaponX));
+            //start playing the idle animation again
+            Animator animator = weaponX.GetComponent<Animator>();
+            animator.SetBool("isPicked", false);
+        }
+        else
+        {
+            lifeBar.transform.parent = weaponX.transform;
+            Destroy(weaponX);
+            lifeBar = null;
+        }
         //in player stats remove the weapon as we are no longer holding it
         playerStats stats = gameObject.GetComponent<playerStats>();
         stats.currentWeapon = null;
         isHoldingWeapon = false;
+        currentWeapon = null;
+
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         //check if parent is null, we dont want to rip the weapon from someones hands
-        
-        if(collision.gameObject.CompareTag("weapon") && collision.gameObject.transform.parent == null)
+        if (collision.gameObject.CompareTag("weapon") && collision.transform.parent == null)
         {
             //we are in range of an weapon
             isInRange = true;
             weaponInRange = collision.gameObject;
+            
         }
+        
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
@@ -138,29 +161,38 @@ public class pickWeapon : MonoBehaviour
         alreadyUsing = false;
     }
     //this func is called when the lifetime of the weapon runs out
-    public void drop(bool delete)
+    public void drop(bool delete, GameObject weapon)
     {
         PhotonView photonView = PhotonView.Get(this);
         //RPC allows us to run a function on network gameobjects
         //we cannot send gameobject in RPC so we have to use photonviewID
-        GameObject weapon = gameObject.transform.GetChild(0).gameObject;
+        //GameObject weapon = gameObject.transform.GetChild(0).gameObject;
         int weaponID = weapon.GetPhotonView().ViewID;
-        photonView.RPC("dropWeapon", RpcTarget.AllBuffered,weaponID);
-
-        if (delete)
-        {
-            PhotonNetwork.Destroy(weapon);
-        }
+        photonView.RPC("dropWeapon", RpcTarget.AllBuffered,weaponID,delete);
     }
     //change the parent so that the bar does not move with the weapon when attacking
-    public void changeLifeBarToPlayer(GameObject weapon)
+    void changeLifeBarToPlayer(GameObject weapon)
     {
+        //wait until it is picked, because if a player dropped the weapon and we quickly picked it up, the lifebar would not be the child of the weapon
         lifeBar = weapon.transform.GetChild(0).gameObject;
+        //reset the lifebar position
+        lifeBar.transform.position = weapon.transform.position + new Vector3(0, 1.2f, 0);
+        lifeBar.transform.rotation = Quaternion.Euler(0, 0, 0);
         lifeBar.transform.parent = gameObject.transform;
     }
-    public void changeLifeBarToWeapon(GameObject weapon)
+    IEnumerator changeLifeBarToWeapon(GameObject weapon)
     {
+       
+        Animator anim = weapon.GetComponent<Animator>();
+        anim.speed = 1000;
+        yield return new WaitUntil(() => anim.GetCurrentAnimatorStateInfo(0).IsName("picked"));
+        //check if it is not null, we might have deleted it when the time run out
+        anim.speed = 1;
+        lifeBar.transform.position = weapon.transform.position + new Vector3(0, 1.2f, 0);
+        lifeBar.transform.rotation = Quaternion.Euler(0, 0, 0);
+        
         lifeBar.transform.parent = weapon.transform;
+        lifeBar = null;
     }
    
 }

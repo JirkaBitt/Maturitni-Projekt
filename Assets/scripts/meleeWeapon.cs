@@ -33,7 +33,7 @@ public abstract class meleeWeapon : weapon
       float randomMultiplier = Random.Range(4, 10);
       randomMultiplier /= 10;
       force = force * randomMultiplier;
-      print(force);
+      
       stats.percentage += (int)(force/6  + force * stats.percentage/200);
       
       Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();

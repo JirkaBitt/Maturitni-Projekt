@@ -33,7 +33,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Empty|EmptyAction
+      name: idle
       takeName: Empty|EmptyAction
       internalID: -5572541973309549404
       firstFrame: 0

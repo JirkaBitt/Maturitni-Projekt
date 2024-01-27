@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GameLevel.unity
     guid: ac8c197fc9f714c98ace9d364942a4cf
+  - enabled: 1
+    path: Assets/Scenes/createPlayer.unity
+    guid: 4151e2f0c7f484fc9bb8f8ac571407bf
   m_configObjects: {}

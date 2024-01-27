@@ -17,6 +17,7 @@ public class playerMovement : MonoBehaviour
     public int dashCooldown = 3;
     private bool dashAvailable = true;
     public string playerFacing = "right";
+    public GameObject nameBar;
     private Animator animator;
     private pickWeapon _pickWeapon;
 
@@ -24,6 +25,7 @@ public class playerMovement : MonoBehaviour
     private void Start()
     {
         rb = gameObject.GetComponent<Rigidbody2D>();
+        nameBar = gameObject.transform.GetChild(0).gameObject;
         _pickWeapon = gameObject.GetComponent<pickWeapon>();
         particles = gameObject.GetComponent<ParticleSystem>();
         moveParticlesToFeet();
@@ -110,8 +112,9 @@ public class playerMovement : MonoBehaviour
                     //rotate the player to the right
                     playerFacing = "right";
                     gameObject.transform.RotateAround(gameObject.transform.position, Vector3.up, 180);
-                    
+                    nameBar.transform.rotation = Quaternion.Euler(0,0,0);
                 }
+                return;
             }
             if (facingInt < 0)
             {
@@ -120,10 +123,9 @@ public class playerMovement : MonoBehaviour
                     //rotate the player to the left
                     playerFacing = "left";
                     gameObject.transform.RotateAround(gameObject.transform.position, Vector3.up, 180);
-                   
+                    nameBar.transform.rotation = Quaternion.Euler(0,0,0);
                 }
             }
-
         }
         
     }

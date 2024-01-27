@@ -332,6 +332,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e43038e21e4ec4baab5a508f4431a383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trailDurationSeconds: 0.2
+  oneCopyDuration: 0.15
   numberOfCopies: 15
   fadeSprite: 1
+  trailColor: {r: 1, g: 1, b: 1, a: 1}

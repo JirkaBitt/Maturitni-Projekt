@@ -16,6 +16,7 @@ public class assetInfo : MonoBehaviour
     public int[,] pixelArray;
 
     public string name;
+    
     // Start is called before the first frame update
     void Start()
     {

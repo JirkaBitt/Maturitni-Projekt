@@ -71,11 +71,7 @@ public class checkPlayerBounds : MonoBehaviourPunCallbacks
         
         pickWeapon pickScript = player.GetComponent<pickWeapon>();
       //drop the weapon on all instances
-        pickScript.dropWeapon(weaponID);
-        //delete the weapon if we are the owner
-        if (weapon.GetPhotonView().IsMine)
-        {
-            PhotonNetwork.Destroy(weapon);
-        }
+        pickScript.drop(true,weapon);
+       
     }
 }

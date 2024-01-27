@@ -42,9 +42,17 @@ public class chooseLevel : MonoBehaviour
         
         PUN2_GameLobby lobbyScript = lobby.GetComponent<PUN2_GameLobby>();
         //if result is false there was a problem
-        bool result = lobbyScript.joinRoomWithName(inputText.text);
+        bool result = lobbyScript.checkIfRoomExists(inputText.text);//lobbyScript.joinRoomWithName(inputText.text);
         
-        if (!result)
+        if (result)
+        {
+            GameObject roomHolder = new GameObject();
+            roomHolder.tag = "roomName";
+            roomHolder.name = inputText.text;
+            DontDestroyOnLoad(roomHolder);
+            SceneManager.LoadScene("createPlayer");
+        }
+        else
         {
             warning.SetActive(true);
         }

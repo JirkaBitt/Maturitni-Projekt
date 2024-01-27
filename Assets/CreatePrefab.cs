@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Photon.Pun;
+using TMPro;
 using UnityEngine;
 
 public class CreatePrefab : MonoBehaviourPunCallbacks
@@ -15,6 +16,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
     public GameObject controller;
     public GameObject scenebounds;
     public GameObject lifeBar;
+    public GameObject playerName;
     DefaultPool pool = PhotonNetwork.PrefabPool as DefaultPool;
 
     public int numberOfCreated = 0;
@@ -58,7 +60,29 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
     public void renamePlayer(string Name, int id)
     {
         photonView.RPC("namePlayer",RpcTarget.AllBuffered,id,Name);
-    } 
+    }
+
+    public void changePlayer(GameObject player)
+    {
+        //change the texture of my player on all clients
+        GameObject sceneAssets = GameObject.Find("Scene Assets");
+        GameObject character = sceneAssets.transform.GetChild(0).gameObject;
+            
+        assetInfo info = character.GetComponent<assetInfo>();
+        int[,] colors = info.pixelArray;
+        List<int> color1D = new List<int>();
+        int arrayWidth = colors.GetLength(0);
+        for (int y = 0; y < colors.GetLength(1); y++)
+        {
+            for (int x = 0; x < arrayWidth; x++)
+            {
+                color1D.Add(colors[x,y]);
+            }
+        }
+
+        int photonID = player.GetPhotonView().ViewID;
+        photonView.RPC("changePlayerTexture",RpcTarget.AllBuffered,photonID,color1D.ToArray(),arrayWidth);
+    }
     IEnumerator waitForAsets()
     {
         yield return new WaitUntil(() => numberOfCreated == defaults.Length);
@@ -102,15 +126,13 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
             colorsRPC[x, y] = colors1D[i];
         }
         
-        
-   
-        GameObject DefaultGameObject = assetData[nameRPC];
+        GameObject newAsset = assetData[nameRPC];
         //assign the default object to the sceneAssets
-        DefaultGameObject = Instantiate(DefaultGameObject);
+        newAsset = Instantiate(newAsset);
         
-        assetInfo info = DefaultGameObject.GetComponent<assetInfo>();
+        assetInfo info = newAsset.GetComponent<assetInfo>();
         
-        DefaultGameObject.name = nameRPC;
+        newAsset.name = nameRPC;
         //defaultParent.transform.parent = objectPrefab.transform.parent;
         //check if default parent has children, if yes then destroy them
         /*
@@ -127,9 +149,9 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
 */
         //remove collider and SpriteRenderer
 
-        if (DefaultGameObject.GetComponent<PolygonCollider2D>() != null)
+        if (newAsset.GetComponent<PolygonCollider2D>() != null)
         {
-            Destroy(DefaultGameObject.GetComponent<PolygonCollider2D>());
+            Destroy(newAsset.GetComponent<PolygonCollider2D>());
         }
         
         //Destroy(defaultParent.GetComponent<SpriteRenderer>());
@@ -137,38 +159,53 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
        //CombineSpriteArray();
         // Sprite finalSprite = objectPrefab.GetComponent<SpriteRenderer>().sprite;
         //  DefaultGameObject.GetComponent<SpriteRenderer>().sprite = finalSprite;
-        CombineSpriteArray(DefaultGameObject, colorsRPC);
+        CombineSpriteArray(newAsset, colorsRPC);
       
         Vector2 defSize = new Vector2(info.width, info.height);
-        ResizeAssets(DefaultGameObject,defSize);
-        if (DefaultGameObject.CompareTag("weapon"))
+        ResizeAssets(newAsset,defSize);
+        
+        //player is facing the wrong direction
+        if (newAsset.CompareTag("Player"))
+        {
+            newAsset.transform.Rotate(0,180,0);
+            GameObject nameHolder = Instantiate(playerName);
+            nameHolder.transform.position = newAsset.transform.position + new Vector3(0, 1.4f, 0);
+            nameHolder.transform.rotation = Quaternion.Euler(0,0,0);
+            nameHolder.transform.parent = newAsset.transform;
+            nameHolder.transform.localScale = Vector3.one * 4;
+            nameHolder.GetComponent<TMP_Text>().text = PhotonNetwork.LocalPlayer.NickName;
+        }
+        //parentHousing connects the life bar with the weapon
+      
+        if (newAsset.CompareTag("weapon"))
         {
             //spawn the life bar and move it to the weapon
             GameObject bar = Instantiate(lifeBar);
-            bar.transform.position = DefaultGameObject.transform.position + new Vector3(0, 1.2f, 0);
-            bar.transform.parent = DefaultGameObject.transform;
+            bar.transform.position = newAsset.transform.position + new Vector3(0, 1.2f, 0);
+           
+            bar.transform.parent = newAsset.transform;
+            bar.GetComponent<decreaseWeaponLife>().weapon = newAsset;
+           
         }
-        //player is facing the wrong direction
-        if (DefaultGameObject.CompareTag("Player"))
-        {
-            DefaultGameObject.transform.Rotate(0,180,0);
-        }
-        pool.ResourceCache.Add(nameRPC, DefaultGameObject);
-       // DontDestroyOnLoad(DefaultGameObject);
-        DefaultGameObject.SetActive(false);
+        pool.ResourceCache.Add(nameRPC, newAsset);
+            // DontDestroyOnLoad(DefaultGameObject);
+        newAsset.SetActive(false);
+          
         numberOfCreated++;
     }
     public void CombineSpriteArray(GameObject attach, int[,] colorsRPC)
     {
        
             //find the first and last black pixel
-            int firstX = colorsRPC.GetLength(0);
+            int length = colorsRPC.GetLength(0);
+            int height = colorsRPC.GetLength(1);
+            int firstX = length;
             int lastX = 0;
-            int firstY = colorsRPC.GetLength(1);
+            int firstY = height;
             int lastY = 0;
-            for (int y = 0; y < colorsRPC.GetLength(1); y++)
+            for (int y = 0; y < height; y++)
             {
-                for (int x = 0; x < colorsRPC.GetLength(0); x++)
+                for (int x = 0; x < length; x++)
                 {
                     if (colorsRPC[x,y] == 1)
                     {
@@ -658,8 +695,26 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
         print("rename player");
         GameObject player = PhotonView.Find(gameobjectID).gameObject;
         player.name = nameID;
+        
+       
     }
-    
+
+    [PunRPC] public void changePlayerTexture(int gameobjectID, int[] colors1D, int width)
+    {
+        GameObject player = PhotonView.Find(gameobjectID).gameObject;
+        int length = colors1D.Length;
+        int height =  length/ width;
+        int[,] colorsRPC = new int[width, height];
+        for (int i = 0; i < length; i++)
+        {
+            int x = i % width;
+            int y = i / width;
+            colorsRPC[x, y] = colors1D[i];
+        }
+        CombineSpriteArray(player, colorsRPC);
+       
+        print("changed texture for player!!!!!");
+    }
     private Tuple<Vector2, Vector2> getBounds(Vector2[] path,PolygonCollider2D coll)
     {
         Vector2 minX = new Vector2(1000,-1000);

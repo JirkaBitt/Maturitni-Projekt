@@ -1,16 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class CreateTrail : MonoBehaviour
 {
     private Sprite whiteSprite;
 
-    public float trailDurationSeconds;
+    public float oneCopyDuration;
 
     public int numberOfCopies;
 
     public bool fadeSprite = true;
+
+    public Color trailColor = Color.white;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,7 +26,7 @@ public class CreateTrail : MonoBehaviour
         {
             if (texColors[i] == Color.black)
             {
-                texColors[i] = Color.white;
+                texColors[i] = trailColor;
                 if (fadeSprite)
                 {
                      texColors[i].a = i * (1 / texLength);
@@ -54,7 +57,7 @@ public class CreateTrail : MonoBehaviour
         copy.transform.localScale = transform.localScale;
         //we are reassigning them because it is faster, the script does not have to search for the global variable
         float lifetime = 0;
-        float lifetimeDuration = trailDurationSeconds;
+        float lifetimeDuration = oneCopyDuration;
         while (lifetime < lifetimeDuration)
         {
             //decrease the opacity

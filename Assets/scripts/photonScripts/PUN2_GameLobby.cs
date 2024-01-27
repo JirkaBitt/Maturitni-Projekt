@@ -196,17 +196,26 @@ public class PUN2_GameLobby : MonoBehaviourPunCallbacks
 
         //Join the Room
         print("clickedJoinRoom");
-       
+
+        //if (checkIfRoomExists(joinName))
+       // {
+            //it is a legit room
+            PhotonNetwork.JoinRoom(joinName);
+            return true;
+       // }
+        joiningRoom = false;
+        return false;
+    }
+
+    public bool checkIfRoomExists(string joinName)
+    {
         foreach (var roomInfo in createdRooms)
         {
             if (roomInfo.Name == joinName)
             {
-                //it is a legit room
-                PhotonNetwork.JoinRoom(joinName);
                 return true;
             }
         }
-        joiningRoom = false;
         return false;
     }
     public override void OnCreateRoomFailed(short returnCode, string message)
