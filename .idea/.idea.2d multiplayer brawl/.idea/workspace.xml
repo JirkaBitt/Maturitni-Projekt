@@ -5,29 +5,10 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.2d multiplayer brawl/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.2d multiplayer brawl/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/CreatePrefab.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/CreatePrefab.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Character.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Character.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/axe.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/axe.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/bombWeapon.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/bombWeapon.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/decreaseWeaponLife.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/decreaseWeaponLife.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/idleWeaponContinous.fbx.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/idleWeaponContinous.fbx.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/spear.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/spear.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/sword.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/sword.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/timeBar.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/timeBar.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/weaponAnimatorController.controller" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/weaponAnimatorController.controller" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/ChooseLevel.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/ChooseLevel.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/GameLevel.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/GameLevel.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/analyzeImage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/analyzeImage.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/chooseLevel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/chooseLevel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/CreateTrail.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/CreateTrail.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/assetInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/assetInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/checkPlayerBounds.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/checkPlayerBounds.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/scripts/meleeWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/meleeWeapon.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/photonScripts/PUN2_GameLobby.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/photonScripts/PUN2_GameLobby.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/scripts/photonScripts/PUN2_PlayerSync.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/photonScripts/PUN2_PlayerSync.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/scripts/photonScripts/PUN2_RoomController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/photonScripts/PUN2_RoomController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/pickWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/pickWeapon.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/playerMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/playerMovement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,6 +35,7 @@
     <setting file="file://$PROJECT_DIR$/Assets/scripts/meleeWeapon.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/scripts/photonScripts/PUN2_weaponSync.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/scripts/pickWeapon.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/scripts/playerIcon.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/scripts/weapon.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b3393ed50e824818a1c3bdc09589ea5b94bc00/66/ecd4931e/EditorUtility.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
@@ -138,7 +120,7 @@
       <workItem from="1702035525605" duration="89369000" />
       <workItem from="1704791986103" duration="61484000" />
       <workItem from="1706220524235" duration="50000" />
-      <workItem from="1706220606119" duration="20471000" />
+      <workItem from="1706220606119" duration="34955000" />
     </task>
     <servers />
   </component>

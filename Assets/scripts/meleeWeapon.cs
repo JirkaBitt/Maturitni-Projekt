@@ -26,7 +26,9 @@ public abstract class meleeWeapon : weapon
       PhotonView phView = PhotonView.Find(photonViewID);
      
       GameObject enemy = phView.gameObject;
-
+      PUN2_PlayerSync playerSync = enemy.GetComponent<PUN2_PlayerSync>();
+      //disable the sync for 0.6s
+      playerSync.launchEnemy();
       //add the force to his percentage and launch him with his percentage
       playerStats stats = enemy.GetComponent<playerStats>();
       //add a litle bit of randomness

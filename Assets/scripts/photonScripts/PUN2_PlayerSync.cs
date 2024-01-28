@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Photon.Pun;
 
@@ -25,6 +26,7 @@ public class PUN2_PlayerSync : MonoBehaviourPun, IPunObservable
     private Vector3 receivedLaunchVector;
     private playerStats stats;
 
+    public bool ignorePhoton = false;
     // Use this for initialization
     void Start()
     {
@@ -78,21 +80,37 @@ public class PUN2_PlayerSync : MonoBehaviourPun, IPunObservable
     // Update is called once per frame
     void Update()
     {
-        if (!photonView.IsMine)
+        if (!ignorePhoton)
         {
-            //Update remote player (smooth this, this looks good, at the cost of some accuracy)
-            //Lerp is linear transformation
-            //0 == transform.position and 1 is instant transformation to latestPos
-            transform.position = Vector3.Lerp(transform.position, latestPos, Time.deltaTime * 5);
-            //transform.rotation = Quaternion.Lerp(transform.rotation, latestRot, Time.deltaTime * 5);
-            transform.rotation = latestRot;
+            if (!photonView.IsMine)
+            {
+                //Update remote player (smooth this, this looks good, at the cost of some accuracy)
+                //Lerp is linear transformation
+                //0 == transform.position and 1 is instant transformation to latestPos
+                transform.position = Vector3.Lerp(transform.position, latestPos, Time.deltaTime * 5);
+                //transform.rotation = Quaternion.Lerp(transform.rotation, latestRot, Time.deltaTime * 5);
+                transform.rotation = latestRot;
 
-            //launch network players
+                //launch network players
+            }
+            else
+            {
+                //this is my player
+
+            }
         }
-        else
-        {
-            //this is my player
-           
-        }
+    }
+
+    public void launchEnemy()
+    {
+        //make the copies ignore the original bcs there is a lot of lag
+        ignorePhoton = true;
+        StartCoroutine(wait());
+    }
+    
+    IEnumerator wait()
+    {
+        yield return new WaitForSeconds(0.6f);
+        ignorePhoton = false;
     }
 }

@@ -20,6 +20,10 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
     DefaultPool pool = PhotonNetwork.PrefabPool as DefaultPool;
 
     public int numberOfCreated = 0;
+
+    public GameObject loadingScreen;
+    
+    
     //private float[] pixWidth;
     // Start is called before the first frame update
     void Start()
@@ -82,6 +86,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
 
         int photonID = player.GetPhotonView().ViewID;
         photonView.RPC("changePlayerTexture",RpcTarget.AllBuffered,photonID,color1D.ToArray(),arrayWidth);
+        sceneAssets.SetActive(false);
     }
     IEnumerator waitForAsets()
     {
@@ -90,6 +95,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
         PhotonNetwork.Instantiate("Arena", Vector3.zero, Quaternion.identity);
         controller.SetActive(true);
         scenebounds.SetActive(true);
+        loadingScreen.SetActive(false);
        // controller.GetComponent<PUN2_RoomController>().spawnPoint = spawns;
         if (!PhotonNetwork.LocalPlayer.IsMasterClient)
         {

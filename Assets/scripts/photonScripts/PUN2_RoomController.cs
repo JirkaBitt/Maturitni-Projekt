@@ -22,13 +22,15 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
     public GameObject[] weaponPrefabs;
     public Transform weaponSpawnPoint;
     private bool canSpawnWeapon = true;
-    public GUIStyle percentageStyle;
+    //public GUIStyle percentageStyle;
     private List<GameObject> spawnedWeapons = new List<GameObject>();
     public playerStats[] playerStats;
 
     public string[] WeaponNames;
 
     public GameObject CreatePrefabs;
+
+    public GameObject displayIcons;
     //private List<playerStats> _statsList = new List<playerStats>();
     // Use this for initialization
     void Start()
@@ -61,7 +63,9 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                 camScript.player = player;
                 camScript.rb = player.GetComponent<Rigidbody2D>();
                 //we have to call it on create prefabs because room controller is disabled at the start of the game
-                CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(PhotonNetwork.LocalPlayer.UserId, playerView.ViewID);
+                string playerID = PhotonNetwork.LocalPlayer.UserId;
+                CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID);
+                displayIcons.GetComponent<displayPlayerStats>().addPlayerTexture(playerID);
                 //call rpc buffered so it runs even for players that join later
                 //we have to call it on the photonview of the roomcontroller because that is the only one with namePlayer function
                 //photonView.RPC("namePlayer",RpcTarget.AllBuffered,playerView.ViewID,PhotonNetwork.LocalPlayer.UserId);
@@ -92,29 +96,12 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
 
         //Show the Room name
         GUI.Label(new Rect(135, 5, 200, 25), PhotonNetwork.CurrentRoom.Name);
-
-      
-        //Show the list of the players connected to this Room
-        for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
-        {
-            //Show if this player is a Master Client. There can only be one Master Client per Room so use this to define the authoritative logic etc.)
-            string isMasterClient = (PhotonNetwork.PlayerList[i].IsMasterClient ? ": MasterClient" : "");
-            GUI.Label(new Rect(5, 35 + 30 * i, 200, 25), PhotonNetwork.PlayerList[i].NickName + isMasterClient);
-
-           
-            //we want to show percentages of damage taken in the bottom corner
-            percentageStyle.fontSize = 40;
-            percentageStyle.normal.textColor = Color.white;
-            //find the stats with userId
-            playerStats stats = GameObject.Find(PhotonNetwork.PlayerList[i].UserId).GetComponent<playerStats>();
-            GUI.Label(new Rect(60 + i * 200, Screen.height - 180, 100, 50), PhotonNetwork.PlayerList[i].NickName + "\n" + stats.percentage+" %"  + "   KO: " + stats.Knockouts, percentageStyle);
-        }
     }
   
     public override void OnLeftRoom()
     {
         //We have left the Room, return back to the GameLobby
-        UnityEngine.SceneManagement.SceneManager.LoadScene("GameLobby");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("ChooseLevel");
     }
     public override void OnJoinedRoom()
     {
@@ -165,22 +152,12 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         //call rpc buffered so it runs even for players that join later
         //we have to call it on the photonview of the roomcontroller because that is the only one with namePlayer function
         CreatePrefab createScript = CreatePrefabs.GetComponent<CreatePrefab>();
-        createScript.renamePlayer(PhotonNetwork.LocalPlayer.UserId, playerView.ViewID);
+        string playerID = PhotonNetwork.LocalPlayer.UserId;
+        createScript.renamePlayer(playerID, playerView.ViewID);
         createScript.changePlayer(player);
-    }
-
-    public override void OnPlayerEnteredRoom(Player newPlayer)
-    {
-        base.OnPlayerEnteredRoom(newPlayer);
-        cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
-        camScript.updatePlayers();
-    }
-
-    public override void OnPlayerLeftRoom(Player otherPlayer)
-    {
-        base.OnPlayerLeftRoom(otherPlayer);
-        cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
-        camScript.updatePlayers();
+        displayIcons.GetComponent<displayPlayerStats>().addPlayerTexture(playerID);
+        //add the player to all camera movement scripts
+        photonView.RPC("updateCameraPlayers",RpcTarget.AllBuffered);
     }
 
     IEnumerator spawnWeapon()
@@ -341,5 +318,12 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         }
 
         return new Tuple<Vector2, Vector2>(minX, maxX);
+    }
+
+    [PunRPC]
+    public void updateCameraPlayers()
+    {
+        cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
+        camScript.updatePlayers();
     }
 }
