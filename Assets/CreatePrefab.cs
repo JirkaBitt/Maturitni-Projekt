@@ -35,22 +35,18 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
 
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
-            GameObject sceneAssets = GameObject.Find("Scene Assets");
-            print("!!!!!!!!!!!!" + sceneAssets.name + "!!!!!!!!" + sceneAssets.transform.childCount);
-            for (int i = 1; i < sceneAssets.transform.childCount; i++)
+            GameObject sceneAssets = GameObject.Find("AssetHolder");
+            assetHolder holder = sceneAssets.GetComponent<assetHolder>();
+            foreach (var AssetName in defaultsNames)
             {
-
-                GameObject obj = sceneAssets.transform.GetChild(i).gameObject;
-                print(obj.name);
-                assetInfo info = obj.GetComponent<assetInfo>();
-                Create(info.pixelArray, info.name);
-                obj.SetActive(false);
+                Create(holder.assets[AssetName],AssetName);
             }
         }
         else
         {
             
         }
+      
         //add callback to spawn the player and room
         StartCoroutine(waitForAsets());
     }
@@ -69,14 +65,14 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
     public void changePlayer(GameObject player)
     {
         //change the texture of my player on all clients
-        GameObject sceneAssets = GameObject.Find("Scene Assets");
-        GameObject character = sceneAssets.transform.GetChild(0).gameObject;
-            
-        assetInfo info = character.GetComponent<assetInfo>();
-        int[,] colors = info.pixelArray;
+        GameObject sceneAssets = GameObject.Find("AssetHolder");
+        assetHolder holder = sceneAssets.GetComponent<assetHolder>();
+
+        int[,] colors = holder.assets["Character"];
         List<int> color1D = new List<int>();
         int arrayWidth = colors.GetLength(0);
-        for (int y = 0; y < colors.GetLength(1); y++)
+        int yHeight = colors.GetLength(1);
+        for (int y = 0; y < yHeight; y++)
         {
             for (int x = 0; x < arrayWidth; x++)
             {
@@ -86,16 +82,19 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
 
         int photonID = player.GetPhotonView().ViewID;
         photonView.RPC("changePlayerTexture",RpcTarget.AllBuffered,photonID,color1D.ToArray(),arrayWidth);
-        sceneAssets.SetActive(false);
+        //sceneAssets.SetActive(false);
     }
     IEnumerator waitForAsets()
     {
-        yield return new WaitUntil(() => numberOfCreated == defaults.Length);
         
+        print("start wait");
+        yield return new WaitUntil(() => numberOfCreated == defaults.Length);
+        print("end wait");
         PhotonNetwork.Instantiate("Arena", Vector3.zero, Quaternion.identity);
         controller.SetActive(true);
         scenebounds.SetActive(true);
         loadingScreen.SetActive(false);
+        
        // controller.GetComponent<PUN2_RoomController>().spawnPoint = spawns;
         if (!PhotonNetwork.LocalPlayer.IsMasterClient)
         {
@@ -135,7 +134,11 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
         GameObject newAsset = assetData[nameRPC];
         //assign the default object to the sceneAssets
         newAsset = Instantiate(newAsset);
-        
+        if (newAsset.CompareTag("Player"))
+        {
+            newAsset.GetComponent<PUN2_PlayerSync>().enabled = true;
+        }
+
         assetInfo info = newAsset.GetComponent<assetInfo>();
         
         newAsset.name = nameRPC;
@@ -178,7 +181,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
             nameHolder.transform.position = newAsset.transform.position + new Vector3(0, 1.4f, 0);
             nameHolder.transform.rotation = Quaternion.Euler(0,0,0);
             nameHolder.transform.parent = newAsset.transform;
-            nameHolder.transform.localScale = Vector3.one * 4;
+            nameHolder.transform.localScale = Vector3.one * 3;
             nameHolder.GetComponent<TMP_Text>().text = PhotonNetwork.LocalPlayer.NickName;
         }
         //parentHousing connects the life bar with the weapon
@@ -318,8 +321,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
          
            createPollygonCollider(pixWidth,firstBlackPixelCur,attach, colorsRPC);
     }
-     
-     public Vector2[]getColliderPoints(ref int[,] array)
+    public Vector2[]getColliderPoints(ref int[,] array)
     {
         List<Vector2> corners = new List<Vector2>();
        
@@ -693,7 +695,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
             //y scale is smaller
             resizeThis.transform.localScale = resizeThis.transform.localScale * scale.y;
         }
-        print("final size: " + name);
+        print("final size: " + resizeThis.name);
         
     }
     [PunRPC] public void namePlayer(int gameobjectID, string nameID)

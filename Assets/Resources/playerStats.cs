@@ -11,8 +11,12 @@ public class playerStats: MonoBehaviour
   public GameObject currentWeapon;
   public int percentage;
 
+  public int score = 0;
+  public GameObject lastAttacker;
+  
   private void Start()
   {
+    
     photonID = gameObject.GetComponent<PhotonView>().ViewID;
     percentage = 0;
   }

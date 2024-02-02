@@ -125,6 +125,7 @@ public class pickWeapon : MonoBehaviour
             lifeBar.transform.parent = weaponX.transform;
             Destroy(weaponX);
             lifeBar = null;
+           
         }
         //in player stats remove the weapon as we are no longer holding it
         playerStats stats = gameObject.GetComponent<playerStats>();

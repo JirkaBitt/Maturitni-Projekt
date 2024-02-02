@@ -22,12 +22,14 @@ public class playerMovement : MonoBehaviour
     private pickWeapon _pickWeapon;
 
     private ParticleSystem particles;
-    private void Start()
+    private playerStats stats;
+    private void Awake()
     {
         rb = gameObject.GetComponent<Rigidbody2D>();
         nameBar = gameObject.transform.GetChild(0).gameObject;
         _pickWeapon = gameObject.GetComponent<pickWeapon>();
         particles = gameObject.GetComponent<ParticleSystem>();
+        stats = gameObject.GetComponent<playerStats>();
         moveParticlesToFeet();
 
     }

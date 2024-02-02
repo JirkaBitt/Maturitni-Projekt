@@ -31,6 +31,14 @@ public class checkPlayerBounds : MonoBehaviourPunCallbacks
             playerStats stats = gObject.GetComponent<playerStats>();
             stats.percentage = 0;
             stats.Knockouts += 1;
+            stats.score -= 1;
+            if (stats.lastAttacker != null)
+            {
+                //we have to credit the last guy that launched us
+                playerStats enemyStats = stats.lastAttacker.GetComponent<playerStats>();
+                enemyStats.score += 1;
+                stats.lastAttacker = null;
+            }
             GameObject weapon = stats.currentWeapon;
             //delete weapon if player is holding it
             if (weapon != null)

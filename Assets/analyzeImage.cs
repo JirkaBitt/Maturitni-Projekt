@@ -74,6 +74,8 @@ public class analyzeImage : MonoBehaviour
     public GameObject assetDisplayText;
     //this is if we only want the character
     public bool onlyCharacter = false;
+
+    public GameObject warning;
     class prefab
     {
         public string name;
@@ -147,12 +149,13 @@ public class analyzeImage : MonoBehaviour
         }
         public void refreshAsset()
         {
-            
-            for (int y = 0; y < pixelClass.GetLength(1); y++)
+            int xLength = pixelClass.GetLength(0);
+            int yLength = pixelClass.GetLength(1);
+            for (int y = 0; y < yLength; y++)
             {
-                for (int x = 0; x < pixelClass.GetLength(0); x++)
+                for (int x = 0; x < xLength; x++)
                 {
-                    colors[x, y] = pixelClass[x, y].finalColor == Color.black ? 1 : 2;
+                    colors[x, y] = pixelClass[x, y].finalColor == Color.black ? 1 : 0;
                 }
             }
             CombineSpriteArray(objectPrefab, colors);
@@ -186,9 +189,7 @@ public class analyzeImage : MonoBehaviour
         //combine sprite array creates an texture from the supplied array of color 
         public void CombineSpriteArray(GameObject attach, int[,] colorsRPC)
         {
-            if (!isDefault)
-            {
-                //find the first and last black pixel
+            //find the first and last black pixel
                 int firstX = colors.GetLength(0);
                 int lastX = 0;
                 int firstY = colors.GetLength(1);
@@ -225,7 +226,7 @@ public class analyzeImage : MonoBehaviour
                 bool foundCorner = false;
                 int spritesWidth = pixelClass[0, 0].Size;
                 int spritesHeight = spritesWidth;
-                bool isArena = DefaultGameObject.CompareTag("ground");
+               
                 Vector2 texturePixelSize = new Vector2(lastX - firstX, lastY - firstY);
                 Texture2D combinedTexture = new Texture2D(spritesWidth * (int)texturePixelSize.x,
                     spritesHeight * (int)texturePixelSize.y);
@@ -266,8 +267,6 @@ public class analyzeImage : MonoBehaviour
                         }
                         
                        // pixelClass[x,y].deactivate();
-                        
-                       
                     }
                 }
 
@@ -299,11 +298,12 @@ public class analyzeImage : MonoBehaviour
               
                firstBlackPixel = (Vector2)final.bounds.center -
                    new Vector2(combinedTexture.width / 2, combinedTexture.height / 2) * 0.01f + firstBlackPixel;
-            }
+            
         }
         //find next corner works with direction, pixel index and corner index to determine the next index of the corner and the direction we want to continue
-        public void finalize()
+        public void finalize(assetHolder holder)
         {
+            /*
             GameObject def = Instantiate(DefaultGameObject);
             def.transform.parent = objectPrefab.transform.parent;
             Destroy(objectPrefab);
@@ -325,8 +325,13 @@ public class analyzeImage : MonoBehaviour
                 }
             }
             
+            print(colors.Length);
             info.pixelArray = colors;
             info.name = name;
+            print(info.pixelArray.Length+"-"+name);
+            */
+            Destroy(objectPrefab);
+            holder.assets.Add(name,colors);
         }
        
     }
@@ -355,35 +360,46 @@ public class analyzeImage : MonoBehaviour
     public void startGame()
     {
         //create room and return the room name
+        Destroy(slate);
+        GameObject assetHolderObj = new GameObject();
+        assetHolderObj.name = "AssetHolder";
+        assetHolder holder = assetHolderObj.AddComponent<assetHolder>();
         foreach (var pref in assetPrefabs)
         {
             //remove white pixels
-            pref.finalize();
-         
+            pref.finalize(holder);
         }
-        //this ensures that the assets stay there when we start the game
-       
-        DontDestroyOnLoad(sceneAssets);
-        sceneAssets.SetActive(true);
+        
+        //this ensures that the assets stay there when we start the gam
+       // DontDestroyOnLoad(sceneAssets);
+        DontDestroyOnLoad(assetHolderObj);
+        //sceneAssets.SetActive(true);
+        Destroy(sceneAssets);
         PUN2_GameLobby lobby = photonLobby.GetComponent<PUN2_GameLobby>();
         //this function creates a room and returns its name
-        string roomName = lobby.createRoomWithoutUI();
-        Console.WriteLine("roomName " + roomName);
+        lobby.createRoomWithoutUI();
+        
     }
 
     public void joinGame()
     {
-        
+        if (checkIfBlank())
+        {
+            return;
+        }
         Destroy(slate);
+        GameObject assetHolderObj = new GameObject();
+        assetHolderObj.name = "AssetHolder";
+        assetHolder holder = assetHolderObj.AddComponent<assetHolder>();
         foreach (var pref in assetPrefabs)
         {
             //remove white pixels
-            pref.finalize();
-         
+            pref.finalize(holder);
+            
         }
         //this ensures that the assets stay there when we start the game
-        DontDestroyOnLoad(sceneAssets);
-        sceneAssets.SetActive(true);
+        DontDestroyOnLoad(assetHolderObj);
+        Destroy(sceneAssets);
         PUN2_GameLobby lobby = photonLobby.GetComponent<PUN2_GameLobby>();
         //this function creates a room and returns its name
         GameObject roomName = GameObject.FindWithTag("roomName");
@@ -422,6 +438,37 @@ public class analyzeImage : MonoBehaviour
         slate = parent;
         
     }
+
+    public bool checkIfBlank()
+    {
+        //check if the player has drawn something
+        foreach (var pixel in gameLevelPixels)
+        {
+            if (pixel.finalColor == Color.black)
+            {
+                return false;
+            }
+        }
+
+        StartCoroutine(showWarning());
+        return true;
+    }
+    IEnumerator showWarning()
+    {
+        warning.SetActive(true);
+        TextMeshProUGUI text = warning.GetComponent<TextMeshProUGUI>();
+        yield return new WaitForSeconds(0.8f);
+        /*
+        for (int i = 0; i < 10; i++)
+        {
+            text.alpha = 1 - i / 10;
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        text.alpha = 1;
+        */
+        warning.SetActive(false);
+    }
     //refresh slate makes every pixel in the canvas white again
     public void refreshSlate(string assetName)
     {
@@ -444,8 +491,8 @@ public class analyzeImage : MonoBehaviour
     {
         int index = assetIndex;
         prefab pref = assetPrefabs[index];
-        Destroy(pref.objectPrefab);
-        pref.pixelClass = null;
+        //Destroy(pref.objectPrefab);
+       // pref.pixelClass = null;
         assetIndex = index;
         //create new 
         //showCropper(finderTexture,generateAsset,pref.name);
@@ -454,6 +501,10 @@ public class analyzeImage : MonoBehaviour
     //submit change is called when we click the submit button when editing an asset
     public void submitChange()
     {
+        if (checkIfBlank())
+        {
+            return;
+        }
         //update prefab
         int index = assetIndex;
         prefab pref = assetPrefabs[index];
@@ -462,8 +513,6 @@ public class analyzeImage : MonoBehaviour
         pref.pixelClass = pixArray;
       // pref.objectPrefab = currentParent;
         pref.refreshAsset();
-        pref.isDefault = false;
-
         minimalizeAsset(pref);
     }
     //recolor frames refreshes the frames from highlighted to white
@@ -538,6 +587,10 @@ public class analyzeImage : MonoBehaviour
     //move to the next is called when user clicks next and it saves the asset in a new instance of the class prefab and refreshes the slate
     public void moveToTheNext()
     {
+        if (checkIfBlank())
+        {
+            return;
+        }
         //create new class that holds the object and the pixels so we can delete the  white ones at the end
         //acces the default object size
         assetInfo info = defaultAssets[assetIndex].GetComponent<assetInfo>();
@@ -720,7 +773,7 @@ public class analyzeImage : MonoBehaviour
             frame.SetActive(false);
         }
         //activate the selected asset
-        pref.objectPrefab.SetActive(true);
+        //pref.objectPrefab.SetActive(true);
         if (!pref.isDefault)
         {
             foreach (var pix in pref.pixelClass)
@@ -731,8 +784,8 @@ public class analyzeImage : MonoBehaviour
         toolsScript.activateButtons();
         pref.fitTheScreen();
         //we have to reasign the gameLevelpixels because they are used castraycast
-        gameLevelPixels = pref.pixelClass;
-        currentParent = pref.objectPrefab;
+        //gameLevelPixels = pref.pixelClass;
+        //currentParent = pref.objectPrefab;
         displayed = false;
         
         assetDisplayText.SetActive(true);

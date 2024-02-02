@@ -27,6 +27,8 @@ public class PUN2_PlayerSync : MonoBehaviourPun, IPunObservable
     private playerStats stats;
 
     public bool ignorePhoton = false;
+
+    private GameObject textHolder;
     // Use this for initialization
     void Start()
     {
@@ -45,7 +47,8 @@ public class PUN2_PlayerSync : MonoBehaviourPun, IPunObservable
             //we want to set collider to trigger otherwise Vector3.Lerp keeps getting stuck
 
             gameObject.GetComponent<Rigidbody2D>().isKinematic = true;
-
+            textHolder = gameObject.transform.GetChild(0).gameObject;
+            
             for (int i = 0; i < localScripts.Length; i++)
             {
                 localScripts[i].enabled = false;
@@ -90,7 +93,7 @@ public class PUN2_PlayerSync : MonoBehaviourPun, IPunObservable
                 transform.position = Vector3.Lerp(transform.position, latestPos, Time.deltaTime * 5);
                 //transform.rotation = Quaternion.Lerp(transform.rotation, latestRot, Time.deltaTime * 5);
                 transform.rotation = latestRot;
-
+                textHolder.transform.rotation = Quaternion.Euler(0,0,0);
                 //launch network players
             }
             else

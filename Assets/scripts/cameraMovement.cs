@@ -54,6 +54,10 @@ public class cameraMovement : MonoBehaviourPunCallbacks
 
         //if x values are between 0 and 1 player is seen by the camera
         //print(player);
+        if (player == null)
+        {
+            return;
+        }
         Vector2 viewPos = mainCamera.WorldToViewportPoint(player.transform.position);
 
         //we want to move the camera about 0.2 from 0 or 1 so the player is still in sight

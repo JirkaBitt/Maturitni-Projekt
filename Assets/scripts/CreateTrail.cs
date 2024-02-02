@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,6 +15,8 @@ public class CreateTrail : MonoBehaviour
     public bool fadeSprite = true;
 
     public Color trailColor = Color.white;
+
+    private List<GameObject> createdCopies = new List<GameObject>();
     // Start is called before the first frame update
     void Start()
     {
@@ -49,6 +52,7 @@ public class CreateTrail : MonoBehaviour
     IEnumerator createCopy(Sprite sprite)
     {
         GameObject copy = new GameObject("copy");
+        createdCopies.Add(copy);
         SpriteRenderer rend = copy.AddComponent<SpriteRenderer>();
         rend.sprite = sprite;
         copy.transform.parent = transform.parent;
@@ -66,7 +70,8 @@ public class CreateTrail : MonoBehaviour
             lifetime += 0.02f;
             yield return new WaitForSeconds(0.02f);
         }
-        
+
+        createdCopies.Remove(copy);
         Destroy(copy);
         
     }
@@ -78,6 +83,7 @@ public class CreateTrail : MonoBehaviour
             StartCoroutine(createCopy(whiteSprite));
             yield return new WaitForSeconds(0.02f);
         }
+        createdCopies.Clear();
         /*
         Queue<GameObject> copies = new Queue<GameObject>();
         float interval = 0.1f;
@@ -120,5 +126,14 @@ public class CreateTrail : MonoBehaviour
     public void createTrail()
     {
         StartCoroutine(createTrailCoroutine());
+    }
+
+    private void OnDestroy()
+    {
+        //if the weapon gets deleted while we are attacking we have to delete the trail afterwards
+        foreach (var copy in createdCopies)
+        {
+            Destroy(copy);
+        }
     }
 }

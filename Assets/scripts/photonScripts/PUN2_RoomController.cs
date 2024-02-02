@@ -3,7 +3,10 @@ using UnityEngine;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Photon.Realtime;
+using TMPro;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
@@ -24,13 +27,33 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
     private bool canSpawnWeapon = true;
     //public GUIStyle percentageStyle;
     private List<GameObject> spawnedWeapons = new List<GameObject>();
-    public playerStats[] playerStats;
 
     public string[] WeaponNames;
 
     public GameObject CreatePrefabs;
 
     public GameObject displayIcons;
+
+    public GameObject endGUI;
+
+    public GameObject endController;
+
+   public GameObject inGameUI;
+
+    public bool hideGUI;
+
+    public GameObject clock;
+
+    public GameObject startGameButton;
+
+    public GameObject RoomIDText;
+
+    public GameObject displayStats;
+
+    private GameObject myPlayer;
+
+    public bool spawningEnabled = true;
+    
     //private List<playerStats> _statsList = new List<playerStats>();
     // Use this for initialization
     void Start()
@@ -38,6 +61,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
        
         //set the default fps to 60
         Application.targetFrameRate = 60;
+        inGameUI.SetActive(true);
         //In case we started this demo with the wrong scene being active, simply load the menu scene
         if (PhotonNetwork.CurrentRoom == null)
         {
@@ -47,15 +71,18 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         }
         else
         {
-            spawnPoint = findRespawnPositions();
             if (PhotonNetwork.IsMasterClient)
             {
                 //fetch created assets
                // getCreatedAssets();
                 //spawn character, this is only for the room creator, others are created in OnJoinedRoom
                 print("instantiate from start");
+                spawnPoint = findRespawnPositions();
                 //GameObject arena = PhotonNetwork.Instantiate("Arena", Vector3.zero, Quaternion.identity);
                 GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[0], Quaternion.identity);
+                myPlayer = player;
+                //disable some scripts before the start
+                beforeStart(player);
                 PhotonView playerView = player.GetPhotonView();
                 //name him after the player so we can find him in onGUI
                 cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
@@ -77,23 +104,14 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
     private void Update()
     {
         //only the master client will spawn weapons
-        if (canSpawnWeapon && PhotonNetwork.IsMasterClient && spawnedWeapons.Count <= maxWeaponCount)
-        {
-            StartCoroutine(spawnWeapon());
-        }
     }
 
     void OnGUI()
     {
         if (PhotonNetwork.CurrentRoom == null)
             return;
-
-        //Leave this Room
-        if (GUI.Button(new Rect(5, 5, 125, 25), "Leave Room"))
-        {
-            PhotonNetwork.LeaveRoom();
-        }
-
+        if(hideGUI)
+            return;
         //Show the Room name
         GUI.Label(new Rect(135, 5, 200, 25), PhotonNetwork.CurrentRoom.Name);
     }
@@ -136,11 +154,13 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         //we have to wait until we are in room, it can take some time
         //then we want to instantiate a player that will be visible for every player in room
         print("instantiate from create!!!!!!!");
-        int numberOfPlayers = PhotonNetwork.CurrentRoom.Players.Count;
-        //spawn the 
-        int randomSpawnIndex = Random.Range(0, spawnPoint.Length);
+        spawnPoint = findRespawnPositions();
+       // int numberOfPlayers = PhotonNetwork.CurrentRoom.Players.Count;
+       int randomSpawnIndex = Random.Range(0, spawnPoint.Length);
       
         GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[randomSpawnIndex], Quaternion.identity, 0);
+        myPlayer = player;
+        beforeStart(player);
         //name him after the player so we can find him in onGUI
         PhotonView playerView = player.GetPhotonView();
         
@@ -162,27 +182,43 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
 
     IEnumerator spawnWeapon()
     {
-        canSpawnWeapon = false;
+        
         //wait before spawning the weapon
-        var randomWait = Random.Range(8, 15);
-        yield return new WaitForSeconds(randomWait);
-        
-       // if (spawnedWeapons.Count < maxWeaponCount)
-        
+
+        // if (spawnedWeapons.Count < maxWeaponCount)
+       while (true)
+       {
+           //only the master client can spawn weapons, this is here because when master leaves, someone else will be master
+           while (!PhotonNetwork.IsMasterClient)
+           {
+               yield return new WaitForSeconds(5);
+           }
+
+           if (spawningEnabled)
+           {
+               GameObject[] weapons = GameObject.FindGameObjectsWithTag("weapon");
+               while (!(weapons.Length <= maxWeaponCount))
+               {
+                   yield return new WaitForSeconds(5);
+               }
+
+               int randomWeaponIndex = Random.Range(0, WeaponNames.Length);
+               //find random spawn position
+               int randomSpawnIndex = Random.Range(0, spawnPoint.Length);
+               //GameObject weaponPrefab = weaponPrefabs[randomWeaponIndex];
+               //spaw weapon for all player and save it in a list
+               GameObject weapon = PhotonNetwork.InstantiateRoomObject(WeaponNames[randomWeaponIndex],
+                   spawnPoint[randomSpawnIndex],
+                   Quaternion.identity, 0);
+
+               spawnedWeapons.Add(weapon);
+           }
+           int randomWait = Random.Range(8, 15);
+           yield return new WaitForSeconds(randomWait);
+       }
             //select random weapon 
            // int randomWeaponIndex = Random.Range(0, weaponPrefabs.Length);
-           int randomWeaponIndex = Random.Range(0, WeaponNames.Length);
-            //find random spawn position
-            int randomSpawnIndex = Random.Range(0, spawnPoint.Length);
-            //GameObject weaponPrefab = weaponPrefabs[randomWeaponIndex];
-            //spaw weapon for all player and save it in a list
-            GameObject weapon = PhotonNetwork.InstantiateRoomObject(WeaponNames[randomWeaponIndex], spawnPoint[randomSpawnIndex],
-                Quaternion.identity, 0);
-           
-            spawnedWeapons.Add(weapon);
-        
-
-        canSpawnWeapon = true;
+       
     }
 /*
     IEnumerator dropWeapon(GameObject wep)
@@ -325,5 +361,130 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
     {
         cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
         camScript.updatePlayers();
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        base.OnPlayerLeftRoom(otherPlayer);
+        cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
+        camScript.updatePlayers();
+        
+    }
+
+    public void beforeStart(GameObject player)
+    {
+        playerMovement movement = player.GetComponent<playerMovement>();
+        movement.enabled = false;
+        
+        RoomIDText.GetComponent<TextMeshProUGUI>().SetText(PhotonNetwork.CurrentRoom.Name);
+        startGameButton.SetActive(true);
+/*
+        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        {
+            startGameButton.SetActive(true);
+            startGameButton.GetComponent<Button>().onClick.AddListener(() =>
+            {
+                photonView.RPC("startGame",RpcTarget.All);
+                PhotonNetwork.CurrentRoom.IsOpen = false;
+            });
+        }
+        */
+    }
+
+    public void startGameButtonCallBack()
+    {
+        photonView.RPC("startGame",RpcTarget.All);
+        PhotonNetwork.CurrentRoom.IsOpen = false;
+    }
+    public void playAgain()
+    {
+        displayStats.SetActive(true);
+        endGUI.SetActive(false);
+        inGameUI.SetActive(true);
+        
+        int randomIndex = Random.Range(0, spawnPoint.Length);
+        GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[randomIndex], Quaternion.identity);
+        myPlayer = player;
+        //disable some scripts before the start
+        beforeStart(player);
+        PhotonView playerView = player.GetPhotonView();
+        //name him after the player so we can find him in onGUI
+        cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
+        camScript.enabled = true;
+        camScript.player = player;
+        camScript.rb = player.GetComponent<Rigidbody2D>();
+        //we have to call it on create prefabs because room controller is disabled at the start of the game
+        string playerID = PhotonNetwork.LocalPlayer.UserId;
+        CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID);
+        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        {
+            PhotonNetwork.CurrentRoom.IsOpen = true;
+        }
+        else
+        {
+            CreatePrefabs.GetComponent<CreatePrefab>().changePlayer(player);
+            
+        }
+        CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID);
+        photonView.RPC("updateCameraPlayers",RpcTarget.AllBuffered);
+        displayIcons.GetComponent<displayPlayerStats>().addPlayerTexture(playerID);
+    }
+    
+    [PunRPC]
+    public void startGame()
+    {
+        //GameObject player = GameObject.Find(PhotonNetwork.LocalPlayer.UserId);
+        myPlayer.GetComponent<playerMovement>().enabled = true;
+        spawningEnabled = true;
+        //now start the clock
+        clock.GetComponent<countDown>().startCount();
+        RoomIDText.SetActive(false);
+        startGameButton.SetActive(false);
+        //only the master will spawn the weapons, but we want to run it at all clients in case that one of them bbecomes master
+        StartCoroutine(spawnWeapon());
+        
+    }
+    public void endGame()
+    {
+        inGameUI.SetActive(false);
+        startGameButton.SetActive(false);
+        hideGUI = true;
+        spawningEnabled = false;
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        GameObject[] weapons = GameObject.FindGameObjectsWithTag("weapon");
+        foreach (var weap in weapons)
+        {
+            Destroy(weap);
+        }
+        int playerCount = players.Length;
+        endGUI.SetActive(true);
+        showAllResults showResults = endController.GetComponent<showAllResults>();
+        playerStats[] stats = new playerStats[playerCount];
+        Dictionary<string, int> scores = new Dictionary<string, int>();
+        Dictionary<string, int> placements = new Dictionary<string, int>();
+        Dictionary<string, string> nicks = new Dictionary<string, string>();
+        
+        for (int i = 0; i < playerCount; i++)
+        {
+            stats[i] = players[i].GetComponent<playerStats>();
+            scores.Add(players[i].name,stats[i].score);
+            nicks.Add(PhotonNetwork.PlayerList[i].UserId,PhotonNetwork.PlayerList[i].NickName);
+            players[i].SetActive(false);
+        }
+        var sortedDict = scores.OrderBy(pair => pair.Value).ToList();
+        for (int i = 0; i < playerCount; i++)
+        {
+            placements.Add(sortedDict[i].Key,i+1);
+        }
+        showResults.showResults(players,placements,nicks);
+        foreach (var player in players)
+        {
+            displayPlayerStats disStats = displayIcons.GetComponent<displayPlayerStats>();
+            disStats.playerIDs.Clear();
+            disStats.characterTextures.Clear();
+            disStats.characterInfos.Clear();
+            Destroy(player);
+        }
+        displayIcons.SetActive(false);
     }
 }

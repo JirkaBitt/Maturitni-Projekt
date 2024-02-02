@@ -170,7 +170,7 @@ public class PUN2_GameLobby : MonoBehaviourPunCallbacks
         }
     }
 
-    public string createRoomWithoutUI()
+    public void createRoomWithoutUI()
     {
         //create random roomName with random name 
         roomName = Random.Range(10000,99999).ToString();
@@ -179,12 +179,13 @@ public class PUN2_GameLobby : MonoBehaviourPunCallbacks
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.IsOpen = true;
         roomOptions.IsVisible = true;
-        roomOptions.MaxPlayers = (byte)10; //Set any number
+        roomOptions.MaxPlayers = (byte)4; //Set any number
         //this is for finding our players stats
         roomOptions.PublishUserId = true;
-                
+        print("join Lobby");
         PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
-        return roomName;
+        
+        
     }
 
     public bool joinRoomWithName(string joinName)
@@ -239,6 +240,7 @@ public class PUN2_GameLobby : MonoBehaviourPunCallbacks
         PhotonNetwork.NickName = playerName;
         //Load the Scene called GameLevel (Make sure it's added to build settings)
         PhotonNetwork.LoadLevel("GameLevel");
+       
     }
 
     public override void OnJoinedRoom()

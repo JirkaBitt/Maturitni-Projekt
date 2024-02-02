@@ -20,6 +20,7 @@ public class assetInfo : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        /*
         startScale = gameObject.transform.localScale;
         if (gameObject.GetComponent<SpriteRenderer>() != null)
         {
@@ -27,7 +28,8 @@ public class assetInfo : MonoBehaviour
             height = assetSprite.bounds.size.y;
             width = assetSprite.bounds.size.x;
             
-        }
+        }*/
+        calculateSize();
     }
 
    public void calculateSize()

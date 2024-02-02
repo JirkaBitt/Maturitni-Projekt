@@ -31,6 +31,8 @@ public abstract class meleeWeapon : weapon
       playerSync.launchEnemy();
       //add the force to his percentage and launch him with his percentage
       playerStats stats = enemy.GetComponent<playerStats>();
+      //set our player as the last attacker
+      stats.lastAttacker = gameObject.transform.parent.gameObject;
       //add a litle bit of randomness
       float randomMultiplier = Random.Range(4, 10);
       randomMultiplier /= 10;

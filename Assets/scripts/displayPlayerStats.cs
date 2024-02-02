@@ -10,18 +10,16 @@ public class displayPlayerStats : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     public Dictionary<string, Texture2D> characterTextures = new Dictionary<string, Texture2D>();
     public Dictionary<string, playerStats> characterInfos = new Dictionary<string, playerStats>();
+    public List<string> playerIDs = new List<string>();
     public Texture2D frameTexture;
     public GUIStyle percentageStyle;
     public GUIStyle playerStyle;
-    public Texture2D textBackground;
-    public float YoffsetPercentage;
-    public float YoffsetPlayer;
-    public float XoffsetPercentage;
-    public float XoffsetPlayer;
     void Start()
     {
         percentageStyle.fontSize = 90;
+        percentageStyle.normal.textColor = Color.red;
         playerStyle.fontSize = 30;
+        //playerIDs.Add(PhotonNetwork.LocalPlayer.UserId);
         //percentageStyle.normal.textColor = Color.white;
         //percentageStyle.normal.background = textBackground;
     }
@@ -35,10 +33,11 @@ public class displayPlayerStats : MonoBehaviourPunCallbacks
     private void OnGUI()
     {
         float screenHeight = Screen.height;
-        for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
+        int playerCount = playerIDs.Count;
+        for (int i = 0; i < playerCount; i++)
         {
             //find the stats with userId
-            string playerID = PhotonNetwork.PlayerList[i].UserId;
+            string playerID = playerIDs[i];
             try
             {
                 float kMult = 220 / 345f;
@@ -60,7 +59,7 @@ public class displayPlayerStats : MonoBehaviourPunCallbacks
            
         }
     }
-
+    
     public void addPlayerTexture(string id)
     {
         photonView.RPC("addPlayer",RpcTarget.AllBuffered,id);
@@ -72,5 +71,6 @@ public class displayPlayerStats : MonoBehaviourPunCallbacks
         playerStats info = player.GetComponent<playerStats>();
         characterTextures.Add(id,rend.sprite.texture);
         characterInfos.Add(id,info);
+        playerIDs.Add(id);
     }
 }

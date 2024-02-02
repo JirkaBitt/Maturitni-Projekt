@@ -130,6 +130,7 @@ public class changeTools : MonoBehaviour
         {
             toolRadius = 2;
         }
+        
        // reassign the value to the controller
         controllerScript.toolRadius = toolRadius;
     }

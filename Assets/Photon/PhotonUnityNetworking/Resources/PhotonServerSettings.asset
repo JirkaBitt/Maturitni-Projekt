@@ -55,6 +55,12 @@ MonoBehaviour:
   - deleteWeapon
   - changePlayerTexture
   - addPlayer
+  - updateCameraPlayers
+  - leaveRPC
+  - stayRPC
+  - startWaitForAssets
+  - startGame
+  - showPlayerThatPlaysAgain
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
