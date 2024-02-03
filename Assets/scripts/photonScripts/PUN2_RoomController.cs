@@ -376,7 +376,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         playerMovement movement = player.GetComponent<playerMovement>();
         movement.enabled = false;
         
-        RoomIDText.GetComponent<TextMeshProUGUI>().SetText(PhotonNetwork.CurrentRoom.Name);
+        RoomIDText.GetComponent<TextMeshProUGUI>().SetText("Room ID: " + PhotonNetwork.CurrentRoom.Name);
         startGameButton.SetActive(true);
 /*
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
@@ -401,7 +401,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         displayStats.SetActive(true);
         endGUI.SetActive(false);
         inGameUI.SetActive(true);
-        
+        RoomIDText.SetActive(true);
         int randomIndex = Random.Range(0, spawnPoint.Length);
         GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[randomIndex], Quaternion.identity);
         myPlayer = player;
@@ -423,7 +423,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         else
         {
             CreatePrefabs.GetComponent<CreatePrefab>().changePlayer(player);
-            
         }
         CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID);
         photonView.RPC("updateCameraPlayers",RpcTarget.AllBuffered);
