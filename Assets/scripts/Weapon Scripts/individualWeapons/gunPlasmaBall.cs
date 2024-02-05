@@ -7,7 +7,7 @@ public class gunPlasmaBall : gunWeapons
 {
     public GameObject bulletPrefab;
 
-    public float maxScaleMagnitude = 1.8f;
+    public float maxScaleMagnitude = 1.4f;
     // Start is called before the first frame update
     public override void Use()
     {
@@ -15,7 +15,7 @@ public class gunPlasmaBall : gunWeapons
         
             Vector3 spawnPosition = gameObject.transform.position + 1.6f * gameObject.transform.right;
             //create a new instance of the bullet
-            GameObject bullet = PhotonNetwork.Instantiate(bulletPrefab.name, spawnPosition, Quaternion.identity);
+            GameObject bullet = PhotonNetwork.Instantiate("Projectile", spawnPosition, Quaternion.identity);
             
             //make the bullet move the gun
             int playerID = gameObject.transform.parent.gameObject.GetPhotonView().ViewID;
@@ -36,7 +36,7 @@ public class gunPlasmaBall : gunWeapons
         {
             if (scale.magnitude < maxScaleMagnitude)
             {
-                scale += new Vector3(1, 1, 0) * 0.7f * Time.deltaTime;
+                scale += new Vector3(1, 1, 0) * 0.5f * Time.deltaTime;
                 bullet.transform.localScale = scale;
             }
 
@@ -52,7 +52,7 @@ public class gunPlasmaBall : gunWeapons
         //with this we will set the bullet flying, we can adjust the speed adding scale to the the vector
         int bulletID = bullet.GetPhotonView().ViewID;
         gameObject.GetPhotonView().RPC("removeParent",RpcTarget.All,bulletID);
-        launchVector *= scale.magnitude;
+        launchVector *= scale.magnitude * 1.5f;
         bullScript.launchVector = launchVector;
     }
 

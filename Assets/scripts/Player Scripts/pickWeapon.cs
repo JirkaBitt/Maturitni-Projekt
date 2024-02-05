@@ -195,5 +195,10 @@ public class pickWeapon : MonoBehaviour
         lifeBar.transform.parent = weapon.transform;
         lifeBar = null;
     }
+
+    public void deleteLifeBar()
+    {
+        Destroy(lifeBar);
+    }
    
 }

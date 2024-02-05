@@ -390,6 +390,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
     {
         photonView.RPC("startGame",RpcTarget.All);
         PhotonNetwork.CurrentRoom.IsOpen = false;
+      
     }
     public void playAgain()
     {

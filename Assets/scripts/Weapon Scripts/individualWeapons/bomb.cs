@@ -10,6 +10,7 @@ public class bomb : consumableWeapons
     public GameObject explosionPrefab;
     private float gravityValue = 10;
     private bool exploded = false;
+  
     public override void Use()
     {
         //throw the weapon, this script is in consumableWeapon
@@ -27,6 +28,8 @@ public class bomb : consumableWeapons
         stats.currentWeapon = null;
         pickWeapon pickscript = player.GetComponent<pickWeapon>();
         pickscript.isHoldingWeapon = false;
+        pickscript.currentWeapon = null;
+        pickscript.deleteLifeBar();
         //detonate the weapon
         StartCoroutine(blowUp(3));
     }

@@ -28,6 +28,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     void Start()
     {
+        assetData.Clear();
         for (int i = 0; i < defaults.Length; i++)
         {
             assetData.Add(defaultsNames[i],defaults[i]);
