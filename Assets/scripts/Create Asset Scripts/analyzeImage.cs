@@ -76,6 +76,8 @@ public class analyzeImage : MonoBehaviour
     public bool onlyCharacter = false;
 
     public GameObject warning;
+
+   // public GameObject loadingScreen;
     class prefab
     {
         public string name;
@@ -361,6 +363,7 @@ public class analyzeImage : MonoBehaviour
     {
         //create room and return the room name
         Destroy(slate);
+        //loadingScreen.SetActive(true);
         GameObject assetHolderObj = new GameObject();
         assetHolderObj.name = "AssetHolder";
         assetHolder holder = assetHolderObj.AddComponent<assetHolder>();

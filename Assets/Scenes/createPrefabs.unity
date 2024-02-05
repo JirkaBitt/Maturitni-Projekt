@@ -1062,7 +1062,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfPixelsX: 80
-  currentTool: Eraser
+  currentTool: Pencil
   assetNames:
   - Arena
   - Character

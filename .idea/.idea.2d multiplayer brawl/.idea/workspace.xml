@@ -3,56 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="0ac32aa4-67f8-4e2d-a9d8-bfc02d86cdb5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.2d multiplayer brawl/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.2d multiplayer brawl/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/CreatePrefab.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/CreatePrefab.cs.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/GameLevel.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/GameLevel.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/SendGameobjects.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/SendGameobjects.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/addPlayerToList.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/addPlayerToList.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/analyzeImage.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/analyzeImage.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/assetHolder.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/assetHolder.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/axeAnimation.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/axeAnimation.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/axeAttack.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/axeAttack.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/changeTools.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/changeTools.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/chooseLevel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/chooseLevel.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/countDown.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/countDown.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/frameScript.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/frameScript.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/playerAttack.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/playerAttack.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/resetGame.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/resetGame.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/saveLoadLevel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/saveLoadLevel.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/bulletSync.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/bulletSync.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/createCollider.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/createCollider.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/displayPlayerStats.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/displayPlayerStats.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/createPrefabs.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/createPrefabs.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/scripts/Create Asset Scripts/analyzeImage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/Create Asset Scripts/analyzeImage.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/scripts/photonScripts/PUN2_RoomController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/scripts/photonScripts/PUN2_RoomController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/pickWeapon.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/pickWeapon.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/playerIcon.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/playerIcon.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/playerMovement.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/scripts/playerMovement.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/showAllResults.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/showAllResults.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/showPlayerResult.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/showPlayerResult.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/startGameButton.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/startGameButton.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/weapon_Sync.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/weapon_Sync.cs.meta" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,21 +14,9 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/Assets/Resources/decreaseWeaponLife.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Resources/playerStats.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/platforms/floatUpwards.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/platforms/spawnPlatforms.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/scripts/CreateTrail.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/scripts/assetInfo.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/scripts/checkPlayerBounds.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/scripts/consumableWeapons.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/scripts/individualWeapons/bomb.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/scripts/individualWeapons/bulletScript.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/scripts/individualWeapons/spearWeapon.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/scripts/individualWeapons/swordWeapon.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/scripts/meleeWeapon.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/scripts/photonScripts/PUN2_weaponSync.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/scripts/weapon.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b3393ed50e824818a1c3bdc09589ea5b94bc00/66/ecd4931e/EditorUtility.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -158,7 +100,7 @@
       <workItem from="1702035525605" duration="89369000" />
       <workItem from="1704791986103" duration="61484000" />
       <workItem from="1706220524235" duration="50000" />
-      <workItem from="1706220606119" duration="86681000" />
+      <workItem from="1706220606119" duration="88254000" />
     </task>
     <servers />
   </component>

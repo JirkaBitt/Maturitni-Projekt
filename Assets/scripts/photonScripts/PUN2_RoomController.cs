@@ -106,16 +106,11 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         //only the master client will spawn weapons
     }
 
-    void OnGUI()
+    public void leave()
     {
-        if (PhotonNetwork.CurrentRoom == null)
-            return;
-        if(hideGUI)
-            return;
-        //Show the Room name
-        GUI.Label(new Rect(135, 5, 200, 25), PhotonNetwork.CurrentRoom.Name);
+        //this will be called when the button is pressed
+        PhotonNetwork.LeaveRoom();
     }
-  
     public override void OnLeftRoom()
     {
         //We have left the Room, return back to the GameLobby
