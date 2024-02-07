@@ -10,6 +10,7 @@ public class displayPlayerStats : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     public Dictionary<string, Texture2D> characterTextures = new Dictionary<string, Texture2D>();
     public Dictionary<string, playerStats> characterInfos = new Dictionary<string, playerStats>();
+    private Dictionary<string, string> playerNicknames = new Dictionary<string, string>();
     public List<string> playerIDs = new List<string>();
     public Texture2D frameTexture;
     public GUIStyle percentageStyle;
@@ -48,7 +49,7 @@ public class displayPlayerStats : MonoBehaviourPunCallbacks
                 playerStats stats = characterInfos[playerID];
                 //GUI.Label(new Rect(200 + i * 300, Screen.height - 100, 260, 60), textBackground);
                 GUI.Label(new Rect(distanceFromX + 230, screenHeight - 230, 260, 165*kMult),stats.percentage+" %" , percentageStyle);
-                GUI.Label(new Rect(distanceFromX + 325*kMult, screenHeight - 110, 341 * kMult, 75*kMult),PhotonNetwork.PlayerList[i].NickName , playerStyle);
+                GUI.Label(new Rect(distanceFromX + 325*kMult, screenHeight - 110, 341 * kMult, 75*kMult), playerNicknames[playerID], playerStyle);
                
             }
             catch (Exception e)
@@ -63,6 +64,10 @@ public class displayPlayerStats : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         playerIDs.Remove(otherPlayer.UserId);
+        playerNicknames.Remove(otherPlayer.UserId);
+        characterTextures.Remove(otherPlayer.UserId);
+        characterInfos.Remove(otherPlayer.UserId);
+        
         base.OnPlayerLeftRoom(otherPlayer);
     }
 
@@ -78,5 +83,12 @@ public class displayPlayerStats : MonoBehaviourPunCallbacks
         characterTextures.Add(id,rend.sprite.texture);
         characterInfos.Add(id,info);
         playerIDs.Add(id);
+        for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
+        {
+            if (PhotonNetwork.PlayerList[i].UserId == id)
+            {
+                playerNicknames.Add(id,PhotonNetwork.PlayerList[i].NickName);
+            }
+        }
     }
 }

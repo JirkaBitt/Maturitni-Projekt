@@ -14,6 +14,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
     public Dictionary<string,GameObject> assetData = new Dictionary<string, GameObject>();
     private Vector3[] spawns;
     public GameObject controller;
+   
     public GameObject scenebounds;
     public GameObject lifeBar;
     public GameObject playerName;
@@ -28,6 +29,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     void Start()
     {
+        pool.ResourceCache.Clear();
         assetData.Clear();
         for (int i = 0; i < defaults.Length; i++)
         {
@@ -177,7 +179,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
         //player is facing the wrong direction
         if (newAsset.CompareTag("Player"))
         {
-            newAsset.transform.Rotate(0,180,0);
+           // newAsset.transform.Rotate(0,180,0);
             GameObject nameHolder = Instantiate(playerName);
             nameHolder.transform.position = newAsset.transform.position + new Vector3(0, 1.4f, 0);
             nameHolder.transform.rotation = Quaternion.Euler(0,0,0);
@@ -187,7 +189,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
         }
         //parentHousing connects the life bar with the weapon
       
-        if (newAsset.CompareTag("weapon"))
+        if (newAsset.CompareTag("weapon") && nameRPC != "Projectile")
         {
             //spawn the life bar and move it to the weapon
             GameObject bar = Instantiate(lifeBar);

@@ -35,6 +35,11 @@ public class chooseLevel : MonoBehaviour
     {
         SceneManager.LoadScene("createPrefabs");
     }
+
+    public void loadLevels()
+    {
+        SceneManager.LoadScene("savedLevels");
+    }
     public void joinRoom()
     {
         //check ID from input with room names if it matches than join that room

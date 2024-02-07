@@ -2,17 +2,29 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 
-public class startGameButton : MonoBehaviour
+public class startGameButton : MonoBehaviourPunCallbacks
 {
     public GameObject controller;
+    public GameObject startButton;
+    public GameObject textObject;
     public GUIStyle StartStyle = new GUIStyle();
+    
     void Start()
     {
-        StartStyle.fontSize = 80;
-        StartStyle.normal.textColor = Color.red;
-        StartStyle.alignment = TextAnchor.MiddleCenter;
+        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        {
+            startButton.SetActive(true);
+            textObject.SetActive(false);
+        }
+        else
+        {
+            startButton.SetActive(false);
+            textObject.SetActive(true);
+        }
+
     }
 
     // Update is called once per frame
@@ -21,23 +33,23 @@ public class startGameButton : MonoBehaviour
         
     }
 
-    void OnGUI()
+    public override void OnMasterClientSwitched(Player newMasterClient)
     {
-       
-        
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
-            if (GUI.Button(new Rect(Screen.width / 2 - 150, Screen.height - 400, 300, 60), "Start the Game"))
-            {
-                //now start the game
-                controller.GetComponent<PUN2_RoomController>().startGameButtonCallBack();
-            }
+            startButton.SetActive(true);
+            textObject.SetActive(false);
         }
         else
         {
-            Rect rect = new Rect(0,0,1000,80);
-            rect.center = new Vector2(Screen.width / 2, Screen.height / 2 - 400);
-            GUI.Label(rect,"Waiting for the creator to start the game",StartStyle);
+            startButton.SetActive(false);
+            textObject.SetActive(true);
         }
+        base.OnMasterClientSwitched(newMasterClient);
+    }
+
+    public void startGame()
+    {
+        controller.GetComponent<PUN2_RoomController>().startGameButtonCallBack();
     }
 }

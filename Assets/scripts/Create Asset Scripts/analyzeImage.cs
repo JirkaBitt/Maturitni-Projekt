@@ -77,7 +77,12 @@ public class analyzeImage : MonoBehaviour
 
     public GameObject warning;
 
-   // public GameObject loadingScreen;
+    public bool loadLevelsFromSaves = false;
+
+    public GameObject savePopup;
+
+   
+    // public GameObject loadingScreen;
     class prefab
     {
         public string name;
@@ -99,6 +104,7 @@ public class analyzeImage : MonoBehaviour
 
         private GameObject slate;
         private int[,] colors;
+        
         public prefab(GameObject slatee,GameObject objectt, pixel[,] array, string n,bool defaultAsset,GameObject defObj, Vector3 defSize)
         {
 
@@ -161,6 +167,12 @@ public class analyzeImage : MonoBehaviour
                 }
             }
             CombineSpriteArray(objectPrefab, colors);
+        }
+
+        public void addSavedAsset(int[,] savedInts)
+        {
+            colors = savedInts;
+            CombineSpriteArray(objectPrefab, savedInts);
         }
         public void minimalize()
         {
@@ -345,7 +357,15 @@ public class analyzeImage : MonoBehaviour
         sceneAssets.name = "Scene Assets";
         sceneAssets.tag = "created";
         toolsScript = buttonUI.GetComponent<changeTools>();
-        createSlate();
+       
+        if (loadLevelsFromSaves)
+        {
+            loadSavedAssets();
+        }
+        else
+        {
+            createSlate();
+        }
     }
     void Update()
     {
@@ -372,18 +392,59 @@ public class analyzeImage : MonoBehaviour
             //remove white pixels
             pref.finalize(holder);
         }
-        
         //this ensures that the assets stay there when we start the gam
-       // DontDestroyOnLoad(sceneAssets);
         DontDestroyOnLoad(assetHolderObj);
         //sceneAssets.SetActive(true);
+        if (onlyCharacter || loadLevelsFromSaves)
+        {
+            createRoom();
+        }
+        else
+        {
+            //we should show the popup and wait for user to decide if they want to save the assets
+            savePopup.SetActive(true);
+            
+            toolsScript.startGameButton.SetActive(false);
+            foreach (var display in frames)
+            {
+                display.SetActive(false);
+            }
+        }
+    }
+
+    public void createRoom()
+    {
         Destroy(sceneAssets);
         PUN2_GameLobby lobby = photonLobby.GetComponent<PUN2_GameLobby>();
         //this function creates a room and returns its name
         lobby.createRoomWithoutUI();
-        
     }
+    public void loadSavedAssets()
+    {
+        GameObject holder = GameObject.Find("savedAssets");
+        fetchCreatedLevels dataHolder = holder.GetComponent<fetchCreatedLevels>();
 
+        fetchCreatedLevels.savedAssets selectedLevel = dataHolder.selectedAssets;
+        createSlateForSaved(selectedLevel.assets[0].GetLength(1));
+        gameLevelPixels[0,0].finalColor = Color.black;
+        for (int i = 0; i < 8; i++)
+        {
+            //create new class that holds the object and the pixels so we can delete the  white ones at the end
+            //acces the default object size
+            assetInfo info = defaultAssets[i].GetComponent<assetInfo>();
+            info.calculateSize();
+            Vector3 defSize = new Vector3(info.width, info.height, 1);
+            //Destroy(temp);
+            GameObject parentAsset = new GameObject();
+            parentAsset.transform.parent = sceneAssets.transform;
+            prefab asset = new prefab( slate,parentAsset, gameLevelPixels, assetNames[i],false,defaultAssets[i],defSize);
+            asset.fullScreenPosition = currentParent.transform.position;
+            asset.fullScreenScale = currentParent.transform.localScale;
+            asset.addSavedAsset(selectedLevel.assets[i]);
+            assetPrefabs.Add(asset);
+        }
+        finalizeAssets();
+    }
     public void joinGame()
     {
         if (checkIfBlank())
@@ -415,6 +476,30 @@ public class analyzeImage : MonoBehaviour
            print("failed to join!!!!!!!!");
         }
        
+    }
+
+    public void createSlateForSaved(int height)
+    {
+        GameObject parent = new GameObject();
+        parent.name = "Slate";
+        int pixelWidth = (int)(Screen.width * (1 - 0.2f)) / numberOfPixelsX;
+        //big pixels in y
+        int pixelsY = height;
+
+        gameLevelPixels = new pixel[numberOfPixelsX, pixelsY];
+        for (int y = 0; y < pixelsY; y++)
+        {
+            for (int x = 0; x < numberOfPixelsX; x++)
+            {
+                gameLevelPixels[x,y] = new pixel(x, y, pixelWidth, Color.white, parent);
+            }
+        }
+        //make it fit the screen
+        fitTheScreen(parent, numberOfPixelsX, pixelsY);
+        //add it to the scene parent
+        parent.transform.parent = sceneAssets.transform;
+        currentParent = parent;
+        slate = parent;
     }
     //create slate is called at the start and creates a canvas of pixels to draw to
     public void createSlate()
@@ -459,17 +544,7 @@ public class analyzeImage : MonoBehaviour
     IEnumerator showWarning()
     {
         warning.SetActive(true);
-        TextMeshProUGUI text = warning.GetComponent<TextMeshProUGUI>();
-        yield return new WaitForSeconds(0.8f);
-        /*
-        for (int i = 0; i < 10; i++)
-        {
-            text.alpha = 1 - i / 10;
-            yield return new WaitForSeconds(0.05f);
-        }
-
-        text.alpha = 1;
-        */
+        yield return new WaitForSeconds(1f);
         warning.SetActive(false);
     }
     //refresh slate makes every pixel in the canvas white again
