@@ -44,6 +44,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
             {
                 Create(holder.assets[AssetName],AssetName);
             }
+            Destroy(holder);
         }
         else
         {

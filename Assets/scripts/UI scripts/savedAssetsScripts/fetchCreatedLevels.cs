@@ -17,15 +17,18 @@ public class fetchCreatedLevels : MonoBehaviour
     public GameObject assetButton;
 
     public GameObject scrollview;
+
+    private List<GameObject> buttons = new List<GameObject>();
     public class savedAssets
     {
         public int[][,] assets = new int[8][,];
         public string saveName;
-        
-        public savedAssets(int[][,] input, string name)
+        public string path;
+        public savedAssets(int[][,] input, string name, string pathToFile)
         {
             assets = input;
             saveName = name;
+            path = pathToFile;
         }
     }
     void Start()
@@ -62,14 +65,15 @@ public class fetchCreatedLevels : MonoBehaviour
             reader.Close();
             if (!isCorupted)
             {
-                savedAssets currentSave = new savedAssets(assets, saveName);
+                savedAssets currentSave = new savedAssets(assets, saveName,path.FullName);
                 allSaves.Add(currentSave);
 
                 GameObject newButton = Instantiate(assetButton);
+                buttons.Add(newButton);
                 newButton.transform.parent = scrollview.transform;
                 newButton.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().SetText(saveName);
                 newButton.transform.localPosition =
-                    new Vector3(0, -60, 0) - new Vector3(0, 100, 0) * (allSaves.Count - 1);
+                    new Vector3(-75, -60, 0) - new Vector3(0, 100, 0) * (allSaves.Count - 1);
                 newButton.GetComponent<Button>().onClick.AddListener(() =>
                 {
                     selectedAssets = currentSave;
@@ -77,14 +81,27 @@ public class fetchCreatedLevels : MonoBehaviour
                     SceneManager.LoadScene("loadCreatedLevel");
 
                 });
+
+                GameObject deleteButton = newButton.transform.GetChild(1).gameObject;
+                deleteButton.GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    buttons.Remove(newButton);
+                    File.Delete(path.FullName);
+                    Destroy(newButton);
+                    refreshButtons();
+                });
             }
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void refreshButtons()
     {
-        
+        //move all buttons when one is deleted
+        for (int i = 0; i < buttons.Count; i++)
+        {
+            buttons[i].transform.localPosition =
+                new Vector3(-75, -60, 0) - new Vector3(0, 100, 0) * i;
+        }
     }
     private int[,] decodeAsset(string hex)
     {

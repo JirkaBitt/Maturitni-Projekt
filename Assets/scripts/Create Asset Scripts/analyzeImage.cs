@@ -395,7 +395,7 @@ public class analyzeImage : MonoBehaviour
         //this ensures that the assets stay there when we start the gam
         DontDestroyOnLoad(assetHolderObj);
         //sceneAssets.SetActive(true);
-        if (onlyCharacter || loadLevelsFromSaves)
+        if (onlyCharacter)
         {
             createRoom();
         }
@@ -403,7 +403,9 @@ public class analyzeImage : MonoBehaviour
         {
             //we should show the popup and wait for user to decide if they want to save the assets
             savePopup.SetActive(true);
-            
+            //disable the UI
+            GameObject goBack = GameObject.Find("goBack");
+            goBack.SetActive(false);
             toolsScript.startGameButton.SetActive(false);
             foreach (var display in frames)
             {
