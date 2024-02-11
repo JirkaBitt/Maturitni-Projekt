@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Photon.Pun;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public abstract class meleeWeapon : weapon
 {
@@ -43,7 +46,34 @@ public abstract class meleeWeapon : weapon
       Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();
       //add trail behind the enemy
       enemy.GetComponent<CreateTrail>().createTrail();
-      rb.AddForce(launchVector * (force*10 + stats.percentage*2));
+      rb.AddForce(2 * launchVector * (force*10 + stats.percentage*2));
+      
+      StartCoroutine(removeGravity(force + stats.percentage,enemy));
+   }
+
+   IEnumerator removeGravity(float totalForce,GameObject enemy)
+   {
+      Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();
+      PolygonCollider2D coll = enemy.GetComponent<PolygonCollider2D>();
+      rb.gravityScale = 0;
+      //set istrigger to true so that we can launch him and he does not get stuck
+      coll.isTrigger = true;
+      //only target non trigger objects
+      ContactFilter2D filter2D = new ContactFilter2D();
+      filter2D.useTriggers = false;
+      
+      yield return new WaitForSeconds(0.1f);
+      //set the collider to non triger
+      coll.isTrigger = false;
+         //wait until we hit an object
+      float waitTime = totalForce / 50;
+      Stopwatch timer = new Stopwatch();
+      timer.Start();
+      //remove gravity from the launched enemy for set time or until he hits a solid object
+      yield return new WaitUntil(() => coll.IsTouching(filter2D) || timer.Elapsed.Seconds > waitTime);
+      
+      timer.Stop();
+      rb.gravityScale = 1;
    }
    
 }

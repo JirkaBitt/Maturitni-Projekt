@@ -480,6 +480,8 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
             disStats.characterInfos.Clear();
             Destroy(player);
         }
+        //clear the values, we will assign them again if player wants to play again 
+        displayIcons.GetComponent<displayPlayerStats>().clearValues();
         displayIcons.SetActive(false);
     }
 }

@@ -30,9 +30,9 @@ public class showPlayerResult : MonoBehaviour
         Texture2D playerTexture = player.GetComponent<SpriteRenderer>().sprite.texture;
         Sprite playerSprite = player.GetComponent<SpriteRenderer>().sprite;
         Vector2 spriteSize = playerSprite.bounds.size;
-        float spriteMultiplier = 80 / spriteSize.y;
+        float spriteMultiplier = 30 / spriteSize.y;
         float width = spriteSize.x * spriteMultiplier;
-        iconTexture.GetComponent<RectTransform>().sizeDelta = new Vector2(width, 80);
+        iconTexture.GetComponent<RectTransform>().sizeDelta = new Vector2(width, 30);
         iconTexture.GetComponent<Image>().sprite = playerSprite;
         TextMeshProUGUI place = playerPlacement.GetComponent<TextMeshProUGUI>();
         place.SetText(placement + ".");
@@ -41,7 +41,8 @@ public class showPlayerResult : MonoBehaviour
         name.SetText(playerNick);
 
         gameObject.transform.parent = contentHolder.transform;
-        gameObject.transform.localPosition = new Vector3(460, -50 - (placement - 1) * 100);
+        gameObject.transform.localPosition = new Vector3(155, -25 - (placement - 1) * 40);
+        gameObject.transform.localScale = Vector3.one;
     }
 
     public void voteYes()

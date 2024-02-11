@@ -73,7 +73,8 @@ public class fetchCreatedLevels : MonoBehaviour
                 newButton.transform.parent = scrollview.transform;
                 newButton.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().SetText(saveName);
                 newButton.transform.localPosition =
-                    new Vector3(-75, -60, 0) - new Vector3(0, 100, 0) * (allSaves.Count - 1);
+                    new Vector3(-40, -30, 0) - new Vector3(0, 40, 0) * (allSaves.Count - 1);
+                newButton.transform.localScale = Vector3.one;
                 newButton.GetComponent<Button>().onClick.AddListener(() =>
                 {
                     selectedAssets = currentSave;
@@ -81,7 +82,6 @@ public class fetchCreatedLevels : MonoBehaviour
                     SceneManager.LoadScene("loadCreatedLevel");
 
                 });
-
                 GameObject deleteButton = newButton.transform.GetChild(1).gameObject;
                 deleteButton.GetComponent<Button>().onClick.AddListener(() =>
                 {
@@ -100,7 +100,7 @@ public class fetchCreatedLevels : MonoBehaviour
         for (int i = 0; i < buttons.Count; i++)
         {
             buttons[i].transform.localPosition =
-                new Vector3(-75, -60, 0) - new Vector3(0, 100, 0) * i;
+                new Vector3(-40, -30, 0) - new Vector3(0, 40, 0) * i;
         }
     }
     private int[,] decodeAsset(string hex)

@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using UnityEngine.Windows;
 
 public class chooseLevel : MonoBehaviour
 {
@@ -22,7 +23,6 @@ public class chooseLevel : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = 60;
-        
     }
     
     // Update is called once per frame

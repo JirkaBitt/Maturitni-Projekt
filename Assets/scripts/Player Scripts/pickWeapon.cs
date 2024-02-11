@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Unity.Mathematics;
 
 public class pickWeapon : MonoBehaviour
 {
@@ -77,30 +78,29 @@ public class pickWeapon : MonoBehaviour
         animator.SetBool("isPicked", true);
         //assign plaer as parent so that weapon moves with him
        // weaponX.transform.parent = playerX.transform;
-        weaponX.transform.parent = playerX.transform;
+       float facingDirection = gameObject.transform.forward.z;
+       weaponX.transform.parent = playerX.transform;
+       
+        weaponX.transform.localRotation = Quaternion.Euler(0,180,0);
         //send info to playerStats
         playerStats stats = playerX.GetComponent<playerStats>();
         stats.currentWeapon = weaponX;
         //rotate the weapon based on the player direction
         //if facing left then rotate the weapon on y=180 else y = 0
         //transform.forward gives us the facing direction of our player, only z value is changing from 1 to -1
-        float facingDirection = gameObject.transform.forward.z;
-        if (facingDirection > 0)
-        {
-            //rotate left
-            weaponX.transform.rotation = Quaternion.Euler(0,180,0);
-            //housing.transform.rotation = Quaternion.Euler(0,180,0);
-        }
-        if (facingDirection < 0)
-        {
-            //rotate right
-            weaponX.transform.rotation = Quaternion.Euler(0,0,0);
-            //housing.transform.rotation = Quaternion.Euler(0,0,0);
-        }
+        
         //move the weapon closer to the player
         //weaponX.transform.position = playerX.transform.position + new Vector3(-facingDirection, 0.2f, 0);
         weaponX.transform.position = playerX.transform.position + new Vector3(-facingDirection, 0.2f, 0);
         changeLifeBarToPlayer(weaponX);
+        if (weaponX.name.Contains("Bomb") || weaponX.name.Contains("Gun"))
+        {
+            
+        }
+        else
+        {
+            weaponX.transform.Rotate(0,0,-45);
+        }
         //we have to switch this to false bcs otherwise we cannot drop the weapon
         weaponInRange = null;
         isInRange = false;
@@ -179,6 +179,7 @@ public class pickWeapon : MonoBehaviour
         //reset the lifebar position
         lifeBar.transform.position = weapon.transform.position + new Vector3(0, 1.2f, 0);
         lifeBar.transform.rotation = Quaternion.Euler(0, 0, 0);
+       
         lifeBar.transform.parent = gameObject.transform;
     }
     IEnumerator changeLifeBarToWeapon(GameObject weapon)
@@ -191,7 +192,7 @@ public class pickWeapon : MonoBehaviour
         anim.speed = 1;
         lifeBar.transform.position = weapon.transform.position + new Vector3(0, 1.2f, 0);
         lifeBar.transform.rotation = Quaternion.Euler(0, 0, 0);
-        
+        weapon.transform.rotation = quaternion.Euler(0,0,0);
         lifeBar.transform.parent = weapon.transform;
         lifeBar = null;
     }

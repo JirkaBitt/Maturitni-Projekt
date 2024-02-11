@@ -81,7 +81,7 @@ public class analyzeImage : MonoBehaviour
 
     public GameObject savePopup;
 
-   
+    private bool hasEditedAssets = false;
     // public GameObject loadingScreen;
     class prefab
     {
@@ -402,6 +402,12 @@ public class analyzeImage : MonoBehaviour
         else
         {
             //we should show the popup and wait for user to decide if they want to save the assets
+            if (loadLevelsFromSaves && !hasEditedAssets)
+            {
+                //if we havent edited anything, there is no need to show the update popup
+                createRoom();
+                return;
+            }
             savePopup.SetActive(true);
             //disable the UI
             GameObject goBack = GameObject.Find("goBack");
@@ -586,6 +592,7 @@ public class analyzeImage : MonoBehaviour
             return;
         }
         //update prefab
+        hasEditedAssets = true;
         int index = assetIndex;
         prefab pref = assetPrefabs[index];
         pixel[,] pixArray = gameLevelPixels;

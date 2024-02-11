@@ -71,6 +71,13 @@ public class displayPlayerStats : MonoBehaviourPunCallbacks
         base.OnPlayerLeftRoom(otherPlayer);
     }
 
+    public void clearValues()
+    {
+        playerIDs.Clear();
+        playerNicknames.Clear();
+        characterTextures.Clear();
+        characterInfos.Clear();
+    }
     public void addPlayerTexture(string id)
     {
         photonView.RPC("addPlayer",RpcTarget.AllBuffered,id);

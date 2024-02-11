@@ -44,7 +44,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
             {
                 Create(holder.assets[AssetName],AssetName);
             }
-            Destroy(holder);
+            Destroy(sceneAssets);
         }
         else
         {
@@ -86,6 +86,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
 
         int photonID = player.GetPhotonView().ViewID;
         photonView.RPC("changePlayerTexture",RpcTarget.AllBuffered,photonID,color1D.ToArray(),arrayWidth);
+        Destroy(sceneAssets);
         //sceneAssets.SetActive(false);
     }
     IEnumerator waitForAsets()
