@@ -62,7 +62,9 @@ public class analyzeImage : MonoBehaviour
     public GameObject buttonUI;
 //reference to the displayes that are behind assets
     private GameObject[] frames;
-
+//this bool serves as a check, when we maximazi asset, we dont want to recolor until the mouse is lifted
+    private bool addPixels = true;
+    
     private changeTools toolsScript;
 
     public GameObject photonLobby;
@@ -82,6 +84,8 @@ public class analyzeImage : MonoBehaviour
     public GameObject savePopup;
 
     private bool hasEditedAssets = false;
+
+    public GameObject goBackButton;
     // public GameObject loadingScreen;
     class prefab
     {
@@ -591,6 +595,7 @@ public class analyzeImage : MonoBehaviour
         {
             return;
         }
+        goBackButton.GetComponent<goBack>().cancelEditing = false;
         //update prefab
         hasEditedAssets = true;
         int index = assetIndex;
@@ -630,6 +635,7 @@ public class analyzeImage : MonoBehaviour
        toolsScript.enableStartGame();
        //dont show the text
        assetDisplayText.SetActive(false);
+     
         //displayed set to true stops the raycast
         displayed = true;
         int assetCount = assetPrefabs.Count;
@@ -734,7 +740,7 @@ public class analyzeImage : MonoBehaviour
                 return;
             }
             GameObject hitPixel = hit2D.collider.gameObject;
-            if (hitPixel.CompareTag("pixel") && !displayed)
+            if (hitPixel.CompareTag("pixel") && !displayed && addPixels)
             {
                 List<RaycastHit2D> allHits = new List<RaycastHit2D>();
                 //if we move too fast we skip the pixels, so we retrieve them using this function
@@ -802,12 +808,22 @@ public class analyzeImage : MonoBehaviour
                     //get the size of pixels inside the class
                     maximazeAsset(pref);
                     assetIndex = index;
-                   
+                    //we want to skip the first time
+                    previousRaycastPos = Vector2.zero;
+                    //dont start drwaning until the mouse is lifted
+                    StartCoroutine(waitForMouseUp());
                 }
             }
         }
     }
 
+    IEnumerator waitForMouseUp()
+    {
+        //pause the recoloring of pixels until the mouse is lifted, so we dont make a spot when opening the asset
+        addPixels = false;
+        yield return new WaitUntil(() => Input.GetMouseButtonUp(0));
+        addPixels = true;
+    }
     RaycastHit2D[] addSkippedPixels(Vector2 origin, Vector2 end)
     {
         //get the pixels in line from where we were and where we are now
@@ -847,6 +863,7 @@ public class analyzeImage : MonoBehaviour
     //maximaze is called when we click on an asset to remake it, it will display the slate with the asset
     void maximazeAsset(prefab pref)
     {
+        goBackButton.GetComponent<goBack>().cancelEditing = true;
         //deactivate assets and frames
         toolsScript.disableStartGame();
         pref.updateSmallValues(pref.objectPrefab);
@@ -894,20 +911,16 @@ public class analyzeImage : MonoBehaviour
             frame.SetActive(true);
         }
         slate.SetActive(false);
-/*
-        if (!pref.isDefault)
-        {
-            foreach (var pix in pref.pixelClass)
-            {
-                pix.setWhiteInActive();
-            }
-        }
-        */
         toolsScript.deactivateButtons();
         pref.minimalize();
         displayed = true;
         
         assetDisplayText.SetActive(false);
+    }
+
+    public void returnFromEditing()
+    {
+        minimalizeAsset(assetPrefabs[assetIndex]);
     }
     //tuple allows to return two or more variables
     void fitTheScreen(GameObject parentObject, float numberX, float numberY)

@@ -93,7 +93,6 @@ public class fetchCreatedLevels : MonoBehaviour
             }
         }
     }
-
     private void refreshButtons()
     {
         //move all buttons when one is deleted
@@ -169,11 +168,6 @@ public class fetchCreatedLevels : MonoBehaviour
         else
         {
             binary[3] = 0;
-        }
-
-        if (hexInt != 0)
-        {
-            print("isnt equal to zero!!!!!!!!!!!!!!!!");
         }
         return binary;
     }
