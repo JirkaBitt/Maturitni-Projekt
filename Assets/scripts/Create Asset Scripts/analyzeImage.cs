@@ -86,6 +86,8 @@ public class analyzeImage : MonoBehaviour
     private bool hasEditedAssets = false;
 
     public GameObject goBackButton;
+
+    public GameObject loadingScreen;
     // public GameObject loadingScreen;
     class prefab
     {
@@ -387,7 +389,6 @@ public class analyzeImage : MonoBehaviour
     {
         //create room and return the room name
         Destroy(slate);
-        //loadingScreen.SetActive(true);
         GameObject assetHolderObj = new GameObject();
         assetHolderObj.name = "AssetHolder";
         assetHolder holder = assetHolderObj.AddComponent<assetHolder>();
@@ -401,6 +402,9 @@ public class analyzeImage : MonoBehaviour
         //sceneAssets.SetActive(true);
         if (onlyCharacter)
         {
+            loadingScreen.SetActive(true);
+            toolsScript.startGameButton.SetActive(false);
+            goBackButton.SetActive(false);
             createRoom();
         }
         else
@@ -409,13 +413,15 @@ public class analyzeImage : MonoBehaviour
             if (loadLevelsFromSaves && !hasEditedAssets)
             {
                 //if we havent edited anything, there is no need to show the update popup
+                loadingScreen.SetActive(true);
+                toolsScript.startGameButton.SetActive(false);
+                goBackButton.SetActive(false);
                 createRoom();
                 return;
             }
             savePopup.SetActive(true);
             //disable the UI
-            GameObject goBack = GameObject.Find("goBack");
-            goBack.SetActive(false);
+            goBackButton.SetActive(false);
             toolsScript.startGameButton.SetActive(false);
             foreach (var display in frames)
             {

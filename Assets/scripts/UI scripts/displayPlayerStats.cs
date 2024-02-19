@@ -15,11 +15,15 @@ public class displayPlayerStats : MonoBehaviourPunCallbacks
     public Texture2D frameTexture;
     public GUIStyle percentageStyle;
     public GUIStyle playerStyle;
+    public GUIStyle scoreStyle = new GUIStyle();
+    
     void Start()
     {
         percentageStyle.fontSize = 90;
         percentageStyle.normal.textColor = Color.red;
         playerStyle.fontSize = 30;
+        scoreStyle.fontSize =  30;
+        scoreStyle.normal.textColor = Color.red;
         //playerIDs.Add(PhotonNetwork.LocalPlayer.UserId);
         //percentageStyle.normal.textColor = Color.white;
         //percentageStyle.normal.background = textBackground;
@@ -35,6 +39,7 @@ public class displayPlayerStats : MonoBehaviourPunCallbacks
     {
         float screenHeight = Screen.height;
         int playerCount = playerIDs.Count;
+      
         for (int i = 0; i < playerCount; i++)
         {
             //find the stats with userId
@@ -42,14 +47,15 @@ public class displayPlayerStats : MonoBehaviourPunCallbacks
             try
             {
                 float kMult = 220 / 345f;
-                float distanceFromX = 60 + i * 670 * kMult + i * 100;
-                GUI.Label(new Rect(distanceFromX, screenHeight - 280, 670 * kMult, 345 * kMult), frameTexture);
-                GUI.Label(new Rect(distanceFromX + 80, screenHeight - 220 , 160 *kMult, 160 *kMult), characterTextures[playerID]);
+                float distanceFromX = (60 + i * 670 * kMult + i * 100);
+                GUI.Label(new Rect(distanceFromX, (screenHeight - 280), 670 * kMult , 345 * kMult), frameTexture);
+                GUI.Label(new Rect(distanceFromX + 80, (screenHeight - 220) , 160 *kMult, 160 *kMult), characterTextures[playerID]);
                 
                 playerStats stats = characterInfos[playerID];
                 //GUI.Label(new Rect(200 + i * 300, Screen.height - 100, 260, 60), textBackground);
-                GUI.Label(new Rect(distanceFromX + 230, screenHeight - 230, 260, 165*kMult),stats.percentage+" %" , percentageStyle);
-                GUI.Label(new Rect(distanceFromX + 325*kMult, screenHeight - 110, 341 * kMult, 75*kMult), playerNicknames[playerID], playerStyle);
+                GUI.Label(new Rect(distanceFromX + 230, (screenHeight - 240), 260, 165*kMult),stats.percentage+" %" , percentageStyle);
+                GUI.Label(new Rect(distanceFromX + 235, (screenHeight - 155), 280, 90*kMult),"Score: " + stats.score, scoreStyle);
+                GUI.Label(new Rect(distanceFromX + 325*kMult , (screenHeight - 110), 341 * kMult, 75*kMult), playerNicknames[playerID], playerStyle);
                
             }
             catch (Exception e)

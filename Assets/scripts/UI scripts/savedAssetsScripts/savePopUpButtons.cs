@@ -18,6 +18,8 @@ public class savePopUpButtons : MonoBehaviour
     public GameObject warning;
 
     public bool onlyUpdate = false;
+
+    public GameObject loadingScreen;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,6 +32,7 @@ public class savePopUpButtons : MonoBehaviour
             analyzeImage imageScript = controller.GetComponent<analyzeImage>();
             saveButton.GetComponent<Button>().onClick.AddListener(() =>
             {
+                loadingScreen.SetActive(true);
                 //delete the existing file and create new one with the same name
                 File.Delete(dataHolder.selectedAssets.path);
                 saveAssetHolder.saveAssets(dataHolder.selectedAssets.saveName);
@@ -38,7 +41,12 @@ public class savePopUpButtons : MonoBehaviour
                 imageScript.createRoom();
 
             });
-            notSaveButton.GetComponent<Button>().onClick.AddListener(() => { imageScript.createRoom(); });
+            notSaveButton.GetComponent<Button>().onClick.AddListener(() =>
+            {
+                loadingScreen.SetActive(true);
+                Destroy(saveObj);
+                imageScript.createRoom();
+            });
         }
         else
         {
@@ -57,11 +65,16 @@ public class savePopUpButtons : MonoBehaviour
                     warning.SetActive(true);
                     return;
                 }
+                loadingScreen.SetActive(true);
                 saveAssetHolder.saveAssets(inputText.text);
                 imageScript.createRoom();
 
             });
-            notSaveButton.GetComponent<Button>().onClick.AddListener(() => { imageScript.createRoom(); });
+            notSaveButton.GetComponent<Button>().onClick.AddListener(() =>
+            {
+                loadingScreen.SetActive(true);
+                imageScript.createRoom();
+            });
         }
     }
     

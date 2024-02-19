@@ -6,7 +6,7 @@ using UnityEngine.Serialization;
 
 public class CreateTrail : MonoBehaviour
 {
-    private Sprite whiteSprite;
+    public Sprite whiteSprite;
 
     public float oneCopyDuration;
 
@@ -20,7 +20,13 @@ public class CreateTrail : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+     
+    }
+
+    public void createTexture()
+    {
         SpriteRenderer rend = gameObject.GetComponent<SpriteRenderer>();
+        
         Texture2D tex = rend.sprite.texture;
         
         Color[] texColors = tex.GetPixels();
@@ -32,7 +38,7 @@ public class CreateTrail : MonoBehaviour
                 texColors[i] = trailColor;
                 if (fadeSprite)
                 {
-                     texColors[i].a = i * (1 / texLength);
+                    texColors[i].a = i * (1 / texLength);
                 }
             }
         }
@@ -43,7 +49,6 @@ public class CreateTrail : MonoBehaviour
         newTex.Apply();
         whiteSprite = Sprite.Create(newTex, originalSprite.rect, new Vector2(0.5f, 0.5f));
     }
-
     // Update is called once per frame
     void Update()
     {

@@ -28,6 +28,7 @@ public class showPlayerResult : MonoBehaviour
     {
         gameObject.name = player.name + "-result";
         Texture2D playerTexture = player.GetComponent<SpriteRenderer>().sprite.texture;
+        playerStats stats = player.GetComponent<playerStats>();
         Sprite playerSprite = player.GetComponent<SpriteRenderer>().sprite;
         Vector2 spriteSize = playerSprite.bounds.size;
         float spriteMultiplier = 30 / spriteSize.y;
@@ -38,7 +39,7 @@ public class showPlayerResult : MonoBehaviour
         place.SetText(placement + ".");
         
         TextMeshProUGUI name = playerName.GetComponent<TextMeshProUGUI>();
-        name.SetText(playerNick);
+        name.SetText(playerNick + " - Score: " + stats.score);
 
         gameObject.transform.parent = contentHolder.transform;
         gameObject.transform.localPosition = new Vector3(155, -25 - (placement - 1) * 40);

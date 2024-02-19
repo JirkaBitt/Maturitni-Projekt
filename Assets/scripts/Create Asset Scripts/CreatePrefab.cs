@@ -145,7 +145,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
         }
 
         assetInfo info = newAsset.GetComponent<assetInfo>();
-        
+       
         newAsset.name = nameRPC;
         //defaultParent.transform.parent = objectPrefab.transform.parent;
         //check if default parent has children, if yes then destroy them
@@ -201,6 +201,12 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
             bar.GetComponent<decreaseWeaponLife>().weapon = newAsset;
            
         }
+
+        if (newAsset.TryGetComponent<CreateTrail>(out var component))
+        {
+            component.createTexture();
+        }
+        info.hasSprite = false;
         pool.ResourceCache.Add(nameRPC, newAsset);
             // DontDestroyOnLoad(DefaultGameObject);
         newAsset.SetActive(false);

@@ -192,9 +192,10 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
            if (spawningEnabled)
            {
                GameObject[] weapons = GameObject.FindGameObjectsWithTag("weapon");
-               while (!(weapons.Length <= maxWeaponCount))
+               while (weapons.Length >= maxWeaponCount)
                {
                    yield return new WaitForSeconds(5);
+                   weapons = GameObject.FindGameObjectsWithTag("weapon");
                }
 
                int randomWeaponIndex = Random.Range(0, WeaponNames.Length);
