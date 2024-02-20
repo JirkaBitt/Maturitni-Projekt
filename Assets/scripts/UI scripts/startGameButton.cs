@@ -37,6 +37,8 @@ public class startGameButton : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
+            //we have to open the room bcs it gets open when player clicks the play again button but we changed the master after it got clicked
+            PhotonNetwork.CurrentRoom.IsOpen = true;
             startButton.SetActive(true);
             textObject.SetActive(false);
         }

@@ -721,6 +721,9 @@ public class analyzeImage : MonoBehaviour
             //now start the game 
             if (onlyCharacter)
             {
+                loadingScreen.SetActive(true);
+                toolsScript.startGameButton.SetActive(false);
+                goBackButton.SetActive(false);
                 joinGame();
             }
             else

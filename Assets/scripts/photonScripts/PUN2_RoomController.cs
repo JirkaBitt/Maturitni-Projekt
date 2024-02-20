@@ -196,8 +196,16 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                {
                    yield return new WaitForSeconds(5);
                    weapons = GameObject.FindGameObjectsWithTag("weapon");
+                   if (!spawningEnabled)
+                   {
+                       break;
+                   }
                }
-
+               //it can happen that we will have max weapons and when we destroy them that we get here because we are in the previos loop, so we want to skip this iteration, because it would spawn a weapon when we are showing the results
+               if (!spawningEnabled)
+               {
+                   continue;
+               }
                int randomWeaponIndex = Random.Range(0, WeaponNames.Length);
                //find random spawn position
                int randomSpawnIndex = Random.Range(0, spawnPoint.Length);
@@ -410,6 +418,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         camScript.enabled = true;
         camScript.player = player;
         camScript.rb = player.GetComponent<Rigidbody2D>();
+        camScript.updatePlayers();
         //we have to call it on create prefabs because room controller is disabled at the start of the game
         string playerID = PhotonNetwork.LocalPlayer.UserId;
         CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID);
@@ -425,7 +434,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         photonView.RPC("updateCameraPlayers",RpcTarget.AllBuffered);
         displayIcons.GetComponent<displayPlayerStats>().addPlayerTexture(playerID);
     }
-    
     [PunRPC]
     public void startGame()
     {
@@ -440,18 +448,29 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         StartCoroutine(spawnWeapon());
         
     }
-    public void endGame()
+
+    public void callEndGame()
+    {
+        photonView.RPC("endGame",RpcTarget.All);
+    }
+    [PunRPC] public void endGame()
     {
         inGameUI.SetActive(false);
         startGameButton.SetActive(false);
         hideGUI = true;
         spawningEnabled = false;
+        cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
+        camScript.enabled = false;
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        GameObject[] weapons = GameObject.FindGameObjectsWithTag("weapon");
-        foreach (var weap in weapons)
+        if (PhotonNetwork.IsMasterClient)
         {
-            Destroy(weap);
+            GameObject[] weapons = GameObject.FindGameObjectsWithTag("weapon");
+            foreach (var weap in weapons)
+            {
+                PhotonNetwork.Destroy(weap);
+            }
         }
+
         int playerCount = players.Length;
         endGUI.SetActive(true);
         showAllResults showResults = endController.GetComponent<showAllResults>();
@@ -479,7 +498,11 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
             disStats.playerIDs.Clear();
             disStats.characterTextures.Clear();
             disStats.characterInfos.Clear();
-            Destroy(player);
+            PhotonView playerView = player.GetComponent<PhotonView>();
+            if (playerView.IsMine)
+            {
+                PhotonNetwork.Destroy(player);
+            }
         }
         //clear the values, we will assign them again if player wants to play again 
         displayIcons.GetComponent<displayPlayerStats>().clearValues();

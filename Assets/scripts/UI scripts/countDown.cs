@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using TMPro;
 using UnityEngine;
 
@@ -48,7 +49,11 @@ public class countDown : MonoBehaviour
         }
 
         PUN2_RoomController roomController = controller.GetComponent<PUN2_RoomController>();
-        roomController.endGame();
+        if (PhotonNetwork.IsMasterClient)
+        {
+            roomController.callEndGame();
+        }
+       
         //now end the game
     }
 }

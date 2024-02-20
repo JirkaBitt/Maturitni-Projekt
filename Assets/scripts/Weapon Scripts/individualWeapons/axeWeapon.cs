@@ -67,8 +67,7 @@ public class axeWeapon : meleeWeapon
         Vector3 normal = new Vector3(vector.y * facingInt, vector.x * -facingInt, 0);
         //make it jednotkovy vektor
         normal = normal / normal.magnitude;
-        normal += transform.right/2;
-        print(normal);
+        normal += transform.right/1.5f;
         return normal;
     }
 
