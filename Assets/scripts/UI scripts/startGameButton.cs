@@ -10,8 +10,7 @@ public class startGameButton : MonoBehaviourPunCallbacks
     public GameObject controller;
     public GameObject startButton;
     public GameObject textObject;
-    public GUIStyle StartStyle = new GUIStyle();
-    
+
     void Start()
     {
         if (PhotonNetwork.LocalPlayer.IsMasterClient)

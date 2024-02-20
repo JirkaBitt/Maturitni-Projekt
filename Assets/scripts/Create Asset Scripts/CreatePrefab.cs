@@ -2,16 +2,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Realtime;
 using TMPro;
 using UnityEngine;
 
-public class CreatePrefab : MonoBehaviourPunCallbacks
+public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
 {
     public GameObject[] defaults;
     public string[] defaultsNames;
     public string[] PhotonNames;
     public Dictionary<string,GameObject> assetData = new Dictionary<string, GameObject>();
+   
     private Vector3[] spawns;
     public GameObject controller;
    
@@ -20,17 +23,20 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
     public GameObject playerName;
     DefaultPool pool = PhotonNetwork.PrefabPool as DefaultPool;
 
-    public int numberOfCreated = 0;
+    private int numberOfCreated = 0;
 
     public GameObject loadingScreen;
-    
-    
+
+    private GameObject rpcHolder;
     //private float[] pixWidth;
     // Start is called before the first frame update
     void Start()
     {
+        numberOfCreated = 0;
         pool.ResourceCache.Clear();
         assetData.Clear();
+        rpcHolder = new GameObject();
+        rpcHolder.AddComponent<assetHolder>();
         for (int i = 0; i < defaults.Length; i++)
         {
             assetData.Add(defaultsNames[i],defaults[i]);
@@ -95,7 +101,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
         print("start wait");
         yield return new WaitUntil(() => numberOfCreated == defaults.Length);
         print("end wait");
-        PhotonNetwork.Instantiate("Arena", Vector3.zero, Quaternion.identity);
+        //PhotonNetwork.Instantiate("Arena", Vector3.zero, Quaternion.identity);
         controller.SetActive(true);
         scenebounds.SetActive(true);
         loadingScreen.SetActive(false);
@@ -107,7 +113,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
         }
         else
         {
-            
+           
         }
     }
     public void Create(int [,] colors, string name)
@@ -122,11 +128,35 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
                 color1D.Add(colors[x,y]);
             }
         }
-        gameObject.GetPhotonView().RPC("copyComponents",RpcTarget.AllBuffered,color1D.ToArray(),arrayWidth,name);
+        object[] content = new object[] {color1D.ToArray(),arrayWidth,name};
+        //if we set the caching option to roomcacheglobal it will remain in the room even if the master client leaves
+        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All,CachingOption = EventCaching.AddToRoomCacheGlobal};
+        PhotonNetwork.RaiseEvent(1, content, raiseEventOptions, SendOptions.SendReliable);
+        //gameObject.GetPhotonView().RPC("copyComponents",RpcTarget.AllBufferedViaServer,color1D.ToArray(),arrayWidth,name);
+    }
+    public void OnEvent(EventData photonEvent)
+    {
+        byte eventCode = photonEvent.Code;
+
+        if (eventCode == 1)
+        {
+            object[] data = (object[])photonEvent.CustomData;
+
+            int[] intArray = (int[])data[0];
+            int width = (int)data[1];
+            string assetName = (string)data[2];
+            
+            copyComponents(intArray,width,assetName);
+        }
     }
     [PunRPC]public void copyComponents(int[] colors1D,int width, string nameRPC)
     {
-       
+        if (numberOfCreated == assetData.Count)
+        {
+            //we have already created all assets
+            return;
+        }
+
         int height = colors1D.Length / width;
         int[,] colorsRPC = new int[width, height];
         for (int i = 0; i < colors1D.Length; i++)
@@ -135,7 +165,8 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
             int y = i / width;
             colorsRPC[x, y] = colors1D[i];
         }
-        
+        //we want to save the int arrays on all clients in case that the master leaves
+        rpcHolder.GetComponent<assetHolder>().assets.Add(nameRPC, colorsRPC);
         GameObject newAsset = assetData[nameRPC];
         //assign the default object to the sceneAssets
         newAsset = Instantiate(newAsset);
@@ -145,7 +176,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
         }
 
         assetInfo info = newAsset.GetComponent<assetInfo>();
-       
+        
         newAsset.name = nameRPC;
         //defaultParent.transform.parent = objectPrefab.transform.parent;
         //check if default parent has children, if yes then destroy them
@@ -687,6 +718,8 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
         return false;
     }
 
+    
+
     public void ResizeAssets(GameObject resizeThis, Vector2 defaultSize)
     {
         //create the default asset and fetch its size
@@ -801,4 +834,6 @@ public class CreatePrefab : MonoBehaviourPunCallbacks
 
             return spawnList.ToArray();
     }
+
+   
 }

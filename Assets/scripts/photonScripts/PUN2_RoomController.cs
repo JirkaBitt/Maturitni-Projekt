@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Photon.Realtime;
 using TMPro;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -76,6 +77,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                 //fetch created assets
                // getCreatedAssets();
                 //spawn character, this is only for the room creator, others are created in OnJoinedRoom
+                PhotonNetwork.InstantiateRoomObject("Arena", Vector3.zero, Quaternion.identity);
                 print("instantiate from start");
                 spawnPoint = findRespawnPositions();
                 //GameObject arena = PhotonNetwork.Instantiate("Arena", Vector3.zero, Quaternion.identity);
@@ -114,33 +116,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
     public override void OnLeftRoom()
     {
         //We have left the Room, return back to the GameLobby
-        UnityEngine.SceneManagement.SceneManager.LoadScene("ChooseLevel");
-    }
-    public override void OnJoinedRoom()
-    {
-        /*
-        base.OnJoinedRoom();
-
-        //we have to wait until we are in room, it can take some time
-        //then we want to instantiate a player that will be visible for every player in room
-    
-        print("instantiate from onjoined");
-        int numberOfPlayers = PhotonNetwork.CurrentRoom.Players.Count;
-        //spawn the 
-        int randomSpawnIndex = Random.Range(0, spawnPoint.Length);
-      
-        GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[randomSpawnIndex], Quaternion.identity, 0);
-        //name him after the player so we can find him in onGUI
-        PhotonView playerView = player.GetPhotonView();
-        
-        cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
-        camScript.enabled = true;
-        camScript.player = player;
-        camScript.rb = player.GetComponent<Rigidbody2D>();
-        //call rpc buffered so it runs even for players that join later
-        //we have to call it on the photonview of the roomcontroller because that is the only one with namePlayer function
-        photonView.RPC("namePlayer",RpcTarget.AllBuffered,playerView.ViewID,PhotonNetwork.LocalPlayer.UserId);
-        */
+        SceneManager.LoadScene("ChooseLevel");
     }
 
     public void joinedFromCreate()
@@ -149,6 +125,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         //we have to wait until we are in room, it can take some time
         //then we want to instantiate a player that will be visible for every player in room
         print("instantiate from create!!!!!!!");
+      
         spawnPoint = findRespawnPositions();
        // int numberOfPlayers = PhotonNetwork.CurrentRoom.Players.Count;
        int randomSpawnIndex = Random.Range(0, spawnPoint.Length);
