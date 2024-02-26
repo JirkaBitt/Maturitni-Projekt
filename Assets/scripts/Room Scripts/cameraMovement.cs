@@ -115,9 +115,8 @@ public class cameraMovement : MonoBehaviourPunCallbacks
        
         foreach (var onePlayer in players)
         {
-           
-                Vector3 difference = onePlayer.transform.position - player.transform.position;
-                cameraSize += difference.magnitude;
+            Vector3 difference = onePlayer.transform.position - player.transform.position;
+            cameraSize += difference.magnitude;
             
         }
         //we want to divide cameraSize with playercount so it reflects an avarage value

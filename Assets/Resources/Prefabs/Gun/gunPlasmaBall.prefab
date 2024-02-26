@@ -240,7 +240,7 @@ MonoBehaviour:
   type: 
   triggerLaunch: 0
   bulletPrefab: {fileID: 5475411863845466111, guid: 9e592f867a71e4ad6b807e97c1fa02e4, type: 3}
-  maxScaleMagnitude: 1.8
+  maxScaleMagnitude: 1.2
 --- !u!114 &9184083966844939997
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -10,6 +10,7 @@ public class bulletScript : MonoBehaviour
     // Start is called before the first frame update
     public Vector3 launchVector = Vector3.zero;
     private bool alreadyAdded = false;
+    public GameObject player;
     void Start()
     {
         
@@ -80,11 +81,9 @@ public class bulletScript : MonoBehaviour
         force = force * randomMultiplier;
         print(force);
         stats.percentage += (int)(force/10  + force * stats.percentage/200);
-      
+        stats.lastAttacker = player;
         Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();
-   
+        
         rb.AddForce(launchVector * (force + stats.percentage*2));
-      
-
     }
 }

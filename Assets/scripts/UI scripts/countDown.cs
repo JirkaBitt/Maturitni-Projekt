@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
@@ -13,6 +14,12 @@ public class countDown : MonoBehaviour
     void Start()
     {
        
+    }
+
+    private void OnEnable()
+    {
+        TextMeshProUGUI clock = gameObject.GetComponent<TextMeshProUGUI>();
+        clock.SetText(minutes + ":00");
     }
 
     // Update is called once per frame
@@ -38,7 +45,16 @@ public class countDown : MonoBehaviour
             int timeRemaining = fullTime - seconds;
             int minutesRemaining = timeRemaining / 60;
             int secondsRemaining = timeRemaining % 60;
-            string text = minutesRemaining + ":" + secondsRemaining;
+            string text = "";
+            if (secondsRemaining < 10)
+            {
+                //we want to have the zero before seconds
+                 text = minutesRemaining + ":0" + secondsRemaining;
+            }
+            else
+            {
+                text = minutesRemaining + ":" + secondsRemaining;
+            }
             clock.SetText(text);
 
             if (timeRemaining <= 0)
@@ -47,10 +63,9 @@ public class countDown : MonoBehaviour
                 break;
             }
         }
-
-        PUN2_RoomController roomController = controller.GetComponent<PUN2_RoomController>();
         if (PhotonNetwork.IsMasterClient)
-        {
+        {  
+            PUN2_RoomController roomController = controller.GetComponent<PUN2_RoomController>();
             roomController.callEndGame();
         }
        

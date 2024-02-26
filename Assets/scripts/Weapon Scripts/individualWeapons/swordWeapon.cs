@@ -27,7 +27,7 @@ public class swordWeapon : meleeWeapon
         Vector3 normal = new Vector3(vector.y * -facingInt , vector.x * facingInt, 0);
         //make it jednotkovy vektor
         normal = normal / normal.magnitude;
-        normal += transform.right;
+        normal += facingInt * new Vector3(1,0,0);
         print(normal);
         return normal;
     }

@@ -62,7 +62,7 @@ public abstract class meleeWeapon : weapon
       ContactFilter2D filter2D = new ContactFilter2D();
       filter2D.useTriggers = false;
       
-      yield return new WaitForSeconds(0.1f);
+      yield return new WaitForSeconds(0.06f);
       //set the collider to non triger
       coll.isTrigger = false;
          //wait until we hit an object

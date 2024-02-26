@@ -50,7 +50,6 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             {
                 Create(holder.assets[AssetName],AssetName);
             }
-            Destroy(sceneAssets);
         }
         else
         {
@@ -92,7 +91,6 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
 
         int photonID = player.GetPhotonView().ViewID;
         photonView.RPC("changePlayerTexture",RpcTarget.AllBuffered,photonID,color1D.ToArray(),arrayWidth);
-        Destroy(sceneAssets);
         //sceneAssets.SetActive(false);
     }
     IEnumerator waitForAsets()
@@ -764,7 +762,8 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             colorsRPC[x, y] = colors1D[i];
         }
         CombineSpriteArray(player, colorsRPC);
-       
+        //we have to change the trail texture, bcs otherwise it would use the master clients texture
+        player.GetComponent<CreateTrail>().createTexture();
         print("changed texture for player!!!!!");
     }
     private Tuple<Vector2, Vector2> getBounds(Vector2[] path,PolygonCollider2D coll)

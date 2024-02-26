@@ -47,7 +47,8 @@ public class pickWeapon : MonoBehaviour
                     int currentPlayerID = gameObject.GetComponent<PhotonView>().ViewID;
                     PhotonView photonView = PhotonView.Get(this);
                     //we cannot send gameobject in RPC so we have to use photonviewID
-                    photonView.RPC("AssignPlayerWeapon", RpcTarget.AllBuffered, currentPlayerID, pickedWeaponID);
+                    //it does not need to be buffered bcs all players are in room
+                    photonView.RPC("AssignPlayerWeapon", RpcTarget.All, currentPlayerID, pickedWeaponID);
                 }
 
             }
@@ -169,7 +170,7 @@ public class pickWeapon : MonoBehaviour
         //we cannot send gameobject in RPC so we have to use photonviewID
         //GameObject weapon = gameObject.transform.GetChild(0).gameObject;
         int weaponID = weapon.GetPhotonView().ViewID;
-        photonView.RPC("dropWeapon", RpcTarget.AllBuffered,weaponID,delete);
+        photonView.RPC("dropWeapon", RpcTarget.All,weaponID,delete);
     }
     //change the parent so that the bar does not move with the weapon when attacking
     void changeLifeBarToPlayer(GameObject weapon)

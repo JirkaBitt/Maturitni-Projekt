@@ -323,15 +323,10 @@ public class analyzeImage : MonoBehaviour
         //find next corner works with direction, pixel index and corner index to determine the next index of the corner and the direction we want to continue
         public void finalize(assetHolder holder)
         {
-            /*
-            GameObject def = Instantiate(DefaultGameObject);
-            def.transform.parent = objectPrefab.transform.parent;
-            Destroy(objectPrefab);
-            assetInfo info = def.GetComponent<assetInfo>();
-            //if it is the player we have to reverse the x alues of the array
-            
-            if (def.CompareTag("Player"))
+           //we have to flip the player texture bcs it is reversed
+            if (DefaultGameObject.CompareTag("Player"))
             {
+                print("flip player");
                 //flip the array
                 int xLength = colors.GetLength(0);
                 for (int y = 0; y < colors.GetLength(1); y++)
@@ -344,12 +339,7 @@ public class analyzeImage : MonoBehaviour
                     }
                 }
             }
-            
-            print(colors.Length);
-            info.pixelArray = colors;
-            info.name = name;
-            print(info.pixelArray.Length+"-"+name);
-            */
+
             Destroy(objectPrefab);
             holder.assets.Add(name,colors);
         }

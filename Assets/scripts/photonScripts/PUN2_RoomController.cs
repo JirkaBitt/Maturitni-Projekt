@@ -116,6 +116,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
     public override void OnLeftRoom()
     {
         //We have left the Room, return back to the GameLobby
+        photonView.RPC("updateCameraPlayers",RpcTarget.All);
         SceneManager.LoadScene("ChooseLevel");
     }
 
@@ -149,7 +150,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         createScript.changePlayer(player);
         displayIcons.GetComponent<displayPlayerStats>().addPlayerTexture(playerID);
         //add the player to all camera movement scripts
-        photonView.RPC("updateCameraPlayers",RpcTarget.AllBuffered);
+        photonView.RPC("updateCameraPlayers",RpcTarget.All);
     }
 
     IEnumerator spawnWeapon()
@@ -201,27 +202,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
            // int randomWeaponIndex = Random.Range(0, weaponPrefabs.Length);
        
     }
-/*
-    IEnumerator dropWeapon(GameObject wep)
-    {
-        Rigidbody2D rb = wep.GetComponent<Rigidbody2D>();
-        Collider2D coll = wep.GetComponent<Collider2D>();
-        //enable gravity
-        rb.simulated = true;
-        //check if we are touching something
-        yield return new WaitUntil(coll.IsTouchingLayers);
-        //stop gravity
-        rb.simulated = false;
-
-    }
-    
-    [PunRPC] public void namePlayer(int gameobjectID, string nameID)
-    {
-        print("rename player");
-        GameObject player = PhotonView.Find(gameobjectID).gameObject;
-        player.name = nameID;
-    }
-*/
     Vector3[] findRespawnPositions()
     {
         List<Vector3> spawnList = new List<Vector3>();
@@ -238,19 +218,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                 //retrieve bounds
                 pathPoints.Add(getBounds(coll.GetPath(i),coll));
             }
-
-          //  Vector3 platformSize = coll.bounds.size;
-            //find middle of the gameobject
-            /*
-            float middleX = platformTransform.position.x;
-            float middleY = platformTransform.position.y;
-            //min and max is half the size from the middle
-            float minX = middleX - platformSize.x / 2;
-            float maxX = middleX + platformSize.x / 2;
-            
-            float minY = middleY - platformSize.y / 2;
-            float maxY = middleY + platformSize.y / 2;
-*/
             foreach (var bounds in pathPoints)
             {
                 int minX = (int)bounds.Item1.x;
@@ -286,25 +253,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         //return found spawnPoints
         return spawnList.ToArray();
     }
-
-    void getCreatedAssets()
-    {
-        //find assets and assign them
-        GameObject player = GameObject.Find("Character");
-        playerPrefab = player;
-        player.SetActive(false);
-        GameObject[] weapons = GameObject.FindGameObjectsWithTag("weapon");
-        foreach (var weapon in weapons)
-        {
-            //disable the weapons
-            weapon.SetActive(false);
-        }
-        GameObject arena = GameObject.Find("Arena");
-        arena.SetActive(false);
-        weaponPrefabs = weapons;
-        Console.WriteLine("Finished Fetching Assets");
-    }
-
     private Tuple<Vector2, Vector2> getBounds(Vector2[] path,PolygonCollider2D coll)
     {
         Vector2 minX = new Vector2(1000,-1000);
@@ -343,15 +291,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
         camScript.updatePlayers();
     }
-
-    public override void OnPlayerLeftRoom(Player otherPlayer)
-    {
-        base.OnPlayerLeftRoom(otherPlayer);
-        cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
-        camScript.updatePlayers();
-        
-    }
-
     public void beforeStart(GameObject player)
     {
         playerMovement movement = player.GetComponent<playerMovement>();
@@ -374,7 +313,8 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
 
     public void startGameButtonCallBack()
     {
-        photonView.RPC("startGame",RpcTarget.All);
+        //AllViaServer should call it on all clients at the same time
+        photonView.RPC("startGame",RpcTarget.AllViaServer);
         PhotonNetwork.CurrentRoom.IsOpen = false;
       
     }
@@ -398,7 +338,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         camScript.updatePlayers();
         //we have to call it on create prefabs because room controller is disabled at the start of the game
         string playerID = PhotonNetwork.LocalPlayer.UserId;
-        CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID);
+        //CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID);
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
             PhotonNetwork.CurrentRoom.IsOpen = true;
@@ -428,7 +368,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
 
     public void callEndGame()
     {
-        photonView.RPC("endGame",RpcTarget.All);
+        photonView.RPC("endGame",RpcTarget.AllViaServer);
     }
     [PunRPC] public void endGame()
     {
@@ -460,10 +400,13 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         {
             stats[i] = players[i].GetComponent<playerStats>();
             scores.Add(players[i].name,stats[i].score);
+            //here we cannot add the name of the gameobject bcs we dont know if it matches with the photon array
             nicks.Add(PhotonNetwork.PlayerList[i].UserId,PhotonNetwork.PlayerList[i].NickName);
             players[i].SetActive(false);
         }
         var sortedDict = scores.OrderBy(pair => pair.Value).ToList();
+        //order by sorts it in an ascending order, but we want descending, player with highest score wins
+        sortedDict.Reverse();
         for (int i = 0; i < playerCount; i++)
         {
             placements.Add(sortedDict[i].Key,i+1);

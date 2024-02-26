@@ -49,6 +49,21 @@ public class startGameButton : MonoBehaviourPunCallbacks
         base.OnMasterClientSwitched(newMasterClient);
     }
 
+    public override void OnEnable()
+    {
+        base.OnEnable();
+        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        {
+            startButton.SetActive(true);
+            textObject.SetActive(false);
+        }
+        else
+        {
+            startButton.SetActive(false);
+            textObject.SetActive(true);
+        }
+    }
+
     public void startGame()
     {
         controller.GetComponent<PUN2_RoomController>().startGameButtonCallBack();

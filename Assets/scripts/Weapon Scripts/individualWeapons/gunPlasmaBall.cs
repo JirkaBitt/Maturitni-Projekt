@@ -7,7 +7,7 @@ public class gunPlasmaBall : gunWeapons
 {
     public GameObject bulletPrefab;
 
-    public float maxScaleMagnitude = 1.4f;
+    public float maxScaleMagnitude = 1.2f;
     // Start is called before the first frame update
     public override void Use()
     {
@@ -62,6 +62,9 @@ public class gunPlasmaBall : gunWeapons
         GameObject bullet = PhotonView.Find(bulletID).gameObject;
         GameObject parent = PhotonView.Find(parentID).gameObject;
         bullet.transform.parent = parent.transform;
+        
+        //assign the player so that we know who hit the enemy
+        bullet.GetComponent<bulletScript>().player = parent;
     }
 
     [PunRPC]

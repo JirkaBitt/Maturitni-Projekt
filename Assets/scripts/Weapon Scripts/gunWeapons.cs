@@ -31,7 +31,7 @@ public abstract class gunWeapons : weapon
         force = force * randomMultiplier;
         print(force);
         stats.percentage += (int)(force/10  + force * stats.percentage/200);
-      
+        stats.lastAttacker = gameObject.transform.parent.gameObject;
         Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();
    
         rb.AddForce(launchVector * (force*6 + stats.percentage*2));
