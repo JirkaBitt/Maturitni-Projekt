@@ -24,12 +24,18 @@ public class swordWeapon : meleeWeapon
         //if we are facing right we want to multiply x*1 and  y*(-1)
         //if left then x*(-1) y*1
         //this is for when we are hitting with the axe from below
-        Vector3 normal = new Vector3(vector.y * -facingInt , vector.x * facingInt, 0);
-        //make it jednotkovy vektor
-        normal = normal / normal.magnitude;
-        normal += facingInt * new Vector3(1,0,0);
-        print(normal);
-        return normal;
+        if ((int)player.GetComponent<Rigidbody2D>().velocity.y != 0)
+        {
+            //player is in the air so he can launch with the sword down
+            Vector3 normal = new Vector3(vector.y * -facingInt , vector.x * facingInt, 0);
+            //make it jednotkovy vektor
+            normal = normal / normal.magnitude;
+            normal += facingInt * new Vector3(1,0,0);
+            print(normal);
+            return normal;
+        }
+        //we are on the ground so launch him up
+        return new Vector3(facingInt * 0.8f, 0.2f,0);
     }
     
     private void OnTriggerStay2D(Collider2D other)

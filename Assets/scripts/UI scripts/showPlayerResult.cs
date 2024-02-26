@@ -27,7 +27,7 @@ public class showPlayerResult : MonoBehaviour
     public void showResult(GameObject player, int placement, string playerNick, GameObject contentHolder)
     {
         gameObject.name = player.name + "-result";
-        Texture2D playerTexture = player.GetComponent<SpriteRenderer>().sprite.texture;
+        //Texture2D playerTexture = player.GetComponent<SpriteRenderer>().sprite.texture;
         playerStats stats = player.GetComponent<playerStats>();
         Sprite playerSprite = player.GetComponent<SpriteRenderer>().sprite;
         Vector2 spriteSize = playerSprite.bounds.size;

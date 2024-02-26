@@ -16,7 +16,7 @@ public class playerMovement : MonoBehaviour
     public float dashForce = 300f;
     public int dashCooldown = 3;
     private bool dashAvailable = true;
-    public string playerFacing = "right";
+    public int playerFacing = 0; //0 is right, 1 is left
     public GameObject nameBar;
     private Animator animator;
     private pickWeapon _pickWeapon;
@@ -109,10 +109,10 @@ public class playerMovement : MonoBehaviour
             if (facingInt > 0)
             {
                 //check if we changed directions
-                if (playerFacing == "left")
+                if (playerFacing == 1)
                 {
                     //rotate the player to the right
-                    playerFacing = "right";
+                    playerFacing = 0;
                     gameObject.transform.RotateAround(gameObject.transform.position, Vector3.up, 180);
                     nameBar.transform.rotation = Quaternion.Euler(0,0,0);
                 }
@@ -120,10 +120,10 @@ public class playerMovement : MonoBehaviour
             }
             if (facingInt < 0)
             {
-                if (playerFacing == "right")
+                if (playerFacing == 0)
                 {
                     //rotate the player to the left
-                    playerFacing = "left";
+                    playerFacing = 1;
                     gameObject.transform.RotateAround(gameObject.transform.position, Vector3.up, 180);
                     nameBar.transform.rotation = Quaternion.Euler(0,0,0);
                 }
@@ -144,7 +144,7 @@ public class playerMovement : MonoBehaviour
         dashAvailable = false;
         
         gameObject.GetComponent<CreateTrail>().createTrail();
-        if (playerFacing == "right")
+        if (playerFacing == 0)
         {
             //dash right
             rb.AddForce(Vector3.right * dashForce);

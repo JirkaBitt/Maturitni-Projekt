@@ -46,7 +46,7 @@ public abstract class meleeWeapon : weapon
       Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();
       //add trail behind the enemy
       enemy.GetComponent<CreateTrail>().createTrail();
-      rb.AddForce(3 * launchVector * (force*10 + stats.percentage*2));
+      rb.AddForce(launchVector * (force*10 + stats.percentage*2));
       
       StartCoroutine(removeGravity(force + stats.percentage,enemy));
    }

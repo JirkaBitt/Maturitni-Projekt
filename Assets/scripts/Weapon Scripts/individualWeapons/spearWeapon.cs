@@ -92,7 +92,7 @@ public class spearWeapon : meleeWeapon
         
         triggerLaunch = true;
         //move the player forward with the spear
-        player.GetComponent<Rigidbody2D>().AddForce(-player.transform.right * force*4);
+        player.GetComponent<Rigidbody2D>().AddForce(player.transform.right * force*4);
         //we stopped charging and want to release the spear
         
     }

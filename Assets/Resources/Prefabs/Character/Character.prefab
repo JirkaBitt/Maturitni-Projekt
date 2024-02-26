@@ -180,6 +180,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   localScripts:
   - {fileID: 1699017230255726335}
+  - {fileID: -6289641829302458102}
   localObjects: []
   ignorePhoton: 0
 --- !u!114 &-6289641829302458102
@@ -5220,6 +5221,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e43038e21e4ec4baab5a508f4431a383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  whiteSprite: {fileID: 0}
   oneCopyDuration: 0.3
   numberOfCopies: 30
   fadeSprite: 0

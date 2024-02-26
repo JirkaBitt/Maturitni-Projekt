@@ -21,7 +21,7 @@ using UnityEngine.ProBuilder;
 using UnityEngine.ProBuilder.MeshOperations;
 using UnityEngine.SceneManagement;
 using Color = UnityEngine.Color;
-
+using GameObject = UnityEngine.GameObject;
 using Screen = UnityEngine.Screen;
 
 
@@ -88,6 +88,8 @@ public class analyzeImage : MonoBehaviour
     public GameObject goBackButton;
 
     public GameObject loadingScreen;
+
+    public GameObject inputName;
     // public GameObject loadingScreen;
     class prefab
     {
@@ -324,6 +326,7 @@ public class analyzeImage : MonoBehaviour
         public void finalize(assetHolder holder)
         {
            //we have to flip the player texture bcs it is reversed
+           /*
             if (DefaultGameObject.CompareTag("Player"))
             {
                 print("flip player");
@@ -339,7 +342,7 @@ public class analyzeImage : MonoBehaviour
                     }
                 }
             }
-
+*/
             Destroy(objectPrefab);
             holder.assets.Add(name,colors);
         }
@@ -424,6 +427,15 @@ public class analyzeImage : MonoBehaviour
     {
         Destroy(sceneAssets);
         PUN2_GameLobby lobby = photonLobby.GetComponent<PUN2_GameLobby>();
+        string pName = inputName.GetComponent<TMP_InputField>().text;
+        if (pName != "")
+        {
+            lobby.playerName = pName;
+        }
+        else
+        {
+            lobby.playerName = "Player";
+        }
         //this function creates a room and returns its name
         lobby.createRoomWithoutUI();
     }
@@ -473,6 +485,15 @@ public class analyzeImage : MonoBehaviour
         DontDestroyOnLoad(assetHolderObj);
         Destroy(sceneAssets);
         PUN2_GameLobby lobby = photonLobby.GetComponent<PUN2_GameLobby>();
+        string pName = inputName.GetComponent<TMP_InputField>().text;
+        if (pName != "")
+        {
+             lobby.playerName = pName;
+        }
+        else
+        {
+            lobby.playerName = "Player";
+        }
         //this function creates a room and returns its name
         GameObject roomName = GameObject.FindWithTag("roomName");
         

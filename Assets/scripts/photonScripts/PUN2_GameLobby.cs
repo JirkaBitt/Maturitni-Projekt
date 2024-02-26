@@ -9,7 +9,7 @@ using Photon.Realtime;
 //from this tutorial
 public class PUN2_GameLobby : MonoBehaviourPunCallbacks
 {
-    string playerName = "Player 1";
+    public string playerName = "Player 1";
     //Users are separated from each other by gameversion (which allows you to make breaking changes).
     string gameVersion = "0.9";
     //The list of created rooms

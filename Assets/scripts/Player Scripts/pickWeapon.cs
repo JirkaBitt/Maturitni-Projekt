@@ -82,7 +82,7 @@ public class pickWeapon : MonoBehaviour
        float facingDirection = gameObject.transform.forward.z;
        weaponX.transform.parent = playerX.transform;
        
-        weaponX.transform.localRotation = Quaternion.Euler(0,180,0);
+        weaponX.transform.localRotation = Quaternion.Euler(0,0,0);
         //send info to playerStats
         playerStats stats = playerX.GetComponent<playerStats>();
         stats.currentWeapon = weaponX;
@@ -92,7 +92,7 @@ public class pickWeapon : MonoBehaviour
         
         //move the weapon closer to the player
         //weaponX.transform.position = playerX.transform.position + new Vector3(-facingDirection, 0.2f, 0);
-        weaponX.transform.position = playerX.transform.position + new Vector3(-facingDirection, 0.2f, 0);
+        weaponX.transform.position = playerX.transform.position + new Vector3(facingDirection, 0.2f, 0);
         changeLifeBarToPlayer(weaponX);
         if (weaponX.name.Contains("Bomb") || weaponX.name.Contains("Gun"))
         {
