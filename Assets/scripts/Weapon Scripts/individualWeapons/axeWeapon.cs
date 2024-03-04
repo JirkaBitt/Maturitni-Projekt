@@ -19,8 +19,7 @@ public class axeWeapon : meleeWeapon
         
         PhotonView photonView = gameObject.GetPhotonView();
         //we will set trigerlaunch to true in this coroutine
-        StartCoroutine(waitForDamage());
-       
+
         photonView.RPC("playAnimation",RpcTarget.All);
        
         //we will switch triggerlaunch to false when animation ends in attack script
@@ -64,17 +63,21 @@ public class axeWeapon : meleeWeapon
         //if we are facing right we want to multiply x*1 and  y*(-1)
         //if left then x*(-1) y*1
         //this is for when we are hitting with the axe from below
-        Vector3 normal = new Vector3(vector.y * facingInt, vector.x * -facingInt, 0);
+        Vector3 normal = new Vector3(vector.y * facingInt, vector.x * facingInt, 0);
         //make it jednotkovy vektor
+       // normal += new Vector3(1,1,0) * facingInt/1.5f;
         normal = normal / normal.magnitude;
-        normal += new Vector3(1,0,0) * facingInt/1.5f;
         return normal;
     }
 
     IEnumerator waitForDamage()
     {
-        yield return new WaitForSeconds(0.5f);
+        Animator animator = gameObject.GetComponent<Animator>();
+        yield return new WaitForSeconds(0.2f);
         triggerLaunch = true;
+        //wait for the end of the animation
+        yield return new WaitUntil((() => animator.GetCurrentAnimatorStateInfo(0).IsName("picked")));
+        triggerLaunch = false;
     }
     [PunRPC]
     void playAnimation()
@@ -82,6 +85,8 @@ public class axeWeapon : meleeWeapon
         Animator animator = gameObject.GetComponent<Animator>();
         animator.SetTrigger("axeAttack");
         addTrail(gameObject);
+        
+        StartCoroutine(waitForDamage());
     }
     
 

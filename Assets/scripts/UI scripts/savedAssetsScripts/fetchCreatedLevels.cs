@@ -98,8 +98,7 @@ public class fetchCreatedLevels : MonoBehaviour
         //move all buttons when one is deleted
         for (int i = 0; i < buttons.Count; i++)
         {
-            buttons[i].transform.localPosition =
-                new Vector3(-40, -30, 0) - new Vector3(0, 40, 0) * i;
+            buttons[i].transform.localPosition = new Vector3(buttons[i].transform.localPosition.x,-30 - 40 * i,0);
         }
     }
     private int[,] decodeAsset(string hex)

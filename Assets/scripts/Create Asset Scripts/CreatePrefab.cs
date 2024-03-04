@@ -28,6 +28,8 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
     public GameObject loadingScreen;
 
     private GameObject rpcHolder;
+
+    private Vector2 characterSize;
     //private float[] pixWidth;
     // Start is called before the first frame update
     void Start()
@@ -210,12 +212,13 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         //player is facing the wrong direction
         if (newAsset.CompareTag("Player"))
         {
+            characterSize = defSize;
            // newAsset.transform.Rotate(0,180,0);
             GameObject nameHolder = Instantiate(playerName);
             nameHolder.transform.position = newAsset.transform.position + new Vector3(0, 1.4f, 0);
             nameHolder.transform.rotation = Quaternion.Euler(0,0,0);
             nameHolder.transform.parent = newAsset.transform;
-            nameHolder.transform.localScale = Vector3.one * 3;
+            //nameHolder.transform.localScale = Vector3.one * 3;
             nameHolder.GetComponent<TMP_Text>().text = PhotonNetwork.LocalPlayer.NickName;
         }
         //parentHousing connects the life bar with the weapon
@@ -745,13 +748,13 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         print("rename player");
         GameObject player = PhotonView.Find(gameobjectID).gameObject;
         player.name = nameID;
-        
-       
     }
 
     [PunRPC] public void changePlayerTexture(int gameobjectID, int[] colors1D, int width)
     {
         GameObject player = PhotonView.Find(gameobjectID).gameObject;
+        //we have to set the size to the default before resizing it
+        player.transform.localScale = new Vector3(0.4f, 0.4f, 1);
         int length = colors1D.Length;
         int height =  length/ width;
         int[,] colorsRPC = new int[width, height];
@@ -762,77 +765,10 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             colorsRPC[x, y] = colors1D[i];
         }
         CombineSpriteArray(player, colorsRPC);
+        ResizeAssets(player,characterSize);
+        //resize the new player
         //we have to change the trail texture, bcs otherwise it would use the master clients texture
         player.GetComponent<CreateTrail>().createTexture();
         print("changed texture for player!!!!!");
     }
-    private Tuple<Vector2, Vector2> getBounds(Vector2[] path,PolygonCollider2D coll)
-    {
-        Vector2 minX = new Vector2(1000,-1000);
-        Vector2 maxX = new Vector2(-1000,-1000);
-        Vector2 offset = coll.offset;
-        foreach (var pointLocal in path)
-        {
-            
-            //we have to transform from local space to world space
-            Vector2 point = pointLocal - offset;//coll.transform.TransformPoint(pointLocal - offset);
-            print(point.x);
-            float xValue = point.x;
-            if (xValue < minX.x)
-            {
-                minX.x = xValue;
-            }
-
-            if (xValue > maxX.x)
-            {
-                maxX.x = xValue;
-            }
-            //we have to retrieve the roof of the platform
-            if (minX.y < point.y)
-            {
-                minX.y = point.y;
-                maxX.y = point.y;
-            }
-        }
-
-        return new Tuple<Vector2, Vector2>(minX, maxX);
-    }
-
-    private Vector3[] getSpawnPoints(Vector2 min, Vector2 max)
-    {
-        List<Vector3> spawnList = new List<Vector3>();
-        
-            int minX = (int)min.x;
-            int maxX = (int)max.x;
-            int maxY = (int)max.y;
-                
-            int spawnY = (int)maxY + 1;
-            for (int x = (int)minX + 1; x < (int)maxX - 1; x++)
-            {
-                //now we have increments of 1 on the length of the platform
-                Vector3 position = new Vector3(x, spawnY, 0);
-                //check if we are safe to spawn there by casting a raycast to the spawnPosition and checking if it collides with something
-                RaycastHit hit;
-                if (Physics.Raycast(Camera.main.transform.position, position, out hit, Mathf.Infinity))
-                {
-                    // Debug.DrawRay(Camera.main.transform.position, position * hit.distance, Color.yellow);
-                    if (!hit.collider.gameObject.CompareTag("ground"))
-                    {
-                        //we did not hit ground 
-                        spawnList.Add(position);
-                    }
-                    //we did hit something, dont spawn here
-                }
-                else
-                {
-                    //we did not hit anything we are safe to spawn here
-                    spawnList.Add(position);
-                }
-
-            }
-
-            return spawnList.ToArray();
-    }
-
-   
 }

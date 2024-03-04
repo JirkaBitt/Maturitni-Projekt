@@ -95,6 +95,8 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                 string playerID = PhotonNetwork.LocalPlayer.UserId;
                 CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID);
                 displayIcons.GetComponent<displayPlayerStats>().addPlayerTexture(playerID);
+                
+               // displaySpawnPoints();
                 //call rpc buffered so it runs even for players that join later
                 //we have to call it on the photonview of the roomcontroller because that is the only one with namePlayer function
                 //photonView.RPC("namePlayer",RpcTarget.AllBuffered,playerView.ViewID,PhotonNetwork.LocalPlayer.UserId);
@@ -224,34 +226,75 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                 int maxX = (int)bounds.Item2.x;
                 int maxY = (int)bounds.Item1.y;
                 
-                int spawnY = (int)maxY + 2;
+                int spawnY = (int)maxY + 1;
                 for (int x = (int)minX + 2; x < (int)maxX - 2; x++)
                 {
                     //now we have increments of 1 on the length of the platform
                     Vector3 position = new Vector3(x, spawnY, 0);
                     //check if we are safe to spawn there by casting a raycast to the spawnPosition and checking if it collides with something
-                    RaycastHit hit;
+               
+                    RaycastHit2D[] hits = Physics2D.CircleCastAll(position, 0.7f, Vector2.zero);
+                    if (hits.Length == 0)
+                    {
+                        print("no hits!!!!!!!!!!");
+                        spawnList.Add(position);
+                    }
+                    else
+                    {
+                        //check if some of the hits are ground
+                        bool hitGround = false;
+                        foreach (var oneHit in hits)
+                        {
+                            if (oneHit.collider.gameObject.CompareTag("ground"))
+                            {
+                                hitGround = true;
+                                break;
+                            } 
+                        }
+                        if (!hitGround)
+                        {
+                            spawnList.Add(position);
+                        }
+                    }
+                   
+                   
+                    /*
                     if (Physics.Raycast(Camera.main.transform.position, position, out hit, Mathf.Infinity))
                     {
                         // Debug.DrawRay(Camera.main.transform.position, position * hit.distance, Color.yellow);
+                        
                         if (!hit.collider.gameObject.CompareTag("ground"))
                         {
                             //we did not hit ground 
                             spawnList.Add(position);
                         }
+                        
                         //we did hit something, dont spawn here
                     }
                     else
                     {
                         //we did not hit anything we are safe to spawn here
-                        spawnList.Add(position);
-                    }
+                        //check the radius around the point
 
+                    }*/
                 }
             }
         }
         //return found spawnPoints
+        print("spawnPoints count = " + spawnList.Count);
         return spawnList.ToArray();
+    }
+
+    private void displaySpawnPoints()
+    {
+        foreach (var spawn in spawnPoint)
+        {
+            GameObject dis = new GameObject();
+            SpriteRenderer rend = dis.AddComponent<SpriteRenderer>();
+            rend.sprite = myPlayer.GetComponent<SpriteRenderer>().sprite;
+            dis.transform.localScale = new Vector3(0.05f, 0.05f, 1);
+            dis.transform.position = spawn;
+        }
     }
     private Tuple<Vector2, Vector2> getBounds(Vector2[] path,PolygonCollider2D coll)
     {
@@ -263,7 +306,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
             //we have to transform from local space to world space
             //we have to apply offset as well because it is relative to the collider
             Vector2 point = coll.transform.TransformPoint(pointLocal + offset);
-            print(point.x);
             float xValue = point.x;
             if (xValue < minX.x)
             {
@@ -402,7 +444,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
             scores.Add(players[i].name,stats[i].score);
             //here we cannot add the name of the gameobject bcs we dont know if it matches with the photon array
             nicks.Add(PhotonNetwork.PlayerList[i].UserId,PhotonNetwork.PlayerList[i].NickName);
-            players[i].SetActive(false);
+//            players[i].SetActive(false);
         }
         var sortedDict = scores.OrderBy(pair => pair.Value).ToList();
         //order by sorts it in an ascending order, but we want descending, player with highest score wins

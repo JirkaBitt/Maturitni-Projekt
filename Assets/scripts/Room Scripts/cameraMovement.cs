@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
@@ -15,11 +16,7 @@ public class cameraMovement : MonoBehaviourPunCallbacks
     public float cameraSpeed = 5f;
     // private CharacterController playerController;
    public Rigidbody2D rb;
-
-   
-
-   
-    // Start is called before the first frame update
+   // Start is called before the first frame update
     void Start()
     {
         players = GameObject.FindGameObjectsWithTag("Player");
@@ -29,25 +26,6 @@ public class cameraMovement : MonoBehaviourPunCallbacks
         mainCamera.transform.position += (Vector3)toPlayer;
 
     }
-
-    
-
-    /*public override void OnJoinedRoom()
-    {
-        //we have to wait before we instantiate the player
-        players = returnPlayers();
-        foreach (var onePlayer in players)
-        {
-            if (onePlayer.GetComponent<PhotonView>().IsMine)
-            {
-                player = onePlayer;
-            }
-        }
-        rb = player.GetComponent<Rigidbody2D>();
-        mainCamera = Camera.main;
-        cameraStartPosition = mainCamera.transform.position;
-    }
-*/
     // Update is called once per frame
     void Update()
     {
@@ -112,13 +90,23 @@ public class cameraMovement : MonoBehaviourPunCallbacks
        // players = returnPlayers();
         
         float cameraSize = 0;
-       
-        foreach (var onePlayer in players)
+        try
         {
-            Vector3 difference = onePlayer.transform.position - player.transform.position;
-            cameraSize += difference.magnitude;
+             foreach (var onePlayer in players)
+            {
+                Vector3 difference = onePlayer.transform.position - player.transform.position;
+                cameraSize += difference.magnitude;
             
+            }
         }
+        catch (Exception e)
+        {
+            //some player could have left the game via crash or something else, so we have to have catch and update the players in there
+            updatePlayers();
+            Console.WriteLine(e);
+            throw;
+        }
+       
         //we want to divide cameraSize with playercount so it reflects an avarage value
         //-1 because our player is a part of players as well
         cameraSize = cameraSize / ((players.Length) * cameraZoomDivider);

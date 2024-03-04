@@ -45,7 +45,6 @@ public class assetInfo : MonoBehaviour
             }
         }
     }
-
    public void turnOffAnimation()
    {
        if (hasAnimation)

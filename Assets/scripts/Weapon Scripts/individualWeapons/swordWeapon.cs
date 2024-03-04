@@ -29,9 +29,8 @@ public class swordWeapon : meleeWeapon
             //player is in the air so he can launch with the sword down
             Vector3 normal = new Vector3(vector.y * -facingInt , vector.x * facingInt, 0);
             //make it jednotkovy vektor
-            normal = normal / normal.magnitude;
             normal += facingInt * new Vector3(1,0,0);
-            print(normal);
+            normal = normal / normal.magnitude;
             return normal;
         }
         //we are on the ground so launch him up
@@ -65,6 +64,13 @@ public class swordWeapon : meleeWeapon
             }
         }
     }
+
+    IEnumerator waitForAnimationEnd()
+    {
+        Animator animator = gameObject.GetComponent<Animator>();
+        yield return new WaitUntil((() => animator.GetCurrentAnimatorStateInfo(0).IsName("picked")));
+        triggerLaunch = false;
+    }
     [PunRPC]
     void playAnimation()
     {
@@ -72,5 +78,7 @@ public class swordWeapon : meleeWeapon
         Animator animator = gameObject.GetComponent<Animator>();
         animator.SetTrigger("swordAttack");
         addTrail(gameObject);
+
+        StartCoroutine(waitForAnimationEnd());
     }
 }

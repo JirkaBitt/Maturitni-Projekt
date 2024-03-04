@@ -57,15 +57,15 @@ public abstract class meleeWeapon : weapon
       PolygonCollider2D coll = enemy.GetComponent<PolygonCollider2D>();
       rb.gravityScale = 0;
       //set istrigger to true so that we can launch him and he does not get stuck
-      coll.isTrigger = true;
+      
       //only target non trigger objects
       ContactFilter2D filter2D = new ContactFilter2D();
       filter2D.useTriggers = false;
-      
-      yield return new WaitForSeconds(0.06f);
-      //set the collider to non triger
+
+      coll.isTrigger = true;
+      yield return null;
       coll.isTrigger = false;
-         //wait until we hit an object
+      //wait until we hit an object
       float waitTime = totalForce / 50;
       Stopwatch timer = new Stopwatch();
       timer.Start();

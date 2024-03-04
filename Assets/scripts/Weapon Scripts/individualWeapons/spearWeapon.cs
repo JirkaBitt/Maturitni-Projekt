@@ -50,8 +50,8 @@ public class spearWeapon : meleeWeapon
                     print("launch enemy");
                     Vector3 launchV = computeLaunchVector();
                     //check if we are hitting the player from the front of the spear and not the back of it
-                    float launchDirection = launchV.x / Mathf.Abs(launchV.x);
-                    if (launchDirection == -playerHoldingThisWepon.transform.right.x)
+                    int launchDirection = Mathf.RoundToInt(launchV.x / Mathf.Abs(launchV.x));
+                    if (launchDirection == playerHoldingThisWepon.transform.right.x)
                     {
                         this.launchEnemy(enemyInRange, launchV, force);
                         triggerLaunch = false;
@@ -115,10 +115,18 @@ public class spearWeapon : meleeWeapon
     [PunRPC]
     void resumeAnimation()
     {
+        triggerLaunch = true;
         Animator animator = gameObject.GetComponent<Animator>();
         animator.speed = 1;
         addTrail(gameObject);
+
+        StartCoroutine(waitForAnimationEnd());
     }
-   
+    IEnumerator waitForAnimationEnd()
+    {
+        Animator animator = gameObject.GetComponent<Animator>();
+        yield return new WaitUntil((() => animator.GetCurrentAnimatorStateInfo(0).IsName("picked")));
+        triggerLaunch = false;
+    }
     
 }

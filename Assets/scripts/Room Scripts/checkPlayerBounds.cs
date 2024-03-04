@@ -8,7 +8,6 @@ using Random = UnityEngine.Random;
 public class checkPlayerBounds : MonoBehaviourPunCallbacks
 {
     private PUN2_RoomController controller;
-    public Vector3[] respawnPoints;
     // Start is called before the first frame update
     void Start()
     {
@@ -26,18 +25,22 @@ public class checkPlayerBounds : MonoBehaviourPunCallbacks
         GameObject gObject = other.gameObject;
         //PhotonView photonView = gameObject.GetComponent<PhotonView>();
         //we can only delete the player from isMine
-        if (gObject.CompareTag("Player")){
-            
+        if (gObject.CompareTag("Player"))
+        {
+            PhotonView playerView = gObject.GetPhotonView();
+            if (!playerView.IsMine)
+            {
+                return;
+            }
             playerStats stats = gObject.GetComponent<playerStats>();
-            stats.percentage = 0;
-            stats.Knockouts += 1;
-            stats.score -= 1;
             if (stats.lastAttacker != null)
             {
                 //we have to credit the last guy that launched us
-                playerStats enemyStats = stats.lastAttacker.GetComponent<playerStats>();
-                enemyStats.score += 1;
-                stats.lastAttacker = null;
+                photonView.RPC("addScore",RpcTarget.All,stats.lastAttacker.GetPhotonView().ViewID,playerView.ViewID,true);
+            }
+            else
+            {
+                photonView.RPC("addScore",RpcTarget.All,0,playerView.ViewID,false);
             }
             GameObject weapon = stats.currentWeapon;
             //delete weapon if player is holding it
@@ -46,8 +49,6 @@ public class checkPlayerBounds : MonoBehaviourPunCallbacks
                 //pickWeapon pickScript = other.GetComponent<pickWeapon>();
                 int photonID = weapon.GetPhotonView().ViewID;
                 //drop the weapon and then destroy it
-                //pickScript.dropWeapon(photonID);
-                //PhotonNetwork.Destroy(weapon);
                 photonView.RPC("deleteWeapon",RpcTarget.All,photonID,gObject.GetPhotonView().ViewID);
             }
 
@@ -78,8 +79,24 @@ public class checkPlayerBounds : MonoBehaviourPunCallbacks
         GameObject weapon = PhotonView.Find(weaponID).gameObject;
         
         pickWeapon pickScript = player.GetComponent<pickWeapon>();
-      //drop the weapon on all instances
+        //drop the weapon on all instances
         pickScript.drop(true,weapon);
+       
+    }
+
+    [PunRPC]
+    public void addScore(int addObj, int removeObj, bool hasAttacker)
+    {
+        GameObject defeated = PhotonView.Find(removeObj).gameObject;
+        playerStats defeatedStats = defeated.GetComponent<playerStats>();
+        defeatedStats.score -= 1;
+        defeatedStats.percentage = 0;
+        if (hasAttacker)
+        {
+             GameObject attacker = PhotonView.Find(addObj).gameObject;
+             attacker.GetComponent<playerStats>().score += 1;
+             defeatedStats.lastAttacker = null;
+        }
        
     }
 }
