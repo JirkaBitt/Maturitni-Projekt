@@ -10,7 +10,6 @@ public class showAllResults : MonoBehaviour
     // Start is called before the first frame update
     public GameObject resultContainer;
     public GameObject resultPrefab;
-
     public GameObject[] podiumWinners = new GameObject[3]; //0 is first, 1 is second, 2 is third
     void Start()
     {

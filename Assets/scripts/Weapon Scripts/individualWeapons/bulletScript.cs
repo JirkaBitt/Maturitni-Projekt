@@ -11,6 +11,7 @@ public class bulletScript : MonoBehaviour
     public Vector3 launchVector = Vector3.zero;
     private bool alreadyAdded = false;
     public GameObject player;
+
     void Start()
     {
         
@@ -33,7 +34,7 @@ public class bulletScript : MonoBehaviour
         }
     }
 
-    private void OnTriggerStay2D(Collider2D col)
+    private void OnTriggerEnter2D(Collider2D col)
     {
         //check if we have shot the gun
         print(col.gameObject.name);
@@ -48,9 +49,7 @@ public class bulletScript : MonoBehaviour
                 if (bulletPhotonView.IsMine)
                 {
                     PhotonView enemyPhotonView = hit.GetPhotonView();
-                    bulletPhotonView.RPC("addForceBullet", RpcTarget.All, enemyPhotonView.ViewID, launchVector, 80f);
-                    
-                    PhotonNetwork.Destroy(gameObject);
+                    bulletPhotonView.RPC("addForceBullet", RpcTarget.AllViaServer, enemyPhotonView.ViewID, launchVector, 80f);
                 }
             }
 
@@ -85,5 +84,10 @@ public class bulletScript : MonoBehaviour
         Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();
         
         rb.AddForce(launchVector * (force + stats.percentage*2));
+        enemy.GetComponent<CreateTrail>().createTrail();
+        if (gameObject.GetPhotonView().IsMine)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
     }
 }

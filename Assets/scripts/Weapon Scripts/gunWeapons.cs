@@ -35,7 +35,7 @@ public abstract class gunWeapons : weapon
         Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();
    
         rb.AddForce(launchVector * (force*6 + stats.percentage*2));
-      
+        enemy.GetComponent<CreateTrail>().createTrail();
 
     }
 }

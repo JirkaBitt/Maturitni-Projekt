@@ -54,7 +54,8 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
     private GameObject myPlayer;
 
     public bool spawningEnabled = true;
-    
+
+    public GameObject playAgainButton;
     //private List<playerStats> _statsList = new List<playerStats>();
     // Use this for initialization
     void Start()
@@ -82,6 +83,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                 spawnPoint = findRespawnPositions();
                 //GameObject arena = PhotonNetwork.Instantiate("Arena", Vector3.zero, Quaternion.identity);
                 GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[0], Quaternion.identity);
+                player.transform.position = spawnPoint[0];
                 myPlayer = player;
                 //disable some scripts before the start
                 beforeStart(player);
@@ -93,7 +95,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                 camScript.rb = player.GetComponent<Rigidbody2D>();
                 //we have to call it on create prefabs because room controller is disabled at the start of the game
                 string playerID = PhotonNetwork.LocalPlayer.UserId;
-                CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID);
+                CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID,PhotonNetwork.LocalPlayer.NickName);
                 displayIcons.GetComponent<displayPlayerStats>().addPlayerTexture(playerID);
                 
                // displaySpawnPoints();
@@ -101,6 +103,10 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                 //we have to call it on the photonview of the roomcontroller because that is the only one with namePlayer function
                 //photonView.RPC("namePlayer",RpcTarget.AllBuffered,playerView.ViewID,PhotonNetwork.LocalPlayer.UserId);
                 
+            }
+            else
+            {
+                joinedFromCreate();
             }
         }
     }
@@ -134,6 +140,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
        int randomSpawnIndex = Random.Range(0, spawnPoint.Length);
       
         GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[randomSpawnIndex], Quaternion.identity, 0);
+        player.transform.position = spawnPoint[randomSpawnIndex];
         myPlayer = player;
         beforeStart(player);
         //name him after the player so we can find him in onGUI
@@ -148,7 +155,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         //we have to call it on the photonview of the roomcontroller because that is the only one with namePlayer function
         CreatePrefab createScript = CreatePrefabs.GetComponent<CreatePrefab>();
         string playerID = PhotonNetwork.LocalPlayer.UserId;
-        createScript.renamePlayer(playerID, playerView.ViewID);
+        createScript.renamePlayer(playerID, playerView.ViewID,PhotonNetwork.LocalPlayer.NickName);
         createScript.changePlayer(player);
         displayIcons.GetComponent<displayPlayerStats>().addPlayerTexture(playerID);
         //add the player to all camera movement scripts
@@ -389,7 +396,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         {
             CreatePrefabs.GetComponent<CreatePrefab>().changePlayer(player);
         }
-        CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID);
+        CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID,PhotonNetwork.LocalPlayer.NickName);
         photonView.RPC("updateCameraPlayers",RpcTarget.AllBuffered);
         displayIcons.GetComponent<displayPlayerStats>().addPlayerTexture(playerID);
     }
@@ -403,6 +410,8 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         clock.GetComponent<countDown>().startCount();
         RoomIDText.SetActive(false);
         startGameButton.SetActive(false);
+        //disable the button even for those that are still in the result ui
+        playAgainButton.SetActive(false);
         //only the master will spawn the weapons, but we want to run it at all clients in case that one of them bbecomes master
         StartCoroutine(spawnWeapon());
         
@@ -416,6 +425,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
     {
         inGameUI.SetActive(false);
         startGameButton.SetActive(false);
+        playAgainButton.SetActive(true);
         hideGUI = true;
         spawningEnabled = false;
         cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
@@ -429,7 +439,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                 PhotonNetwork.Destroy(weap);
             }
         }
-
         int playerCount = players.Length;
         endGUI.SetActive(true);
         showAllResults showResults = endController.GetComponent<showAllResults>();
@@ -469,5 +478,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         //clear the values, we will assign them again if player wants to play again 
         displayIcons.GetComponent<displayPlayerStats>().clearValues();
         displayIcons.SetActive(false);
+        
+        StopCoroutine("spawnWeapon");
     }
 }

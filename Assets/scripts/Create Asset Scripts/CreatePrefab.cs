@@ -10,42 +10,44 @@ using UnityEngine;
 
 public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
 {
+    //serializable variables that are assigned in unity
     public GameObject[] defaults;
     public string[] defaultsNames;
-    public string[] PhotonNames;
+    //this dictionary is created from the two previous arrays
     public Dictionary<string,GameObject> assetData = new Dictionary<string, GameObject>();
-   
+    //array of all spawn locations calculated at the start of the game
     private Vector3[] spawns;
+    //reference too the gameobject that has the controller script
     public GameObject controller;
-   
+    //reference to the object that detects when we are launched outside the map
     public GameObject scenebounds;
+    //reference to the prefab that is assigned to the weapons
     public GameObject lifeBar;
+    //reference to the prefab that is assigned to the player
     public GameObject playerName;
+    //Photon normally uses the Resource folder to spawn the weapons, but we are making the objects in runtime, so we add them to the defaultpool from where photon can spawn it
     DefaultPool pool = PhotonNetwork.PrefabPool as DefaultPool;
-
+    //we will calculate the number of created assets, there is a waituntil that checks that numberOfCreated == the number we want to create
     private int numberOfCreated = 0;
-
+    //reference to the loading screen that is active until we have created all assets
     public GameObject loadingScreen;
-
-    private GameObject rpcHolder;
-
+    //the size of the player, we have to remember it bcs we will be resizing the other players when theirs texture is changed
     private Vector2 characterSize;
-    //private float[] pixWidth;
-    // Start is called before the first frame update
+  
     void Start()
     {
+        //we want to reset the dictionaries, photon remembers them when we load the scene again
         numberOfCreated = 0;
         pool.ResourceCache.Clear();
         assetData.Clear();
-        rpcHolder = new GameObject();
-        rpcHolder.AddComponent<assetHolder>();
+        
         for (int i = 0; i < defaults.Length; i++)
         {
             assetData.Add(defaultsNames[i],defaults[i]);
         }
-
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
+            //if we are the master client, that means we have drawn the assets and we will send the info to the other players
             GameObject sceneAssets = GameObject.Find("AssetHolder");
             assetHolder holder = sceneAssets.GetComponent<assetHolder>();
             foreach (var AssetName in defaultsNames)
@@ -53,12 +55,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
                 Create(holder.assets[AssetName],AssetName);
             }
         }
-        else
-        {
-            
-        }
-      
-        //add callback to spawn the player and room
+        //wait until we have created all assets, then start the game
         StartCoroutine(waitForAsets());
     }
 
@@ -67,10 +64,10 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         
     }
-
-    public void renamePlayer(string Name, int id)
+    public void renamePlayer(string Name, int id, string nickname)
     {
-        photonView.RPC("namePlayer",RpcTarget.AllBuffered,id,Name);
+        //rename player renames the player on all clients to the users Id
+        photonView.RPC("namePlayer",RpcTarget.AllBuffered,id,Name,nickname);
     }
 
     public void changePlayer(GameObject player)
@@ -81,6 +78,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
 
         int[,] colors = holder.assets["Character"];
         List<int> color1D = new List<int>();
+        //bcs photon RPC cannot send 2D array, we have to convert it to 1D and on the clients remake it to 2D with the width
         int arrayWidth = colors.GetLength(0);
         int yHeight = colors.GetLength(1);
         for (int y = 0; y < yHeight; y++)
@@ -97,28 +95,16 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
     }
     IEnumerator waitForAsets()
     {
-        
         print("start wait");
         yield return new WaitUntil(() => numberOfCreated == defaults.Length);
         print("end wait");
-        //PhotonNetwork.Instantiate("Arena", Vector3.zero, Quaternion.identity);
+        //when we activate the controller it handles the rest of the work 
         controller.SetActive(true);
         scenebounds.SetActive(true);
         loadingScreen.SetActive(false);
-        
-       // controller.GetComponent<PUN2_RoomController>().spawnPoint = spawns;
-        if (!PhotonNetwork.LocalPlayer.IsMasterClient)
-        {
-            controller.GetComponent<PUN2_RoomController>().joinedFromCreate();
-        }
-        else
-        {
-           
-        }
     }
     public void Create(int [,] colors, string name)
     {
-        //call RPC, it has to be buffered so that players that join later will create the assets as well
         List<int> color1D = new List<int>();
         int arrayWidth = colors.GetLength(0);
         for (int y = 0; y < colors.GetLength(1); y++)
@@ -130,22 +116,22 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         }
         object[] content = new object[] {color1D.ToArray(),arrayWidth,name};
         //if we set the caching option to roomcacheglobal it will remain in the room even if the master client leaves
+        //raise Event is an alternative to RPC, why I use it here is bcs it will stay in the room even if the master client leaves, so that other players are able to create the assets as well
         RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All,CachingOption = EventCaching.AddToRoomCacheGlobal};
         PhotonNetwork.RaiseEvent(1, content, raiseEventOptions, SendOptions.SendReliable);
-        //gameObject.GetPhotonView().RPC("copyComponents",RpcTarget.AllBufferedViaServer,color1D.ToArray(),arrayWidth,name);
     }
     public void OnEvent(EventData photonEvent)
     {
+        //the raise events are resulted here
         byte eventCode = photonEvent.Code;
-
         if (eventCode == 1)
         {
             object[] data = (object[])photonEvent.CustomData;
-
+            //deserialize the info about the assets
             int[] intArray = (int[])data[0];
             int width = (int)data[1];
             string assetName = (string)data[2];
-            
+            //create a copy of the asset on the clients computer
             copyComponents(intArray,width,assetName);
         }
     }
@@ -156,7 +142,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             //we have already created all assets
             return;
         }
-
+        //decode the 1D array back to 2D
         int height = colors1D.Length / width;
         int[,] colorsRPC = new int[width, height];
         for (int i = 0; i < colors1D.Length; i++)
@@ -165,90 +151,55 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             int y = i / width;
             colorsRPC[x, y] = colors1D[i];
         }
-        //we want to save the int arrays on all clients in case that the master leaves
-        rpcHolder.GetComponent<assetHolder>().assets.Add(nameRPC, colorsRPC);
+        //get the prefab of this asset that already has all the scripts on it
         GameObject newAsset = assetData[nameRPC];
-        //assign the default object to the sceneAssets
         newAsset = Instantiate(newAsset);
         if (newAsset.CompareTag("Player"))
         {
             newAsset.GetComponent<PUN2_PlayerSync>().enabled = true;
         }
-
         assetInfo info = newAsset.GetComponent<assetInfo>();
-        
         newAsset.name = nameRPC;
-        //defaultParent.transform.parent = objectPrefab.transform.parent;
-        //check if default parent has children, if yes then destroy them
-        /*
-        int childCount = DefaultGameObject.transform.childCount;
-
-        if (childCount != 0)
-        {
-            for (int j = 0; j < childCount; j++)
-            {
-                //destroy children of the parent object
-                Destroy(DefaultGameObject.transform.GetChild(j).gameObject);
-            }
-        }
-*/
-        //remove collider and SpriteRenderer
-
-        if (newAsset.GetComponent<PolygonCollider2D>() != null)
-        {
-            Destroy(newAsset.GetComponent<PolygonCollider2D>());
-        }
-        
-        //Destroy(defaultParent.GetComponent<SpriteRenderer>());
-       // defaultParent.transform.position = objectPrefab.transform.position;
-       //CombineSpriteArray();
-        // Sprite finalSprite = objectPrefab.GetComponent<SpriteRenderer>().sprite;
-        //  DefaultGameObject.GetComponent<SpriteRenderer>().sprite = finalSprite;
+        //create and assign the texture to this asset, it will also create a new polygon collider
         CombineSpriteArray(newAsset, colorsRPC);
-      
+        //resize the asset to the size of the original set size
         Vector2 defSize = new Vector2(info.width, info.height);
         ResizeAssets(newAsset,defSize);
-        
-        //player is facing the wrong direction
         if (newAsset.CompareTag("Player"))
         {
+            //assign the nickname holder to the player
             characterSize = defSize;
-           // newAsset.transform.Rotate(0,180,0);
             GameObject nameHolder = Instantiate(playerName);
             nameHolder.transform.position = newAsset.transform.position + new Vector3(0, 1.4f, 0);
             nameHolder.transform.rotation = Quaternion.Euler(0,0,0);
             nameHolder.transform.parent = newAsset.transform;
-            //nameHolder.transform.localScale = Vector3.one * 3;
+            //set the nickname
             nameHolder.GetComponent<TMP_Text>().text = PhotonNetwork.LocalPlayer.NickName;
         }
-        //parentHousing connects the life bar with the weapon
-      
         if (newAsset.CompareTag("weapon") && nameRPC != "Projectile")
         {
             //spawn the life bar and move it to the weapon
             GameObject bar = Instantiate(lifeBar);
             bar.transform.position = newAsset.transform.position + new Vector3(0, 1.2f, 0);
-           
             bar.transform.parent = newAsset.transform;
             bar.GetComponent<decreaseWeaponLife>().weapon = newAsset;
-           
         }
-
+        //check if the object has the ability to create a trail
         if (newAsset.TryGetComponent<CreateTrail>(out var component))
         {
+            //create a texture for the trail
             component.createTexture();
         }
+        //set the hasSprite to false, so that when a new instance is created, it will not calculate the sprite size
         info.hasSprite = false;
+        //finally add the asset to the default pool
         pool.ResourceCache.Add(nameRPC, newAsset);
-            // DontDestroyOnLoad(DefaultGameObject);
         newAsset.SetActive(false);
-          
         numberOfCreated++;
     }
     public void CombineSpriteArray(GameObject attach, int[,] colorsRPC)
     {
-       
-            //find the first and last black pixel
+        //find the first and last black pixel
             int length = colorsRPC.GetLength(0);
             int height = colorsRPC.GetLength(1);
             int firstX = length;
@@ -304,11 +255,8 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             {
                 for (int x = firstX; x < lastX; x++)
                 {
-                    //combinedTexture.SetPixels(x * spritesArray.Length, y * spritesArray[0].Length, spritesWidth, spritesHeight, spritesArray[x][y].texture.GetPixels((int)spritesArray[x][y].textureRect.x, (int)spritesArray[x][y].textureRect.y, (int)spritesArray[x][y].textureRect.width, (int)spritesArray[x][y].textureRect.height));
-                    // For a working script, use:
                     if (colorsRPC[x, y] == 1)
                     {
-                        //set the pixel black
                         if (!foundCorner)
                         {
                             //find the first corner pixel in the array
@@ -326,13 +274,8 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
                             spritesHeight,
                             transparent);
                     }
-                    
-                   // pixelClass[x,y].deactivate();
-                    
-                   
                 }
             }
-            
             combinedTexture.Apply();
 
             Sprite final = Sprite.Create(combinedTexture,
@@ -348,6 +291,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
                 SpriteRenderer ren = attach.AddComponent<SpriteRenderer>();
                 ren.sprite = final;
             }
+            //destroy any colliders the object might have, we will create new ones
             Collider2D[] colls = attach.GetComponents<Collider2D>();
             if (colls != null)
             {
@@ -356,9 +300,10 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
                     Destroy(coll);
                 }
             }
+            //this is the width of one pixel in pixels(not unity units)
             float pixWidth = combinedTexture.width / texturePixelSize.x;
-           //go from the middle of the sprite to the bootom corner and from there navigate with firstblackPixel to the first corner of the real sprite, that is the starting position
-          
+           //go from the middle of the sprite to the bottom corner and from there navigate with firstblackPixel to the first corner of the real sprite, that is the starting position
+           //find the offset of the texture and the coordinates of the first black pixel, so that we can allign the collider
            firstBlackPixelCur = (Vector2)final.bounds.center -
                new Vector2(combinedTexture.width / 2, combinedTexture.height / 2) * 0.01f + firstBlackPixelCur;
          
@@ -367,7 +312,6 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
     public Vector2[]getColliderPoints(ref int[,] array)
     {
         List<Vector2> corners = new List<Vector2>();
-       
         //we want to get edges of colliders to create one polygon collider
         Vector2 startPixelIndex = findStartingIndex(array);
         if (startPixelIndex == Vector2.positiveInfinity)
@@ -379,19 +323,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
        // pixel startPixel = pixelClass[(int)startPixelIndex.x,(int)startPixelIndex.y];
         Vector2 startCorner = startPixelIndex + new Vector2(-0.5f, -0.5f);
         corners.Add(startCorner);
-        
         //we can go up, right, left, down
-        /*
-        Vector2[] cornerOffset = new Vector2[4];
-        //bottom left
-        cornerOffset[0] = new Vector2(-0.5f, -0.5f);
-        //bottom right
-        cornerOffset[1] = new Vector2(0.5f, -0.5f);
-        //top left 
-        cornerOffset[2] = new Vector2(-0.5f, 0.5f);
-        //top Right
-        cornerOffset[3] = new Vector2(0.5f, 0.5f);
-        */
         //check if we have pixels on the sides of this corner
         Vector2 curPixel = startPixelIndex;
         Vector2 curDirection = Vector2.right;
@@ -409,14 +341,12 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             curCorner = coordinates.Item1;
             curPixel = coordinates.Item2;
             curDirection = coordinates.Item3;
-            
             //do this until we find an existing corner in the array, the starter corner will always be at the change of a direction
             if (curCorner == startCorner)
             {
                 //we are back at the start
                 //we have completed the circle and the collider is complete
                 break;
-                
             }
             else
             {
@@ -427,11 +357,10 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
                     
                      legacyDirection = curDirection;
                 }
-               
             }
         }
         //delete the pixels we have already completed
-        //ref is a reference to the rray so that i
+        //ref is a reference to the array so that it actually removes the ints from it
         deleteCompletedPixels(startPixelIndex, ref array);
         return corners.ToArray();
     }
@@ -440,14 +369,14 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
     public void deleteCompletedPixels(Vector2 startIndex, ref int[,] array)
     {
         //this will delete every pixel it touches and chain it
+        //we supply it with the original pixel and all pixels that have noncorner touch with it will be destroyed
         Vector2 curIndex = startIndex;
         int width = array.GetLength(0);
         int height = array.GetLength(1);
         int curPixel =  array[(int)curIndex.x, (int)curIndex.y];
         if (curPixel == 1)
         {
-            //curPixel.delete();
-             array[(int)curIndex.x, (int)curIndex.y] = 0;
+            array[(int)curIndex.x, (int)curIndex.y] = 0;
         }
         else
         {
@@ -460,12 +389,10 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         paths[2] = curIndex + Vector2.up;
         paths[3] = curIndex + Vector2.down;
         //start new instance of this func with every path and delete current pixel
-
         for (int i = 0; i < 4; i++)
         {
             if (isInBounds(paths[i], width, height))
             {
-                
                 //recursevely call this function
                 deleteCompletedPixels(paths[i], ref array);
             }
@@ -474,12 +401,12 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
     //is in bounds checks if the supplied indexes are inside the bounds of the wanted array width and height
     bool isInBounds(Vector2 index, int width, int height)
     {
+        //check if we are within the boundries of an array
         bool returnValue = false;
         if (index.x >= 0 && index.x < width && index.y >= 0 && index.y < height)
         {
             returnValue = true;
         }
-
         return returnValue;
     }
     //find next corner works with direction, pixel index and corner index to determine the next index of the corner and the direction we want to continue
@@ -491,14 +418,14 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         Vector2[] touchingPixelsIndexes = new Vector2[4];
        
         //find the touching pixels with the corner offset multiplied by 2
-        Vector2 cornerOff = cornerPosition - pixelIndex;
-        touchingPixelsIndexes[0] = cornerPosition + new Vector2(0.5f, 0.5f);// new Vector2(pixelIndex.x + cornerOff.x * 2, pixelIndex.y);
-        touchingPixelsIndexes[1] = cornerPosition + new Vector2(-0.5f, 0.5f);//new Vector2(pixelIndex.x, pixelIndex.y +cornerOff.y*2);
-        touchingPixelsIndexes[2] = cornerPosition + new Vector2(0.5f, -0.5f);//new Vector2(pixelIndex.x + cornerOff.x * 2, pixelIndex.y+ cornerOff.y*2);
-        touchingPixelsIndexes[3] = cornerPosition + new Vector2(-0.5f, -0.5f);//new Vector2(pixelIndex.x + cornerOff.x * 2, pixelIndex.y+ cornerOff.y*2);
+        touchingPixelsIndexes[0] = cornerPosition + new Vector2(0.5f, 0.5f);
+        touchingPixelsIndexes[1] = cornerPosition + new Vector2(-0.5f, 0.5f);
+        touchingPixelsIndexes[2] = cornerPosition + new Vector2(0.5f, -0.5f);
+        touchingPixelsIndexes[3] = cornerPosition + new Vector2(-0.5f, -0.5f);
      
         int width = array.GetLength(0);
         int height = array.GetLength(1);
+        //check how many of the surrounding pixels are black
         for (int i = 0; i < 4; i++)
         {
             //check if we are inside the bounds of the pixelArray
@@ -512,34 +439,16 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
                     touchingPixels.Add(touchingPixelsIndexes[i]);
                 }
             }
-            else
-            {
-                //we are putside the bounds
-               
-            }
         }
-       
         //we have four options
         //1) we are touching one pixel so we go straight
         //2) touching two pixels, we go to the one that is oposite to ours
         //3) we are touching none, go to the next corner of the same pixel
-        //4) we are touching only the pixel oposite to ours, so the touch is only in the corner, ignore tjis and act like we are touching none
+        //4) we are touching only the pixel oposite to ours, so the touch is only in the corner, ignore this and act like we are touching none
         
         //1 && 4)
         if (touchingPixels.Count == 2)
         {
-            /*
-            Vector2 diff = touchingPixels[0].Item2 - pixelIndex;
-            if (diff.x != 0 && diff.y != 0)
-            {
-                //this is 4), it is the oposite one
-            }
-            else
-            {
-                // this is 1) so move in the direction of diff
-                returnValue = new Tuple<Vector2, Vector2,Vector2>(cornerPosition + diff, touchingPixels[0].Item2,diff);
-            }
-            */
             if (touchingPixels.Contains(pixelIndex + direction))
             {
                 //we have checked that this is the following pixel in line
@@ -549,38 +458,14 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             else
             {
                 //it is a corner touch
-                //clear the array and add the current pixel, the code bellow for count==1 will trigger
+                //clear the array and add the current pixel, the code bellow for count==1 would trigger
                 touchingPixels.Clear();
                 touchingPixels.Add(pixelIndex);
             }
         }
-
         if (touchingPixels.Count == 3)
         {
-            /*
-            Vector2 notTheOpposite = Vector2.zero;
-            Vector2 opposite = Vector2.zero;
-            for (int i = 0; i < 2; i++)
-            {
-                Vector2 diff = touchingPixels[i].Item2 - pixelIndex;
-                if (diff.x == 0 || diff.y == 0)
-                {
-                    //this isnt the oposite one, ignore it
-                    notTheOpposite = touchingPixels[i].Item2;
-                }
-                else
-                {
-                    //this is the oposite one
-                    //we get the direction as the opposite pixel minus the pixel that touches both the pixels
-                    opposite = touchingPixels[i].Item2;
-                }
-            }
-            Vector2 dir = opposite - notTheOpposite;
-            returnValue = new Tuple<Vector2, Vector2, Vector2>(cornerPosition + dir, notTheOpposite,dir);
-            */
             Vector2[] normals = new Vector2[2];
-           
-            //Vector2 normal = cornerOffset - direction;
             //create normals on the direction
             normals[0] = new Vector2(-direction.y, direction.x);
             normals[1] = new Vector2(direction.y, -direction.x);
@@ -593,14 +478,12 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
                     returnValue = new Tuple<Vector2, Vector2, Vector2>(cornerPosition + normals[0], touchingPixels[i] + normals[0],normals[0]);
                     break;
                 }
-                
                 if (touchingPixels.Contains(touchingPixels[i] + normals[1]) && touchingPixels[i] -direction == pixelIndex)
                 {
                     //we have found the right way to go
                     returnValue = new Tuple<Vector2, Vector2, Vector2>(cornerPosition + normals[1], touchingPixels[i] + normals[1],normals[1]);
                     break;
                 }
-
             }
         }
         //we are not touching any pixels, so choose a different corner from the same pixel
@@ -609,14 +492,11 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             //move to the next corner, we will figure it out based on the drection and current offset
             Vector2 cornerOffset = cornerPosition - pixelIndex;
             //we want to flip the corner around the direction vector
-          
-            
             if (direction.x != 0)
             {
                 //we want to flip the Y coordinate of the corner!!!!
                 cornerOffset *= new Vector2(1, -1);
             }
-
             if (direction.y != 0)
             {
                 //flip the X of the corner!!!
@@ -627,18 +507,20 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             returnValue = new Tuple<Vector2, Vector2, Vector2>(pixelIndex + cornerOffset, pixelIndex, dir);
         }
         return returnValue;
-
     }
     //find starting findex goes throw the array from the bottom left corner and checks for the first black pixel, if it founds it then it returns it
     public Vector2 findStartingIndex(int[,] array)
     {
+        //find the first black pixel from bottom left corner
         Vector2 coordinates = Vector2.positiveInfinity;
         bool breakOut = false;
-        for (int y = 0; y < array.GetLength(1); y++)
+        int height = array.GetLength(1);
+        int width = array.GetLength(0);
+        for (int y = 0; y < height; y++)
         {
-            for (int x = 0; x < array.GetLength(0); x++)
+            for (int x = 0; x < width; x++)
             {
-                int possiblePixel =array[x, y];
+                int possiblePixel = array[x, y];
                 if (possiblePixel == 1)
                 {
                     coordinates = new Vector2(x, y);
@@ -652,53 +534,43 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
                 break;
             }
         }
-
         return coordinates;
     }
     public void createPollygonCollider(float pixWidth,Vector2 spriteCorner, GameObject DefaultGameObject, int[,] array)
     {
-        
         PolygonCollider2D coll = DefaultGameObject.AddComponent<PolygonCollider2D>();
-        SpriteRenderer spriteRenderer = DefaultGameObject.GetComponent<SpriteRenderer>();
+        //index keeps track of the current path of the polygon collider
         int index = 0;
         Vector2 startCorner = Vector2.zero;
         bool foundStartCorner = false;
         List<Vector2> collPoints = new List<Vector2>();
-       
-       //conversion from pixels to units is that we divide it by 100
+        //conversion from pixels to units is that we divide it by 100
         float factor = pixWidth * 0.01f;
-      
-        List<Vector3> spawnppoints = new List<Vector3>();
         while (ArePixelsLeft(array))
         {
             collPoints.AddRange(getColliderPoints(ref array));
             coll.pathCount = index + 1;
             for (int i = 0; i < collPoints.Count; i++)
             {
-                //we have to resize the vectors to the real size of the sprite
+                //we have to resize the vectors to the real size of the sprite, bcs it odes not match with unity units
                 collPoints[i] *= factor;
             }
-
             //start corner is the most bottom left corner of the collider
             if (!foundStartCorner)
             {
+                //once we have found it we dont want to go here anymore
                 startCorner = collPoints.First();
                 foundStartCorner = true;
             }
             coll.SetPath(index, collPoints.ToArray());
-            /*
-            Tuple<Vector2, Vector2> bounds = getBounds(collPoints.ToArray(), coll);
-            spawnppoints.AddRange(getSpawnPoints(bounds.Item1,bounds.Item2));
-            */
+            //jump to the next path
             index++;
+            //reset the array
             collPoints.Clear();
         }
-        
-
         //compute the vector to the corner of the sprite, so we line up the collider
         Vector2 collOffset = spriteCorner - startCorner;//spriteRenderer.bounds.center - coll.bounds.center;
         coll.offset = collOffset;
-        
         if (!DefaultGameObject.CompareTag("Player") && !DefaultGameObject.CompareTag("ground"))
         {
              coll.isTrigger = true;
@@ -715,46 +587,44 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
                 return true;
             }
         }
-
         return false;
     }
-
-    
-
     public void ResizeAssets(GameObject resizeThis, Vector2 defaultSize)
     {
-        //create the default asset and fetch its size
+        //get the size of the asset that was created and is the bad size
         Vector3 createdSize = resizeThis.GetComponent<SpriteRenderer>().sprite.bounds.size;
         //get x and y scale
         Vector2 scale = new Vector2(defaultSize.x / createdSize.x, defaultSize.y / createdSize.y);
 
-        //get which scale is bigger
+        //get which scale is bigger, we want to use the smaller scale
         if (scale.x < scale.y)
         {
-            //use the smaller scale
             //we want to multiply both sides with one scale to have the same aspect ratio
-            resizeThis.transform.localScale = resizeThis.transform.localScale * scale.x;
+            resizeThis.transform.localScale *= scale.x;
         }
         else
         {
             //y scale is smaller
-            resizeThis.transform.localScale = resizeThis.transform.localScale * scale.y;
+            resizeThis.transform.localScale *= scale.y;
         }
-        print("final size: " + resizeThis.name);
-        
     }
-    [PunRPC] public void namePlayer(int gameobjectID, string nameID)
+    [PunRPC] public void namePlayer(int gameobjectID, string nameID,string nickname)
     {
-        print("rename player");
+       //this rpc is called on all clients to rename the supplied player to supplied name
         GameObject player = PhotonView.Find(gameobjectID).gameObject;
         player.name = nameID;
+        //also rename the nickname on the holder
+        GameObject nameHolder = player.transform.GetChild(0).gameObject;
+        nameHolder.GetComponent<TMP_Text>().text = nickname;
     }
 
     [PunRPC] public void changePlayerTexture(int gameobjectID, int[] colors1D, int width)
     {
+        //we want to change the texture to the one the player has drawn
         GameObject player = PhotonView.Find(gameobjectID).gameObject;
         //we have to set the size to the default before resizing it
         player.transform.localScale = new Vector3(0.4f, 0.4f, 1);
+        //convert to 2d array
         int length = colors1D.Length;
         int height =  length/ width;
         int[,] colorsRPC = new int[width, height];
@@ -764,11 +634,15 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             int y = i / width;
             colorsRPC[x, y] = colors1D[i];
         }
+        //create new texture and new collider, the old collider will be deleted
         CombineSpriteArray(player, colorsRPC);
         ResizeAssets(player,characterSize);
-        //resize the new player
+        //reset the nickname holder
+        GameObject nameHolder = player.transform.GetChild(0).gameObject;
+        nameHolder.transform.localScale = new Vector3(1, 1, 1);
+        nameHolder.transform.localPosition = new Vector3(0, 1.4f, 0);
+        nameHolder.transform.rotation = Quaternion.Euler(0,0,0);
         //we have to change the trail texture, bcs otherwise it would use the master clients texture
         player.GetComponent<CreateTrail>().createTexture();
-        print("changed texture for player!!!!!");
     }
 }

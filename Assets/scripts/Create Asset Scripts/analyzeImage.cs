@@ -1,25 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Net;
-
-using System.Xml.Schema;
-using JetBrains.Annotations;
-using Photon.Pun;
-
 using TMPro;
-
 using UnityEngine.EventSystems;
-using UnityEngine.Networking;
-using UnityEngine.UI;
-using UnityEngine.ProBuilder;
-using UnityEngine.ProBuilder.MeshOperations;
-using UnityEngine.SceneManagement;
 using Color = UnityEngine.Color;
 using GameObject = UnityEngine.GameObject;
 using Screen = UnityEngine.Screen;
@@ -28,73 +12,77 @@ using Screen = UnityEngine.Screen;
 
 public class analyzeImage : MonoBehaviour
 {
+// the number of pixels on X axis, Y axis will be calculated based on screen height
     public int numberOfPixelsX = 72;
-    //current assets pixels used for raycast and recoloring
+//current assets pixels used for raycast and recoloring
     private pixel[,] gameLevelPixels;
-    //current tool changed by buttons from changeTools script
+//current tool changed by buttons from changeTools script
     public String currentTool = "Pencil";
-    //sceneAssets is the parent that holds all assets
+//sceneAssets is the parent that holds all assets
     private GameObject sceneAssets;
-    //finder texture is the original fullsize image from user photo library
+//finder texture is the original fullsize image from user photo library
     private Texture2D finderTexture;
-    //reloadThese is a list of highlighted pixels that should be reset in the next frame
+//reloadThese is a list of highlighted pixels that should be reset in the next frame
     private List<pixel> reloadThese = new List<pixel>();
-    //this is a holder for the previous position of our mouse when we make the assets, it is used in receiveskipped
+//this is a holder for the previous position of our mouse when we make the assets, it is used in receiveskipped
     private Vector2 previousRaycastPos = Vector2.zero;
-    //assetNames is an array of assets we want to create
+//assetNames is an array of assets we want to create
     public string[] assetNames = new[] { "Arena","Character","Sword","Axe","Spear","Gun","Projectile","Bomb" };
-    //assetIndex is an int that points to the current asset
+//assetIndex is an int that points to the current asset
     public int assetIndex = 0;
 //the pointer to the current asssets parent
     private GameObject currentParent;
-    //list of created assets
+//list of created assets
     private List<prefab> assetPrefabs = new List<prefab>();
     public string selectText = "";
-    //we want to stop the raycast if we display the assets at the end
+//we want to stop the raycast if we display the assets at the end
     private bool displayed = false;
-    //frame prefab
+//frame prefab
     public GameObject frame;
-    //a list of default assets if user decides to skip, we have to keep order in this list
+//a list of default assets if user decides to skip, we have to keep order in this list
     public GameObject[] defaultAssets;
-    //list of higthligthed frames we have to reset in the next frame
+//list of higthligthed frames we have to reset in the next frame
     private List<SpriteRenderer> reloadFrames = new List<SpriteRenderer>();
-    //parent of ui buttons
+//parent of ui buttons
     public GameObject buttonUI;
 //reference to the displayes that are behind assets
     private GameObject[] frames;
 //this bool serves as a check, when we maximazi asset, we dont want to recolor until the mouse is lifted
     private bool addPixels = true;
-    
+//this is a script that controls the switch between pencil and eraser and cursor size
     private changeTools toolsScript;
-
+//photon lobby is used for joining and creating rooms
     public GameObject photonLobby;
 //the radius of pencil or eraser, it is changed from changeTools script
     public float toolRadius = 1;
 //slate is a reference to the drawing pixels
     public GameObject slate;
-
-    public GameObject assetDisplayText;
-    //this is if we only want the character
+// this is the text that tells us what to draw 
+    public GameObject assetDisplayText; 
+//this is if we only want the character, in case we are joining a game 
     public bool onlyCharacter = false;
-
+// this is activated when we clicked move to the next but havent drawn a single pixel, we have to draw at least 1 pixel
     public GameObject warning;
-
+// this will be set to true if we are loading from saved, we will bypass the creation procces and show the overview right away
     public bool loadLevelsFromSaves = false;
-
+//this is a reference to the popup object that allows us to save the created assets for later use
     public GameObject savePopup;
-
+//we have to keep track if we have modified the assets, so that we know if it makes sense to ask the user if he wants to update the saves
     private bool hasEditedAssets = false;
-
+// reference to the button that allows us to go back to choose level or to the overview if we are modifiing an asset
     public GameObject goBackButton;
-
+//loading screen will be shown when we click start game when the proccessing happens
     public GameObject loadingScreen;
-
+//this is a reference to the inputfield where players input their names
     public GameObject inputName;
-    // public GameObject loadingScreen;
+    
+//the prefab class houses the necessary information for each asset and manipulates(maximize, minimalize, refresh) 
     class prefab
     {
         public string name;
+        //this is the object that is shown and that we will manipulate
         public GameObject objectPrefab; 
+        //pixel class is a reference to the slate that we draw on, we get the info about the pixels from there
         public pixel[,] pixelClass;
         public bool isDefault;
 
@@ -117,22 +105,21 @@ public class analyzeImage : MonoBehaviour
         {
 
             this.objectPrefab = objectt;
-            this.pixelClass = array.Clone() as pixel[,];
+            this.pixelClass = array;//array.Clone() as pixel[,];
             this.name = n;
             this.isDefault = defaultAsset;
             this.DefaultGameObject = defObj;
             defaultSize = defSize;
             this.slate = slatee;
             //we have to instantiate it to get the size
-            
-            
             objectPrefab.SetActive(false);
-
-            colors = new int[pixelClass.GetLength(0), pixelClass.GetLength(1)];
-            
-            for (int y = 0; y < pixelClass.GetLength(1); y++)
+            int width = pixelClass.GetLength(0);
+            int height = pixelClass.GetLength(1);
+            colors = new int[width,height];
+            // we only need the ints from pixels, 1 is black, 0 is white
+            for (int y = 0; y < height; y++)
             {
-                for (int x = 0; x < pixelClass.GetLength(0); x++)
+                for (int x = 0; x < width; x++)
                 {
                     if (pixelClass[x, y].finalColor == Color.black)
                     {
@@ -144,19 +131,20 @@ public class analyzeImage : MonoBehaviour
                     }
                 }
             }
-            
+            //create the texture from supplied array of pixels
             CombineSpriteArray(objectPrefab, colors);
         }
 
         public void fitTheScreen()
         {
-            //objectPrefab.transform.position = fullScreenPosition;
-            //objectPrefab.transform.localScale = fullScreenScale;
+            int width = pixelClass.GetLength(0);
+            int height = pixelClass.GetLength(1);
+            //set the drawing space to active and show what we have drawn
             objectPrefab.SetActive(false);
             slate.SetActive(true);
-            for (int y = 0; y < pixelClass.GetLength(1); y++)
+            for (int y = 0; y < height; y++)
             {
-                for (int x = 0; x < pixelClass.GetLength(0); x++)
+                for (int x = 0; x < width; x++)
                 {
                     pixelClass[x, y].finalColor = colors[x, y] == 1 ? Color.black : Color.white;
                     pixelClass[x,y].reloadColor();
@@ -165,6 +153,7 @@ public class analyzeImage : MonoBehaviour
         }
         public void refreshAsset()
         {
+            //remake the texture and update the int array
             int xLength = pixelClass.GetLength(0);
             int yLength = pixelClass.GetLength(1);
             for (int y = 0; y < yLength; y++)
@@ -179,11 +168,13 @@ public class analyzeImage : MonoBehaviour
 
         public void addSavedAsset(int[,] savedInts)
         {
+            //we have loaded assets from saves, we want to display them right away
             colors = savedInts;
             CombineSpriteArray(objectPrefab, savedInts);
         }
         public void minimalize()
         {
+            // show the asset in the overview
             objectPrefab.SetActive(true);
             objectPrefab.transform.position = smallScreenPosition;
             objectPrefab.transform.localScale = smallScreenScale;
@@ -195,13 +186,9 @@ public class analyzeImage : MonoBehaviour
             smallScreenPosition = update.transform.position;
             smallScreenScale = update.transform.lossyScale;
         }
-        public void updateFullValues(GameObject update)
-        {
-            fullScreenPosition = update.transform.position;
-            fullScreenScale = update.transform.lossyScale;
-        }
         public void computeMinimalize(float screenWidth,int assetCount, int index)
         {
+            //compute where this asset should be placed in the overview
             float assetWidth = screenWidth / assetCount;
             smallScreenPosition = new Vector3(assetWidth * index - screenWidth/2 + assetWidth/2, 0, 0);
             smallScreenScale = fullScreenScale / assetCount;
@@ -211,14 +198,18 @@ public class analyzeImage : MonoBehaviour
         //combine sprite array creates an texture from the supplied array of color 
         public void CombineSpriteArray(GameObject attach, int[,] colorsRPC)
         {
-            //find the first and last black pixel
+            //this function creates a texture from the supplied ints
+                //find the first and last black pixel, so that we know how wide and tall the texture should be
                 int firstX = colors.GetLength(0);
                 int lastX = 0;
                 int firstY = colors.GetLength(1);
                 int lastY = 0;
-                for (int y = 0; y < colors.GetLength(1); y++)
+
+                int width = firstX;
+                int height = firstY;
+                for (int y = 0; y < height; y++)
                 {
-                    for (int x = 0; x < colors.GetLength(0); x++)
+                    for (int x = 0; x < width; x++)
                     {
                         if (colors[x,y] == 1)
                         {
@@ -248,11 +239,11 @@ public class analyzeImage : MonoBehaviour
                 bool foundCorner = false;
                 int spritesWidth = pixelClass[0, 0].Size;
                 int spritesHeight = spritesWidth;
-               
+                //create the texture size
                 Vector2 texturePixelSize = new Vector2(lastX - firstX, lastY - firstY);
                 Texture2D combinedTexture = new Texture2D(spritesWidth * (int)texturePixelSize.x,
                     spritesHeight * (int)texturePixelSize.y);
-
+                //create the texture components
                 Color32[] black = new Color32[spritesHeight * spritesWidth];
                 Color32[] transparent = new Color32[spritesHeight * spritesWidth];
                 for (int i = 0; i < black.Length; i++)
@@ -265,11 +256,9 @@ public class analyzeImage : MonoBehaviour
                 {
                     for (int x = firstX; x < lastX; x++)
                     {
-                        //combinedTexture.SetPixels(x * spritesArray.Length, y * spritesArray[0].Length, spritesWidth, spritesHeight, spritesArray[x][y].texture.GetPixels((int)spritesArray[x][y].textureRect.x, (int)spritesArray[x][y].textureRect.y, (int)spritesArray[x][y].textureRect.width, (int)spritesArray[x][y].textureRect.height));
-                        // For a working script, use:
                         if (colorsRPC[x, y] == 1)
                         {
-                            //set the pixel black
+                            //we want to know the coordinations of the first black pixel from left bottom corner
                             if (!foundCorner)
                             {
                                 //find the first corner pixel in the array
@@ -287,8 +276,6 @@ public class analyzeImage : MonoBehaviour
                                 spritesHeight,
                                 transparent);
                         }
-                        
-                       // pixelClass[x,y].deactivate();
                     }
                 }
 
@@ -307,16 +294,8 @@ public class analyzeImage : MonoBehaviour
                     SpriteRenderer ren = attach.AddComponent<SpriteRenderer>();
                     ren.sprite = final;
                 }
-                Collider2D[] colls = attach.GetComponents<Collider2D>();
-                if (colls != null)
-                {
-                    foreach (var coll in colls)
-                    {
-                        Destroy(coll);
-                    }
-                }
                 pixWidth = combinedTexture.width / texturePixelSize.x;
-               //go from the middle of the sprite to the bootom corner and from there navigate with firstblackPixel to the first corner of the real sprite, that is the starting position
+               //go from the middle of the sprite to the bottom corner and from there navigate with firstblackPixel to the first corner of the real sprite, that is the starting position
               
                firstBlackPixel = (Vector2)final.bounds.center -
                    new Vector2(combinedTexture.width / 2, combinedTexture.height / 2) * 0.01f + firstBlackPixel;
@@ -325,25 +304,9 @@ public class analyzeImage : MonoBehaviour
         //find next corner works with direction, pixel index and corner index to determine the next index of the corner and the direction we want to continue
         public void finalize(assetHolder holder)
         {
-           //we have to flip the player texture bcs it is reversed
-           /*
-            if (DefaultGameObject.CompareTag("Player"))
-            {
-                print("flip player");
-                //flip the array
-                int xLength = colors.GetLength(0);
-                for (int y = 0; y < colors.GetLength(1); y++)
-                {
-                    for (int x = 0; x < xLength / 2; x++)
-                    {
-                        int temp = colors[x, y];
-                        colors[x, y] = colors[xLength - 1 - x, y];
-                        colors[xLength - 1 - x, y] = temp;
-                    }
-                }
-            }
-*/
+            // destroy the object, we dont need it anymore
             Destroy(objectPrefab);
+            //add the int array with the name to the object that will go to the next scene where it will create the final asset
             holder.assets.Add(name,colors);
         }
        
@@ -387,12 +350,10 @@ public class analyzeImage : MonoBehaviour
         assetHolder holder = assetHolderObj.AddComponent<assetHolder>();
         foreach (var pref in assetPrefabs)
         {
-            //remove white pixels
             pref.finalize(holder);
         }
         //this ensures that the assets stay there when we start the gam
         DontDestroyOnLoad(assetHolderObj);
-        //sceneAssets.SetActive(true);
         if (onlyCharacter)
         {
             loadingScreen.SetActive(true);
@@ -427,6 +388,7 @@ public class analyzeImage : MonoBehaviour
     {
         Destroy(sceneAssets);
         PUN2_GameLobby lobby = photonLobby.GetComponent<PUN2_GameLobby>();
+        //this is the player name
         string pName = inputName.GetComponent<TMP_InputField>().text;
         if (pName != "")
         {
@@ -467,6 +429,7 @@ public class analyzeImage : MonoBehaviour
     }
     public void joinGame()
     {
+        //we have to check if the player has drawn something
         if (checkIfBlank())
         {
             return;
@@ -509,6 +472,7 @@ public class analyzeImage : MonoBehaviour
 
     public void createSlateForSaved(int height)
     {
+        //this function is different from normal create slate bcs we coukd have had different height, and we want to match the original height
         GameObject parent = new GameObject();
         parent.name = "Slate";
         int pixelWidth = (int)(Screen.width * (1 - 0.2f)) / numberOfPixelsX;
@@ -598,11 +562,7 @@ public class analyzeImage : MonoBehaviour
     {
         int index = assetIndex;
         prefab pref = assetPrefabs[index];
-        //Destroy(pref.objectPrefab);
-       // pref.pixelClass = null;
         assetIndex = index;
-        //create new 
-        //showCropper(finderTexture,generateAsset,pref.name);
         refreshSlate(pref.name);
     }
     //submit change is called when we click the submit button when editing an asset
@@ -620,7 +580,6 @@ public class analyzeImage : MonoBehaviour
         pixel[,] pixArray = gameLevelPixels;
         
         pref.pixelClass = pixArray;
-      // pref.objectPrefab = currentParent;
         pref.refreshAsset();
         minimalizeAsset(pref);
     }
@@ -672,16 +631,13 @@ public class analyzeImage : MonoBehaviour
             //acces the text display and set the text to the name of the asset
             GameObject textDisplay = assetFrame.GetComponent<frameScript>().textDisplay;
             TextMeshProUGUI meshPro = textDisplay.GetComponent<TextMeshProUGUI>();
-
             prefab pref = assetPrefabs[i];
-            
             meshPro.SetText(pref.name);
             //change the scale to fit every asset, +1 so it is a little smaller
             pref.objectPrefab.transform.localScale /= assetCount;
             //move the assets, we need to have -screenwidth/2 because the middle is in 0,0,0 and we want to start from the left
             Vector3 pos = new Vector3(assetWidth * i - screenWidth/2 + assetWidth/2, 0, 0);
             pref.objectPrefab.transform.position = pos;
-
             //we have to offset the frame to move it back so it doesnt collide with the asset
             Vector3 frameOffset = new Vector3(0,0, 1);
             assetFrame.transform.position = pos + frameOffset;
@@ -710,26 +666,19 @@ public class analyzeImage : MonoBehaviour
         GameObject parentAsset = new GameObject();
         parentAsset.transform.parent = sceneAssets.transform;
         prefab asset = new prefab( slate,parentAsset, gameLevelPixels, assetNames[assetIndex],false,defaultAssets[assetIndex],defSize);
-         asset.fullScreenPosition = currentParent.transform.position;
-         asset.fullScreenScale = currentParent.transform.localScale;
+        asset.fullScreenPosition = currentParent.transform.position;
+        asset.fullScreenScale = currentParent.transform.localScale;
         assetPrefabs.Add(asset);
-        
         assetIndex++;
         if (assetIndex < assetNames.Length)
         {
-            //first disable the latest asset
-            //asset.objectPrefab.SetActive(false);
-            
-            //show the cropper again and 
-            //showCropper(finderTexture, generateAsset, assetNames[assetIndex]);
             refreshSlate(assetNames[assetIndex]);
-          
         }
         else
         {
             print("we have created all assets");
             //all assets have been created
-            //now start the game 
+            //now show the overview
             if (onlyCharacter)
             {
                 loadingScreen.SetActive(true);
@@ -886,7 +835,7 @@ public class analyzeImage : MonoBehaviour
         goBackButton.GetComponent<goBack>().cancelEditing = true;
         //deactivate assets and frames
         toolsScript.disableStartGame();
-        pref.updateSmallValues(pref.objectPrefab);
+        //pref.updateSmallValues(pref.objectPrefab);
         foreach (var preff in assetPrefabs)
         {
             preff.objectPrefab.SetActive(false);
@@ -897,14 +846,12 @@ public class analyzeImage : MonoBehaviour
             frame.SetActive(false);
         }
         //activate the selected asset
-        //pref.objectPrefab.SetActive(true);
-        if (!pref.isDefault)
-        {
+       
             foreach (var pix in pref.pixelClass)
             {
                 pix.reactivate();
             }
-        }
+        
         toolsScript.activateButtons();
         pref.fitTheScreen();
         //we have to reasign the gameLevelpixels because they are used castraycast
@@ -945,12 +892,7 @@ public class analyzeImage : MonoBehaviour
     //tuple allows to return two or more variables
     void fitTheScreen(GameObject parentObject, float numberX, float numberY)
    {
-      
-       //create new parent that will be in the middle of the level
-     
-        //int numberX = gameLevelPixels.GetLength(0);
-       // int numberY = gameLevelPixels.GetLength(1);
-        //receive the first gameobject
+        //calculate the scale to fit the whole screen
         if (parentObject.transform.childCount == 0)
         {
             //if we dont have any children in parent then we dont have anything to allign
@@ -1009,9 +951,7 @@ public class analyzeImage : MonoBehaviour
    }
    class pixel
     {
-        //phones have aspect ratio of 16:9
-        //we will use 18:9 because both have to be dividable by the same number(3) and we want wider
-        //we will use 72:36 pixels
+        //we will use 80:Y pixels
         public int Size;
         public int startX;
         public int startY;
@@ -1094,12 +1034,6 @@ public class analyzeImage : MonoBehaviour
                 isActive = true;
                 pixelObject.SetActive(true);
             }
-        }
-        public void delete()
-        {
-            Destroy(pixelObject);
-            pixelObject = null;
-            isActive = false;
         }
     }
 }
