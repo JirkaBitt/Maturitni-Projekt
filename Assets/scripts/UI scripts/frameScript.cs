@@ -1,19 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 
 public class frameScript : MonoBehaviour
 {
+    //this script houses the reference to the text that is in the frame
     public GameObject textDisplay;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

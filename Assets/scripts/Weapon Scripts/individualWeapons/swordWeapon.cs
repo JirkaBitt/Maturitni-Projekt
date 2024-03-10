@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
@@ -7,8 +6,6 @@ public class swordWeapon : meleeWeapon
 {
     private GameObject enemyInRange;
     private GameObject attackedEnemy;
-   
-    // Start is called before the first frame update
     public override void Use()
     {
         //attack
@@ -30,7 +27,7 @@ public class swordWeapon : meleeWeapon
             Vector3 normal = new Vector3(vector.y * -facingInt , vector.x * facingInt, 0);
             //make it jednotkovy vektor
             normal += facingInt * new Vector3(1,0,0);
-            normal = normal / normal.magnitude;
+            normal /= normal.magnitude;
             return normal;
         }
         //we are on the ground so launch him up
@@ -46,25 +43,20 @@ public class swordWeapon : meleeWeapon
         {
             //check if we are in range of an an enemy
             GameObject possibleEnemy = other.gameObject;
-
             if (possibleEnemy.CompareTag("Player") && possibleEnemy != playerHoldingThisWepon)
             {
                 //we have confirmed that this is an enemy
                 enemyInRange = possibleEnemy;
-                
-                //just for testing
                 if (triggerLaunch)
                 {
                     print("launch enemy");
                     Vector3 launchV = computeLaunchVector();
-                    this.launchEnemy(enemyInRange, launchV, 40);
+                    launchEnemy(enemyInRange, launchV, 40);
                     triggerLaunch = false;
                 }
-
             }
         }
     }
-
     IEnumerator waitForAnimationEnd()
     {
         Animator animator = gameObject.GetComponent<Animator>();
@@ -73,12 +65,11 @@ public class swordWeapon : meleeWeapon
     }
     [PunRPC]
     void playAnimation()
-    {
+    { 
         triggerLaunch = true;
         Animator animator = gameObject.GetComponent<Animator>();
         animator.SetTrigger("swordAttack");
         addTrail(gameObject);
-
         StartCoroutine(waitForAnimationEnd());
     }
 }

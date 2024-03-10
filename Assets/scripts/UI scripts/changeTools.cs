@@ -7,14 +7,14 @@ using UnityEngine.UI;
 
 public class changeTools : MonoBehaviour
 {
-    // Start is called before the first frame update
+    //references to the buttons
     public GameObject eraseButton;
     public GameObject pencilButton;
     public GameObject submitButton;
     public GameObject remakeButton;
     public GameObject startGameButton;
+    //reference to the analyze image script
     private analyzeImage controllerScript;
-    
     void Start()
     {
         controllerScript = GameObject.Find("controller").GetComponent<analyzeImage>();
@@ -26,13 +26,13 @@ public class changeTools : MonoBehaviour
         pencil.onClick.AddListener(changeToPencil);
 
         Button submit = submitButton.GetComponent<Button>();
-       submit.onClick.AddListener(moveToNext);
+        submit.onClick.AddListener(moveToNext);
        
-       Button remake = remakeButton.GetComponent<Button>();
-       remake.onClick.AddListener(Remake);
+        Button remake = remakeButton.GetComponent<Button>();
+        remake.onClick.AddListener(Remake);
 
-       Button startGame = startGameButton.GetComponent<Button>();
-       startGame.onClick.AddListener(startGameScript);
+        Button startGame = startGameButton.GetComponent<Button>();
+        startGame.onClick.AddListener(startGameScript);
     }
 
     // Update is called once per frame
@@ -63,6 +63,7 @@ public class changeTools : MonoBehaviour
 
     public void changeFunctions()
     {
+        //we have displayed the assets and now change the functions of these buttons to modify them
         submitButton.GetComponentInChildren<TextMeshProUGUI>().SetText("Save");
         Button submit = submitButton.GetComponent<Button>();
         submit.onClick.RemoveAllListeners();
@@ -71,9 +72,6 @@ public class changeTools : MonoBehaviour
         Button remake = remakeButton.GetComponent<Button>();
         remake.onClick.RemoveAllListeners();
         remake.onClick.AddListener(remakeClicked);
-        
-        //deactivate buttons
-        
     }
 
     public void deactivateButtons()
@@ -95,22 +93,18 @@ public class changeTools : MonoBehaviour
     {
         controllerScript.submitChange();
     }
-
     void remakeClicked()
     {
         controllerScript.remakeClicked();
     }
-
     void startGameScript()
     {
         controllerScript.startGame();
     }
-
     public void enableStartGame()
     {
         startGameButton.SetActive(true);
     }
-
     public void disableStartGame()
     {
         startGameButton.SetActive(false);
@@ -125,22 +119,12 @@ public class changeTools : MonoBehaviour
         {
             toolRadius = 0;
         }
-
+        //the max value is set to 2
         if (toolRadius > 2)
         {
             toolRadius = 2;
         }
-        
-       // reassign the value to the controller
+        // reassign the value to the controller
         controllerScript.toolRadius = toolRadius;
     }
-/*
-    void saveToFiles()
-    {
-        var saveScript = new saveLoadLevel();
-        saveScript.Save(controllerScript.parentGameObject, "/levels");
-        saveScript.Load("/levels");
-    }
-    */
-    
 }

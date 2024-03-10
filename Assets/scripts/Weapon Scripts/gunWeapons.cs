@@ -20,22 +20,17 @@ public abstract class gunWeapons : weapon
     {
         // we will run this script on all instances of this weapon, so in the instance of the enemy the weapon will launch him
         PhotonView phView = PhotonView.Find(photonViewID);
-     
         GameObject enemy = phView.gameObject;
-
         //add the force to his percentage and launch him with his percentage
         playerStats stats = enemy.GetComponent<playerStats>();
         //add a litle bit of randomness
         float randomMultiplier = Random.Range(4, 10);
         randomMultiplier /= 10;
-        force = force * randomMultiplier;
-        print(force);
+        force *= randomMultiplier;
         stats.percentage += (int)(force/10  + force * stats.percentage/200);
         stats.lastAttacker = gameObject.transform.parent.gameObject;
         Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();
-   
         rb.AddForce(launchVector * (force*6 + stats.percentage*2));
         enemy.GetComponent<CreateTrail>().createTrail();
-
     }
 }

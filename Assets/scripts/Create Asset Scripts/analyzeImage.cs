@@ -628,7 +628,7 @@ public class analyzeImage : MonoBehaviour
             Vector2 frameSize = assetFrame.GetComponent<BoxCollider2D>().size;
             float scaleFactor =  assetWidth / frameSize.x;
             assetFrame.transform.localScale = new Vector3(scaleFactor , scaleFactor, 1);
-            //acces the text display and set the text to the name of the asset
+            //access the text display and set the text to the name of the asset
             GameObject textDisplay = assetFrame.GetComponent<frameScript>().textDisplay;
             TextMeshProUGUI meshPro = textDisplay.GetComponent<TextMeshProUGUI>();
             prefab pref = assetPrefabs[i];

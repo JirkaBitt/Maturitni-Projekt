@@ -1,8 +1,9 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
+
 using Photon.Pun;
 using UnityEngine;
-using UnityEngine.Serialization;
+
 
 public class spearWeapon : meleeWeapon
 {
@@ -12,22 +13,18 @@ public class spearWeapon : meleeWeapon
     private float forceDefault = 20;
     private float force = 20;
     private float maxForce = 60;
-   
     public override void Use()
     {
         StartCoroutine(chargeSpear());
-
     }
     Vector3 computeLaunchVector()
     {
-        GameObject player = gameObject.transform.parent?.gameObject;
         //get vector from player to weapon, we could use the collision point instead
         Vector3 vector = enemyInRange.transform.position - gameObject.transform.position;
-        vector = vector / vector.magnitude;
+        vector /= vector.magnitude;
         //we want to launch him a little bit in the air as well
         vector.y += 0.2f;
         return vector;
-
     }
     private void OnTriggerStay2D(Collider2D other)
     {
@@ -38,32 +35,26 @@ public class spearWeapon : meleeWeapon
         {
             //check if we are in range of an an enemy
             GameObject possibleEnemy = other.gameObject;
-
             if (possibleEnemy.CompareTag("Player") && possibleEnemy != playerHoldingThisWepon)
             {
                 //we have confirmed that this is an enemy
                 enemyInRange = possibleEnemy;
-                
-                //just for testing
                 if (triggerLaunch)
                 {
-                    print("launch enemy");
                     Vector3 launchV = computeLaunchVector();
                     //check if we are hitting the player from the front of the spear and not the back of it
                     int launchDirection = Mathf.RoundToInt(launchV.x / Mathf.Abs(launchV.x));
-                    if (launchDirection == playerHoldingThisWepon.transform.right.x)
+                    if (Math.Abs(launchDirection - playerHoldingThisWepon.transform.right.x) < 0.1f)
                     {
-                        this.launchEnemy(enemyInRange, launchV, force);
+                        launchEnemy(enemyInRange, launchV, force);
                         triggerLaunch = false;
                     }
                     //reset force
                     force = forceDefault;
                 }
-
             }
         }
     }
-
     IEnumerator chargeSpear()
     {
         bool hasReleased = false;
@@ -73,28 +64,22 @@ public class spearWeapon : meleeWeapon
         photonView.RPC("playAnimation",RpcTarget.All);
         yield return new WaitForSeconds(0.5f);
         //we want to launch after the 30 frames
-       
         photonView.RPC("stopAnimation",RpcTarget.All);
         while (Input.GetMouseButton(0) && !hasReleased)
         {
             //player is charging the spear
-            
             if (force < maxForce)
             {
                 //Time.DeltaTime is a  very small value
                 force += 0.8f * Time.deltaTime * 400;
             }
-
             yield return null;
         }
-        //resume animation
+        //resume animation, we have stopped charging and want to release the spear
         photonView.RPC("resumeAnimation",RpcTarget.All);
-        
         triggerLaunch = true;
         //move the player forward with the spear
         player.GetComponent<Rigidbody2D>().AddForce(player.transform.right * force*4);
-        //we stopped charging and want to release the spear
-        
     }
 
     [PunRPC]
@@ -118,8 +103,8 @@ public class spearWeapon : meleeWeapon
         triggerLaunch = true;
         Animator animator = gameObject.GetComponent<Animator>();
         animator.speed = 1;
+        //create the trail behind the spear as it charches forward
         addTrail(gameObject);
-
         StartCoroutine(waitForAnimationEnd());
     }
     IEnumerator waitForAnimationEnd()

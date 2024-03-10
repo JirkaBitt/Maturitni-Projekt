@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -22,12 +21,14 @@ public class goBack : MonoBehaviour
     {
         if (cancelEditing)
         {
+            //if we are editing an asset we just want to cancel it
             cancelEditing = false;
             analyzeImage imageScript = analyzeImageObj.GetComponent<analyzeImage>();
             imageScript.returnFromEditing();
         }
         else
         {
+            //return back to lobby
             SceneManager.LoadScene("ChooseLevel");
         }
     }
@@ -35,6 +36,7 @@ public class goBack : MonoBehaviour
     {
         if (cancelEditing)
         {
+            //if we are editing an asset we just want to cancel it
             cancelEditing = false;
             analyzeImage imageScript = analyzeImageObj.GetComponent<analyzeImage>();
             imageScript.returnFromEditing();

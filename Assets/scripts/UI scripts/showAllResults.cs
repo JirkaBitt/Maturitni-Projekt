@@ -7,21 +7,9 @@ using UnityEngine.UI;
 
 public class showAllResults : MonoBehaviour
 {
-    // Start is called before the first frame update
     public GameObject resultContainer;
     public GameObject resultPrefab;
     public GameObject[] podiumWinners = new GameObject[3]; //0 is first, 1 is second, 2 is third
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void showResults(GameObject[] players, Dictionary<string,int> placements,Dictionary<string,string> nicks)
     {
         foreach (var player in players)
@@ -29,7 +17,6 @@ public class showAllResults : MonoBehaviour
             GameObject result = Instantiate(resultPrefab);
             showPlayerResult showScript = result.GetComponent<showPlayerResult>();
             string playerId = player.name;
-            
             string nick = nicks[playerId];
             int placement = placements[playerId];
             if (placement < 4)
@@ -52,27 +39,26 @@ public class showAllResults : MonoBehaviour
         gameObject.GetPhotonView().RPC("leaveRPC",RpcTarget.AllBuffered,playerID+"-result");
         PhotonNetwork.LeaveRoom();
     }
-
     [PunRPC]
     public void stayRPC(string name)
     {
+        //make his icon green and start him the game
         GameObject result = GameObject.Find(name);
         result.GetComponent<showPlayerResult>().voteYes();
     }
     [PunRPC]
     public void leaveRPC(string name)
     {
+        //make the icon red and leave
         GameObject result = GameObject.Find(name);
         result.GetComponent<showPlayerResult>().voteNo();
     }
-
-
     private void addPodium(GameObject winner, int placement)
     {
+        //add player texture to the posium that is next to the results
         GameObject place =  podiumWinners[placement - 1];
         place.SetActive(true);
         Image spriteHolder = place.GetComponent<Image>();
-
         Sprite winnerSprite = winner.GetComponent<SpriteRenderer>().sprite;
         spriteHolder.sprite = winnerSprite;
         spriteHolder.preserveAspect = true;

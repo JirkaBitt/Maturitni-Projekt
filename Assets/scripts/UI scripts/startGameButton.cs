@@ -10,9 +10,9 @@ public class startGameButton : MonoBehaviourPunCallbacks
     public GameObject controller;
     public GameObject startButton;
     public GameObject textObject;
-
     void Start()
     {
+        //if the player is the master show him the button, otherwise show the player the text info that we are wating before the master starts it
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
             startButton.SetActive(true);
@@ -23,15 +23,7 @@ public class startGameButton : MonoBehaviourPunCallbacks
             startButton.SetActive(false);
             textObject.SetActive(true);
         }
-
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
@@ -51,6 +43,7 @@ public class startGameButton : MonoBehaviourPunCallbacks
 
     public override void OnEnable()
     {
+        //check if the master hasnt switched
         base.OnEnable();
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
@@ -63,7 +56,6 @@ public class startGameButton : MonoBehaviourPunCallbacks
             textObject.SetActive(true);
         }
     }
-
     public void startGame()
     {
         controller.GetComponent<PUN2_RoomController>().startGameButtonCallBack();

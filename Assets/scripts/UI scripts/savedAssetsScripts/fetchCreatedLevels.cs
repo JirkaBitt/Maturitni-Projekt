@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using TMPro;
@@ -11,16 +10,17 @@ public class fetchCreatedLevels : MonoBehaviour
 {
     // Start is called before the first frame update
     private List<savedAssets> allSaves = new List<savedAssets>();
-
+    //this is the selected one
     public savedAssets selectedAssets;
-
+    //this is a reference to the prefab that is instantiated for every save
     public GameObject assetButton;
-
+    //the scrollview to which we will place the prefabs
     public GameObject scrollview;
-
+    //all the instatiated prefabs
     private List<GameObject> buttons = new List<GameObject>();
     public class savedAssets
     {
+        //keep track of all the assets ints
         public int[][,] assets = new int[8][,];
         public string saveName;
         public string path;
@@ -36,6 +36,7 @@ public class fetchCreatedLevels : MonoBehaviour
         FileInfo[] info;
         try
         {
+            //retrieve all files that end with .brawlGame
             DirectoryInfo dir = new DirectoryInfo(Application.persistentDataPath + "/");
             info = dir.GetFiles("*.brawlGame");
         }
@@ -44,32 +45,35 @@ public class fetchCreatedLevels : MonoBehaviour
             Console.WriteLine("No saves created");
             return;
         }
-        //string[] existingAssets = info.Directory.GetFiles(@Application.persistentDataPath + "/");
         foreach (var path in info)
         {
             bool isCorupted = false;
             int[][,] assets = new int[8][,];
             StreamReader reader = new StreamReader(path.FullName);
+            //the first line is the nae of the save
             string saveName = reader.ReadLine();
-            print(saveName);
             for (int i = 0; i < 8; i++)
             {
+                //every line is a hex string representation of the int array for every asset
                 string assetRepresentation = reader.ReadLine();
                 if (assetRepresentation == null)
                 {
                     isCorupted = true;
                     break;
                 }
+                //decode it from hex string to 2D int arrray
                 assets[i] = decodeAsset(assetRepresentation);
             }
             reader.Close();
             if (!isCorupted)
             {
+                //create new instance of this class that houses the assets
                 savedAssets currentSave = new savedAssets(assets, saveName,path.FullName);
                 allSaves.Add(currentSave);
-
+                //create the button for these assets
                 GameObject newButton = Instantiate(assetButton);
                 buttons.Add(newButton);
+                //put the button in the scrollview
                 newButton.transform.parent = scrollview.transform;
                 newButton.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().SetText(saveName);
                 newButton.transform.localPosition =
@@ -77,17 +81,19 @@ public class fetchCreatedLevels : MonoBehaviour
                 newButton.transform.localScale = Vector3.one;
                 newButton.GetComponent<Button>().onClick.AddListener(() =>
                 {
+                    //we have selected these assets, load the new scene and mark these assets as the selected ones
                     selectedAssets = currentSave;
                     DontDestroyOnLoad(gameObject);
                     SceneManager.LoadScene("loadCreatedLevel");
-
                 });
                 GameObject deleteButton = newButton.transform.GetChild(1).gameObject;
                 deleteButton.GetComponent<Button>().onClick.AddListener(() =>
                 {
+                    //we want to delete this save
                     buttons.Remove(newButton);
                     File.Delete(path.FullName);
                     Destroy(newButton);
+                    //refresh the buttons position so that there isnt a gap
                     refreshButtons();
                 });
             }
@@ -106,12 +112,12 @@ public class fetchCreatedLevels : MonoBehaviour
         List<int> intList = new List<int>();
         foreach (var hexChar in hex)
         {
+            //every char represents 4 integers
             intList.AddRange(HexToBinary(hexChar));
         }
-
         int[] intArray = intList.ToArray();
         int length = intArray.Length;
-
+        //convert it from 1D to 2D array
         int[,] final = new int[80, length / 80];
         for (int i = 0; i < length; i++)
         {
@@ -126,47 +132,32 @@ public class fetchCreatedLevels : MonoBehaviour
         int hexInt = 0;
         if (hex > '9')
         {
+            //we have to remove A bcs the value would be offseted from it, we want to know how far the hex is from A, it is in ASCII table
+            //this is in case it is a letter
             hexInt = 10 + hex - 'A';
         }
         else
         {
+            //this is in case it is a number
+            //find the offset from 0
             hexInt = hex - '0';
         }
-        if (hexInt >= 8)
+        int squareTwo = 8;
+        for (int i = 0; i < 4; i++)
         {
-            binary[0] = 1;
-            hexInt -= 8;
-        }
-        else
-        {
-            binary[0] = 0;
-        }
-        if (hexInt >= 4)
-        {
-            binary[1] = 1;
-            hexInt -= 4;
-        }
-        else
-        {
-            binary[1] = 0;
-        }
-        if (hexInt >= 2)
-        {
-            binary[2] = 1;
-            hexInt -= 2;
-        }
-        else
-        {
-            binary[2] = 0;
-        }
-        if (hexInt >= 1)
-        {
-            binary[3] = 1;
-            hexInt -= 1;
-        }
-        else
-        {
-            binary[3] = 0;
+            //try to remove the current square of Two
+            if (hexInt >= squareTwo)
+            {
+                binary[i] = 1;
+                //we have to remove the square, so we can check again for the smaller one
+                hexInt -= squareTwo;
+            }
+            else
+            {
+                binary[i] = 0;
+            }
+            //go to the lower square of two
+            squareTwo /= 2;
         }
         return binary;
     }

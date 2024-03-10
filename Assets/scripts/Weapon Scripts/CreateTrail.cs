@@ -1,36 +1,30 @@
-using System;
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
+
 
 public class CreateTrail : MonoBehaviour
 {
+    //white sprite is the copy of the original sprite with changed color
     public Sprite whiteSprite;
-
+    //how long should one copy live
     public float oneCopyDuration;
-
+    //the number of copies that will be created
     public int numberOfCopies;
-
+    //if the copies should have decaying alpha
     public bool fadeSprite = true;
-
+    //the color of the trail, player has red weapons white
     public Color trailColor = Color.white;
-
+    //list of the instantiated copies 
     private List<GameObject> createdCopies = new List<GameObject>();
-    // Start is called before the first frame update
-    void Start()
-    {
-     
-    }
-
     public void createTexture()
     {
         SpriteRenderer rend = gameObject.GetComponent<SpriteRenderer>();
-        
         Texture2D tex = rend.sprite.texture;
-        
         Color[] texColors = tex.GetPixels();
         float texLength = texColors.Length;
+        //change every black pixel to the corresponding color
         for (int i = 0; i < texLength; i++)
         {
             if (texColors[i] == Color.black)
@@ -42,25 +36,21 @@ public class CreateTrail : MonoBehaviour
                 }
             }
         }
-
         Sprite originalSprite = rend.sprite;
         Texture2D newTex = new Texture2D(tex.width,tex.height);
         newTex.SetPixels(texColors);
         newTex.Apply();
         whiteSprite = Sprite.Create(newTex, originalSprite.rect, new Vector2(0.5f, 0.5f));
     }
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     IEnumerator createCopy(Sprite sprite)
     {
+        //create one instance of the copy
         GameObject copy = new GameObject("copy");
         createdCopies.Add(copy);
         SpriteRenderer rend = copy.AddComponent<SpriteRenderer>();
         rend.sprite = sprite;
         copy.transform.parent = transform.parent;
+        //it should be behind at the z axis 
         copy.transform.position = transform.position + new Vector3(0,0,1);
         copy.transform.rotation = transform.rotation;
         copy.transform.localScale = transform.localScale;
@@ -75,10 +65,8 @@ public class CreateTrail : MonoBehaviour
             lifetime += 0.02f;
             yield return new WaitForSeconds(0.02f);
         }
-
         createdCopies.Remove(copy);
         Destroy(copy);
-        
     }
 
     IEnumerator createTrailCoroutine()
@@ -89,43 +77,6 @@ public class CreateTrail : MonoBehaviour
             yield return new WaitForSeconds(0.02f);
         }
         createdCopies.Clear();
-        /*
-        Queue<GameObject> copies = new Queue<GameObject>();
-        float interval = 0.1f;
-        int numberOfCycles = (int)(lifetimeDuration / interval);
-        float duartion = 0;
-        while (true)
-        {
-            copies.Enqueue(createCopy(whiteSprite,original.transform));
-            
-            yield return new WaitForSeconds(interval);
-            duartion += interval;
-            
-            GameObject[] adjustAlpha = copies.ToArray();
-           
-            for (int i = 0; i < adjustAlpha.Length; i++)
-            {
-                SpriteRenderer rendCopy = adjustAlpha[i].GetComponent<SpriteRenderer>();
-                float alpha = 1 - i * (1 / numberOfCycles);
-                rendCopy.color = new Color(1, 1, 1, alpha);
-                if (i >= numberOfCycles)
-                {
-                    GameObject destroy = copies.Dequeue();
-                    Destroy(destroy);
-                }
-            }
-
-            if (duartion >= totalDuration)
-            {
-                GameObject[] delete = copies.ToArray();
-                for (int i = 0; i < delete.Length; i++)
-                {
-                    Destroy(delete[i]);
-                }
-                break;
-            }
-        }
-        */
     }
 
     public void createTrail()
@@ -133,6 +84,14 @@ public class CreateTrail : MonoBehaviour
         StartCoroutine(createTrailCoroutine());
     }
 
+    private void OnDisable()
+    {
+        //if the weapon gets deleted while we are attacking we have to delete the trail afterwards
+        foreach (var copy in createdCopies)
+        {
+            Destroy(copy);
+        }
+    }
     private void OnDestroy()
     {
         //if the weapon gets deleted while we are attacking we have to delete the trail afterwards

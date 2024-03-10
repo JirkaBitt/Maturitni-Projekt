@@ -8,33 +8,20 @@ using UnityEngine;
 public class countDown : MonoBehaviour
 {
     public GameObject controller;
-
     public int minutes;
-    // Start is called before the first frame update
-    void Start()
-    {
-       
-    }
-
+   
     private void OnEnable()
     {
         TextMeshProUGUI clock = gameObject.GetComponent<TextMeshProUGUI>();
         clock.SetText(minutes + ":00");
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void startCount()
     {
         StartCoroutine(count());
     }
     IEnumerator count()
     {
-        
+        //start the countdown
         TextMeshProUGUI clock = gameObject.GetComponent<TextMeshProUGUI>();
         int seconds = 0;
         int fullTime = minutes * 60;
@@ -56,7 +43,6 @@ public class countDown : MonoBehaviour
                 text = minutesRemaining + ":" + secondsRemaining;
             }
             clock.SetText(text);
-
             if (timeRemaining <= 0)
             {
                 //the time has run out, end the game
@@ -65,10 +51,9 @@ public class countDown : MonoBehaviour
         }
         if (PhotonNetwork.IsMasterClient)
         {  
+            //end the game
             PUN2_RoomController roomController = controller.GetComponent<PUN2_RoomController>();
             roomController.callEndGame();
         }
-       
-        //now end the game
     }
 }

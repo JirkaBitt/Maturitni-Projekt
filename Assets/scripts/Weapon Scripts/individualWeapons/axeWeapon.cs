@@ -1,6 +1,5 @@
-using System;
+
 using System.Collections;
-using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
@@ -9,23 +8,15 @@ public class axeWeapon : meleeWeapon
     private GameObject enemyInRange;
     private GameObject attackedEnemy;
     //trigger launch will be used to check if we called .Use() in oncollisionstay
-    
     public override void Use()
     {
         //in here we want to attack other players
         //play animation and launch enemy if we touch them
-
-        weap = gameObject;
-        
         PhotonView photonView = gameObject.GetPhotonView();
         //we will set trigerlaunch to true in this coroutine
-
         photonView.RPC("playAnimation",RpcTarget.All);
-       
         //we will switch triggerlaunch to false when animation ends in attack script
-
     }
-
     private void OnTriggerStay2D(Collider2D other)
     {
         //fetch player holding the weapon to check that we are not hitting him
@@ -40,15 +31,13 @@ public class axeWeapon : meleeWeapon
             {
                 //we have confirmed that this is an enemy
                 enemyInRange = possibleEnemy;
-                
-               //just for testing
-               if (triggerLaunch)
-               {
-                   print("launch enemy");
-                   Vector3 launchV = computeLaunchVector();
-                   this.launchEnemy(enemyInRange, launchV, 40);
-                   triggerLaunch = false;
-               }
+               
+                if (triggerLaunch)
+                {
+                    Vector3 launchV = computeLaunchVector();
+                    launchEnemy(enemyInRange, launchV, 40);
+                    triggerLaunch = false;
+                }
 
             }
         }
@@ -65,14 +54,14 @@ public class axeWeapon : meleeWeapon
         //this is for when we are hitting with the axe from below
         Vector3 normal = new Vector3(vector.y * facingInt, vector.x * facingInt, 0);
         //make it jednotkovy vektor
-       // normal += new Vector3(1,1,0) * facingInt/1.5f;
-        normal = normal / normal.magnitude;
+        normal /= normal.magnitude;
         return normal;
     }
 
     IEnumerator waitForDamage()
     {
         Animator animator = gameObject.GetComponent<Animator>();
+        //we want to wait 0.2s bcs the axe is spinning from the back
         yield return new WaitForSeconds(0.2f);
         triggerLaunch = true;
         //wait for the end of the animation
@@ -84,8 +73,8 @@ public class axeWeapon : meleeWeapon
     {
         Animator animator = gameObject.GetComponent<Animator>();
         animator.SetTrigger("axeAttack");
+        //create a trail behind the weapon as it moves
         addTrail(gameObject);
-        
         StartCoroutine(waitForDamage());
     }
     
