@@ -34,7 +34,6 @@ public class analyzeImage : MonoBehaviour
     private GameObject currentParent;
 //list of created assets
     private List<prefab> assetPrefabs = new List<prefab>();
-    public string selectText = "";
 //we want to stop the raycast if we display the assets at the end
     private bool displayed = false;
 //frame prefab
