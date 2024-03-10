@@ -1,18 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
 public class bulletSync : MonoBehaviourPun, IPunObservable
 {
-    // Start is called before the first frame update
     Vector3 latestPos;
     Vector3 latestScale;
-
-
-   
-
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
@@ -20,7 +12,6 @@ public class bulletSync : MonoBehaviourPun, IPunObservable
             //We own this player: send the others our data
             stream.SendNext(transform.position);
             stream.SendNext(transform.localScale);
-           
         }
         else
         {
@@ -40,10 +31,7 @@ public class bulletSync : MonoBehaviourPun, IPunObservable
             //Lerp is linear transformation
             //0 == transform.position and 1 is instant transformation to latestPos
             transform.position = Vector3.Lerp(transform.position, latestPos, Time.deltaTime * 5);
-            //transform.rotation = Quaternion.Lerp(transform.rotation, latestRot, Time.deltaTime * 5);
             transform.localScale = Vector3.Lerp(transform.localScale, latestScale, Time.deltaTime * 5);
-
-            //launch network players
         }
        
     }

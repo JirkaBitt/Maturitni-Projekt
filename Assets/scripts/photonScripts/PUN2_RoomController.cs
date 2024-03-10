@@ -4,86 +4,63 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Photon.Realtime;
 using TMPro;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
-using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
-
-
-//https://sharpcoderblog.com/blog/make-a-multiplayer-game-in-unity-3d-using-pun-2
-//from this tutorial
 public class PUN2_RoomController : MonoBehaviourPunCallbacks
 {
-
-    //Player instance prefab, must be located in the Resources folder
-    public GameObject playerPrefab;
-    //Player spawn point
+    //spawn points for player and weapons
     public Vector3[] spawnPoint;
+    //serializable int for controlling how many weapons should be in game
     public int maxWeaponCount = 5;
-    public GameObject[] weaponPrefabs;
-    public Transform weaponSpawnPoint;
-    private bool canSpawnWeapon = true;
-    //public GUIStyle percentageStyle;
-    private List<GameObject> spawnedWeapons = new List<GameObject>();
-
+    //array of names of the weapons for spawning
     public string[] WeaponNames;
-
+    //reference to the object that is creating all the assets, for changing the player texture
     public GameObject CreatePrefabs;
-
+    //reference to the object that is showing the stats of all players at the bottom
     public GameObject displayIcons;
-
+    //end screen
     public GameObject endGUI;
-
+    //end controller handles the showing of the results
     public GameObject endController;
-
-   public GameObject inGameUI;
-
-    public bool hideGUI;
-
+    //in game UI for showing buttons, clock, etc
+    public GameObject inGameUI;
+    //reference to the timer of the game
     public GameObject clock;
-
+    //object that creates the start game button or the text that is shown to other players
     public GameObject startGameButton;
-
+    //object that shows the id of the room
     public GameObject RoomIDText;
-
-    public GameObject displayStats;
-
+    //reference to my player so we dont have find him averytime
     private GameObject myPlayer;
-
+    //if we can soawn weapons, it is false when we are showing results
     public bool spawningEnabled = true;
-
+    //reference to the playagain button in the result panel, we want to deactivate it when the master starts a game, so that the player isnt able to join after the game was started
     public GameObject playAgainButton;
-    //private List<playerStats> _statsList = new List<playerStats>();
-    // Use this for initialization
     void Start()
     {
-       
         //set the default fps to 60
         Application.targetFrameRate = 60;
         inGameUI.SetActive(true);
         //In case we started this demo with the wrong scene being active, simply load the menu scene
         if (PhotonNetwork.CurrentRoom == null)
         {
-            Debug.Log("Is not in the room, returning back to Lobby");
-            UnityEngine.SceneManagement.SceneManager.LoadScene("GameLobby");
-            Application.Quit();
+            //some error occured, return to the lobby
+            SceneManager.LoadScene("ChooseLevel");
         }
         else
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                //fetch created assets
-               // getCreatedAssets();
                 //spawn character, this is only for the room creator, others are created in OnJoinedRoom
                 PhotonNetwork.InstantiateRoomObject("Arena", Vector3.zero, Quaternion.identity);
                 print("instantiate from start");
                 spawnPoint = findRespawnPositions();
-                //GameObject arena = PhotonNetwork.Instantiate("Arena", Vector3.zero, Quaternion.identity);
-                GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[0], Quaternion.identity);
-                player.transform.position = spawnPoint[0];
+                //spawn the player
+                int randonSpawn = Random.Range(0, spawnPoint.Length);
+                GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[randonSpawn], Quaternion.identity);
+                //we have to assign the position again, bcs it can spawn us in the middle of the platform
+                player.transform.position = spawnPoint[randonSpawn];
                 myPlayer = player;
                 //disable some scripts before the start
                 beforeStart(player);
@@ -95,14 +72,9 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                 camScript.rb = player.GetComponent<Rigidbody2D>();
                 //we have to call it on create prefabs because room controller is disabled at the start of the game
                 string playerID = PhotonNetwork.LocalPlayer.UserId;
+                //we want to rename the player on all clients to his id and change his texture to the one the player has drawn
                 CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID,PhotonNetwork.LocalPlayer.NickName);
                 displayIcons.GetComponent<displayPlayerStats>().addPlayerTexture(playerID);
-                
-               // displaySpawnPoints();
-                //call rpc buffered so it runs even for players that join later
-                //we have to call it on the photonview of the roomcontroller because that is the only one with namePlayer function
-                //photonView.RPC("namePlayer",RpcTarget.AllBuffered,playerView.ViewID,PhotonNetwork.LocalPlayer.UserId);
-                
             }
             else
             {
@@ -110,12 +82,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
             }
         }
     }
-
-    private void Update()
-    {
-        //only the master client will spawn weapons
-    }
-
     public void leave()
     {
         //this will be called when the button is pressed
@@ -133,19 +99,16 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         base.OnJoinedRoom();
         //we have to wait until we are in room, it can take some time
         //then we want to instantiate a player that will be visible for every player in room
-        print("instantiate from create!!!!!!!");
-      
-        spawnPoint = findRespawnPositions();
-       // int numberOfPlayers = PhotonNetwork.CurrentRoom.Players.Count;
-       int randomSpawnIndex = Random.Range(0, spawnPoint.Length);
-      
+        spawnPoint = findRespawnPositions(); 
+        // int numberOfPlayers = PhotonNetwork.CurrentRoom.Players.Count;
+        int randomSpawnIndex = Random.Range(0, spawnPoint.Length);
+        //instantiate player
         GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[randomSpawnIndex], Quaternion.identity, 0);
         player.transform.position = spawnPoint[randomSpawnIndex];
         myPlayer = player;
         beforeStart(player);
         //name him after the player so we can find him in onGUI
         PhotonView playerView = player.GetPhotonView();
-        
         cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
         camScript.enabled = true;
         camScript.player = player;
@@ -157,6 +120,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         string playerID = PhotonNetwork.LocalPlayer.UserId;
         createScript.renamePlayer(playerID, playerView.ViewID,PhotonNetwork.LocalPlayer.NickName);
         createScript.changePlayer(player);
+        //add the icon of this player to the bottom of the screen
         displayIcons.GetComponent<displayPlayerStats>().addPlayerTexture(playerID);
         //add the player to all camera movement scripts
         photonView.RPC("updateCameraPlayers",RpcTarget.All);
@@ -164,18 +128,13 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
 
     IEnumerator spawnWeapon()
     {
-        
-        //wait before spawning the weapon
-
-        // if (spawnedWeapons.Count < maxWeaponCount)
-       while (true)
+        while (true)
        {
            //only the master client can spawn weapons, this is here because when master leaves, someone else will be master
            while (!PhotonNetwork.IsMasterClient)
            {
                yield return new WaitForSeconds(5);
            }
-
            if (spawningEnabled)
            {
                GameObject[] weapons = GameObject.FindGameObjectsWithTag("weapon");
@@ -196,20 +155,16 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                int randomWeaponIndex = Random.Range(0, WeaponNames.Length);
                //find random spawn position
                int randomSpawnIndex = Random.Range(0, spawnPoint.Length);
-               //GameObject weaponPrefab = weaponPrefabs[randomWeaponIndex];
-               //spaw weapon for all player and save it in a list
+               //spawn the weapon, we want it as a room object so when master leaves it does not destroy all the weapons
                GameObject weapon = PhotonNetwork.InstantiateRoomObject(WeaponNames[randomWeaponIndex],
                    spawnPoint[randomSpawnIndex],
                    Quaternion.identity, 0);
 
-               spawnedWeapons.Add(weapon);
+              
            }
            int randomWait = Random.Range(8, 15);
            yield return new WaitForSeconds(randomWait);
        }
-            //select random weapon 
-           // int randomWeaponIndex = Random.Range(0, weaponPrefabs.Length);
-       
     }
     Vector3[] findRespawnPositions()
     {
@@ -218,7 +173,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         //iterate for every platform
         foreach (var platform in ground)
         {
-            
             PolygonCollider2D coll = platform.GetComponent<PolygonCollider2D>();
             //retrieve paths from collider
             List<Tuple<Vector2, Vector2>> pathPoints = new List<Tuple<Vector2, Vector2>>();
@@ -232,14 +186,13 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                 int minX = (int)bounds.Item1.x;
                 int maxX = (int)bounds.Item2.x;
                 int maxY = (int)bounds.Item1.y;
-                
+                //we want to leave a bit of room on the sides and at the top
                 int spawnY = (int)maxY + 1;
                 for (int x = (int)minX + 2; x < (int)maxX - 2; x++)
                 {
                     //now we have increments of 1 on the length of the platform
                     Vector3 position = new Vector3(x, spawnY, 0);
                     //check if we are safe to spawn there by casting a raycast to the spawnPosition and checking if it collides with something
-               
                     RaycastHit2D[] hits = Physics2D.CircleCastAll(position, 0.7f, Vector2.zero);
                     if (hits.Length == 0)
                     {
@@ -260,40 +213,19 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                         }
                         if (!hitGround)
                         {
+                            //we are save, we did not hit any ground object
                             spawnList.Add(position);
                         }
                     }
-                   
-                   
-                    /*
-                    if (Physics.Raycast(Camera.main.transform.position, position, out hit, Mathf.Infinity))
-                    {
-                        // Debug.DrawRay(Camera.main.transform.position, position * hit.distance, Color.yellow);
-                        
-                        if (!hit.collider.gameObject.CompareTag("ground"))
-                        {
-                            //we did not hit ground 
-                            spawnList.Add(position);
-                        }
-                        
-                        //we did hit something, dont spawn here
-                    }
-                    else
-                    {
-                        //we did not hit anything we are safe to spawn here
-                        //check the radius around the point
-
-                    }*/
                 }
             }
         }
         //return found spawnPoints
-        print("spawnPoints count = " + spawnList.Count);
         return spawnList.ToArray();
     }
-
     private void displaySpawnPoints()
     {
+        //this is used just to visualize the spawn point for debugging 
         foreach (var spawn in spawnPoint)
         {
             GameObject dis = new GameObject();
@@ -314,11 +246,11 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
             //we have to apply offset as well because it is relative to the collider
             Vector2 point = coll.transform.TransformPoint(pointLocal + offset);
             float xValue = point.x;
+            //we want to find the most left corner and the most right corner
             if (xValue < minX.x)
             {
                 minX.x = xValue;
             }
-
             if (xValue > maxX.x)
             {
                 maxX.x = xValue;
@@ -330,7 +262,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                 maxX.y = point.y;
             }
         }
-
         return new Tuple<Vector2, Vector2>(minX, maxX);
     }
 
@@ -342,22 +273,13 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
     }
     public void beforeStart(GameObject player)
     {
+        //we dont want the players to move when the game hasnt started yet
         playerMovement movement = player.GetComponent<playerMovement>();
         movement.enabled = false;
-        
+        //show everyone the room id so others can join
         RoomIDText.GetComponent<TextMeshProUGUI>().SetText("Room ID: " + PhotonNetwork.CurrentRoom.Name);
+        //startgamebutton displays the button for the master and info text for others
         startGameButton.SetActive(true);
-/*
-        if (PhotonNetwork.LocalPlayer.IsMasterClient)
-        {
-            startGameButton.SetActive(true);
-            startGameButton.GetComponent<Button>().onClick.AddListener(() =>
-            {
-                photonView.RPC("startGame",RpcTarget.All);
-                PhotonNetwork.CurrentRoom.IsOpen = false;
-            });
-        }
-        */
     }
 
     public void startGameButtonCallBack()
@@ -365,14 +287,14 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         //AllViaServer should call it on all clients at the same time
         photonView.RPC("startGame",RpcTarget.AllViaServer);
         PhotonNetwork.CurrentRoom.IsOpen = false;
-      
     }
     public void playAgain()
     {
-        displayStats.SetActive(true);
+        //we have decided from the results that we want to play again
         endGUI.SetActive(false);
         inGameUI.SetActive(true);
         RoomIDText.SetActive(true);
+        //we have deleted the player so we have to spawn a new one
         int randomIndex = Random.Range(0, spawnPoint.Length);
         GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[randomIndex], Quaternion.identity);
         myPlayer = player;
@@ -387,7 +309,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         camScript.updatePlayers();
         //we have to call it on create prefabs because room controller is disabled at the start of the game
         string playerID = PhotonNetwork.LocalPlayer.UserId;
-        //CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID);
+        //only set the room to open if the master has clicked to play again
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
             PhotonNetwork.CurrentRoom.IsOpen = true;
@@ -403,7 +325,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
     [PunRPC]
     public void startGame()
     {
-        //GameObject player = GameObject.Find(PhotonNetwork.LocalPlayer.UserId);
+        //enable movement
         myPlayer.GetComponent<playerMovement>().enabled = true;
         spawningEnabled = true;
         //now start the clock
@@ -423,16 +345,17 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
     }
     [PunRPC] public void endGame()
     {
+        //game has ended, show the results
         inGameUI.SetActive(false);
         startGameButton.SetActive(false);
         playAgainButton.SetActive(true);
-        hideGUI = true;
         spawningEnabled = false;
         cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
         camScript.enabled = false;
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         if (PhotonNetwork.IsMasterClient)
         {
+            //we want to delete every weapon
             GameObject[] weapons = GameObject.FindGameObjectsWithTag("weapon");
             foreach (var weap in weapons)
             {
@@ -441,6 +364,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         }
         int playerCount = players.Length;
         endGUI.SetActive(true);
+        //show the results based on score
         showAllResults showResults = endController.GetComponent<showAllResults>();
         playerStats[] stats = new playerStats[playerCount];
         Dictionary<string, int> scores = new Dictionary<string, int>();
@@ -453,7 +377,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
             scores.Add(players[i].name,stats[i].score);
             //here we cannot add the name of the gameobject bcs we dont know if it matches with the photon array
             nicks.Add(PhotonNetwork.PlayerList[i].UserId,PhotonNetwork.PlayerList[i].NickName);
-//            players[i].SetActive(false);
         }
         var sortedDict = scores.OrderBy(pair => pair.Value).ToList();
         //order by sorts it in an ascending order, but we want descending, player with highest score wins
@@ -463,22 +386,19 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
             placements.Add(sortedDict[i].Key,i+1);
         }
         showResults.showResults(players,placements,nicks);
+        //reset the display icons dictionaries
+        displayPlayerStats disStats = displayIcons.GetComponent<displayPlayerStats>();
+        disStats.clearValues();
+        displayIcons.SetActive(false);
         foreach (var player in players)
         {
-            displayPlayerStats disStats = displayIcons.GetComponent<displayPlayerStats>();
-            disStats.playerIDs.Clear();
-            disStats.characterTextures.Clear();
-            disStats.characterInfos.Clear();
             PhotonView playerView = player.GetComponent<PhotonView>();
             if (playerView.IsMine)
             {
                 PhotonNetwork.Destroy(player);
             }
         }
-        //clear the values, we will assign them again if player wants to play again 
-        displayIcons.GetComponent<displayPlayerStats>().clearValues();
-        displayIcons.SetActive(false);
-        
+        //stop the coroutine, so that if we play again the weapons dont spawn twice
         StopCoroutine("spawnWeapon");
     }
 }

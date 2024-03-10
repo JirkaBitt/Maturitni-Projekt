@@ -4,68 +4,52 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class playerMovement : MonoBehaviour
-{// private CharacterController controller;
+{
+    //rigidbody of the player
     private Rigidbody2D rb;
-    
-    //public bool groundedPlayer;
     public float playerSpeed = 5.0f;
     public float jumpForce = 200f;
-   
     public int numberOfAllowedJumps = 2;
     private int performedJumps = 0;
     public float dashForce = 300f;
     public int dashCooldown = 3;
     private bool dashAvailable = true;
     public int playerFacing = 0; //0 is right, 1 is left
+    //the nameholder that displays the player nickname
     public GameObject nameBar;
     private Animator animator;
-    private pickWeapon _pickWeapon;
-
+    //particles that play when we jump
     private ParticleSystem particles;
-    private playerStats stats;
     private void Awake()
     {
         rb = gameObject.GetComponent<Rigidbody2D>();
         nameBar = gameObject.transform.GetChild(0).gameObject;
-        _pickWeapon = gameObject.GetComponent<pickWeapon>();
         particles = gameObject.GetComponent<ParticleSystem>();
-        stats = gameObject.GetComponent<playerStats>();
         moveParticlesToFeet();
-
     }
 
     void Update()
     {
-
         Vector3 move = new Vector3(Input.GetAxis("Horizontal") * Time.deltaTime, 0, 0);
-        //controller.Move(move * Time.deltaTime * playerSpeed);
-
         if (move != Vector3.zero)
         {
             //rotate the player if we change direction
             checkFacingDirection(move);
             //move the player
             gameObject.transform.position += move * playerSpeed;
-
         }
-       
-
-        // Changes the height position of the player..
+        //jump
         if (Input.GetButtonDown("Jump") && performedJumps < numberOfAllowedJumps)
         {
             jump(jumpForce);
         }
-
         //Dash
         if((Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)) && dashAvailable)
         {
-
             StartCoroutine(performDash());
-
         }
 
     }
-
     void jump(float force)
     {
         particles.Play();
@@ -75,7 +59,7 @@ public class playerMovement : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         //check if we hit the ground
-        if (collision.gameObject.tag == "ground")
+        if (collision.gameObject.CompareTag("ground"))
         {
             //player touches the ground, reset doublejump
             if (Mathf.Round(rb.velocity.y) == 0) 
@@ -85,11 +69,10 @@ public class playerMovement : MonoBehaviour
             }
         }
     }
-
     private void OnCollisionStay2D(Collision2D collision)
     {
         //check if we are on the ground and not falling
-        if (collision.gameObject.tag == "ground")
+        if (collision.gameObject.CompareTag("ground"))
         {
             //player touches the ground, reset doublejump
             if (Mathf.Round(rb.velocity.y) == 0) 
@@ -99,7 +82,6 @@ public class playerMovement : MonoBehaviour
             }
         }
     }
-
     void checkFacingDirection(Vector3 movingVector)
     {
         if (movingVector.x != 0)
@@ -137,12 +119,12 @@ public class playerMovement : MonoBehaviour
         Collider2D coll = gameObject.GetComponent<Collider2D>();
         float height = coll.bounds.size.y;
         //move the particles below the feet
-        particles.transform.position = gameObject.transform.position - new Vector3(0, height / 2 + 1, 0);
+        particles.transform.position = gameObject.transform.position - new Vector3(0, height / 2 + 0.2f, 0);
     }
     IEnumerator performDash()
     {
         dashAvailable = false;
-        
+        //create a trail behind the player
         gameObject.GetComponent<CreateTrail>().createTrail();
         if (playerFacing == 0)
         {
@@ -156,9 +138,7 @@ public class playerMovement : MonoBehaviour
         }
         //wait for cooldown
         yield return new WaitForSeconds(dashCooldown);
-
         dashAvailable = true;
-
     }
     
 }

@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -8,22 +5,14 @@ using Random = UnityEngine.Random;
 public class checkPlayerBounds : MonoBehaviourPunCallbacks
 {
     private PUN2_RoomController controller;
-    // Start is called before the first frame update
     void Start()
     {
         controller = GameObject.Find("_RoomController").GetComponent<PUN2_RoomController>();
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     private void OnTriggerExit2D(Collider2D other)
     {
+        //player left the game space
         GameObject gObject = other.gameObject;
-        //PhotonView photonView = gameObject.GetComponent<PhotonView>();
         //we can only delete the player from isMine
         if (gObject.CompareTag("Player"))
         {
@@ -51,7 +40,7 @@ public class checkPlayerBounds : MonoBehaviourPunCallbacks
                 //drop the weapon and then destroy it
                 photonView.RPC("deleteWeapon",RpcTarget.All,photonID,gObject.GetPhotonView().ViewID);
             }
-
+            //respawn the player
             int randomIndex = Random.Range(0, controller.spawnPoint.Length);
             Vector3 selectedPoint = controller.spawnPoint[randomIndex];
             gObject.transform.position = selectedPoint;
@@ -64,11 +53,7 @@ public class checkPlayerBounds : MonoBehaviourPunCallbacks
         else
         {
             print("Destroy" + gObject.name);
-            //check if we are not deleting weapons, it is messing with bombs
-            if (!gObject.CompareTag("weapon"))
-            {
-                Destroy(gObject);
-            }
+            Destroy(gObject);
         }
     }
 
@@ -77,11 +62,9 @@ public class checkPlayerBounds : MonoBehaviourPunCallbacks
     {
         GameObject player = PhotonView.Find(playerID).gameObject;
         GameObject weapon = PhotonView.Find(weaponID).gameObject;
-        
         pickWeapon pickScript = player.GetComponent<pickWeapon>();
         //drop the weapon on all instances
         pickScript.drop(true,weapon);
-       
     }
 
     [PunRPC]
@@ -97,6 +80,5 @@ public class checkPlayerBounds : MonoBehaviourPunCallbacks
              attacker.GetComponent<playerStats>().score += 1;
              defeatedStats.lastAttacker = null;
         }
-       
     }
 }

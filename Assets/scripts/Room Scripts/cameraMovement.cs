@@ -8,15 +8,17 @@ using UnityEngine.UIElements;
 
 public class cameraMovement : MonoBehaviourPunCallbacks
 {
+    //all the players in the room
     public GameObject[] players;
+    //my player
     public GameObject player;
     Camera mainCamera;
-
+    //the current zoom, it adjusts as players are further apart
     public float cameraZoomDivider = 1.2f;
+    //movement speed of the camera
     public float cameraSpeed = 5f;
-    // private CharacterController playerController;
-   public Rigidbody2D rb;
-   // Start is called before the first frame update
+    //the rigidbody of my player
+    public Rigidbody2D rb;
     void Start()
     {
         players = GameObject.FindGameObjectsWithTag("Player");
@@ -29,16 +31,14 @@ public class cameraMovement : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
-
-        //if x values are between 0 and 1 player is seen by the camera
-        //print(player);
+        //if x values are between 0 and 1 then the player is seen by the camera
         if (player == null)
         {
             return;
         }
         Vector2 viewPos = mainCamera.WorldToViewportPoint(player.transform.position);
-
-        //we want to move the camera about 0.2 from 0 or 1 so the player is still in sight
+        //we want to move the camera about 0.4 from 0 or 1 so the player is still in sight
+        //we dont want to copy the position of the player, it does not look good, this way it created an effect that the player is pushing the  camera along
         if (viewPos.x < 0.4)
         {
             mainCamera.transform.position -= Vector3.right * cameraSpeed * Time.deltaTime;
@@ -49,25 +49,15 @@ public class cameraMovement : MonoBehaviourPunCallbacks
             mainCamera.transform.position += Vector3.right * cameraSpeed * Time.deltaTime;
 
         }
-        if (viewPos.y < 0.4)
+        if (viewPos.y < 0.4 || viewPos.y > 0.6)
         {
             //if we stop and are not in the middle then the camera stops as well because velocity is 0, so check if it is 0 and if it is then use cameraspeed
             float velocity = rb.velocity.y;
-            float toPlayerDireetion = player.transform.position.y - mainCamera.transform.position.y;
-            toPlayerDireetion /= Mathf.Abs(toPlayerDireetion);
+            float toPlayerDirection = player.transform.position.y - mainCamera.transform.position.y;
+            toPlayerDirection /= Mathf.Abs(toPlayerDirection);
             bool isStatic = (velocity < 0.1f && velocity > -0.1f);
-            mainCamera.transform.position += Vector3.up * (isStatic ?  toPlayerDireetion * cameraSpeed:velocity) * Time.deltaTime;
+            mainCamera.transform.position += Vector3.up * (isStatic ? toPlayerDirection * cameraSpeed:velocity) * Time.deltaTime;
         }
-        if (viewPos.y > 0.6)
-        {
-            float velocity = rb.velocity.y;
-            
-            float toPlayerDireection = player.transform.position.y - mainCamera.transform.position.y;
-            toPlayerDireection /= Mathf.Abs(toPlayerDireection);
-            bool isStatic = (velocity < 0.1f && velocity > -0.1f);
-            mainCamera.transform.position += Vector3.up * (isStatic ? toPlayerDireection * cameraSpeed:velocity) * Time.deltaTime;
-        }
-
         //check if we are really far away
         if (Mathf.Abs(viewPos.y) > 1.5 || Mathf.Abs(viewPos.x) > 1.5)
         {
@@ -78,7 +68,6 @@ public class cameraMovement : MonoBehaviourPunCallbacks
         }
         //zoom in and out to capture all players
         updateCameraZoom();
-
     }
 
     public void  updatePlayers()
@@ -87,8 +76,6 @@ public class cameraMovement : MonoBehaviourPunCallbacks
     }
     void updateCameraZoom()
     {
-       // players = returnPlayers();
-        
         float cameraSize = 0;
         try
         {
@@ -96,7 +83,6 @@ public class cameraMovement : MonoBehaviourPunCallbacks
             {
                 Vector3 difference = onePlayer.transform.position - player.transform.position;
                 cameraSize += difference.magnitude;
-            
             }
         }
         catch (Exception e)
@@ -108,13 +94,10 @@ public class cameraMovement : MonoBehaviourPunCallbacks
         }
        
         //we want to divide cameraSize with playercount so it reflects an avarage value
-        //-1 because our player is a part of players as well
-        cameraSize = cameraSize / ((players.Length) * cameraZoomDivider);
+        cameraSize /= ((players.Length) * cameraZoomDivider);
         //5 is default value
         cameraSize += 5;
-        //move the camera further from players to capture all players
-        
-        //we want to update only the z value but also allow the camera to move sideways
+        //this zooms out the camera
         mainCamera.orthographicSize = cameraSize;
     }
 }

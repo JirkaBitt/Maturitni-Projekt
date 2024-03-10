@@ -1,39 +1,29 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Unity.Mathematics;
 
 public class pickWeapon : MonoBehaviour
 {
-
+    //check if we are in range of an weapon to pick it up
     public bool isInRange = false;
+    //refrence to the weapon that is in our reach
     public GameObject weaponInRange;
-    
+    //if our player is already holding a weapon
     public bool isHoldingWeapon = false;
-    
+    //the script to use the weapon
     private weapon weaponScript;
-
+    //keep track if we have already clicked attack to prevent spamming
     private bool alreadyUsing = false;
-
+    //the lifebar of the picked weapon
     private GameObject lifeBar;
-
+    //if we decide to pickup the weapon it is stored here
     public GameObject currentWeapon;
-    //private weapon_Sync _weaponSync;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        
             if (Input.GetKeyDown(KeyCode.E) && isHoldingWeapon)
             {
-               
-                //drop the weapon
+                 //drop the weapon
                  drop(false, currentWeapon);
                  return;
             }
@@ -56,7 +46,7 @@ public class pickWeapon : MonoBehaviour
             {
                 alreadyUsing = true;
                 weaponScript.Use();
-                //waitforisusing prevents the player from spamming attacks
+                //waitForIsUsing prevents the player from spamming attacks
                 StartCoroutine(waitForIsUsing());
 
             }
@@ -67,32 +57,25 @@ public class pickWeapon : MonoBehaviour
         //Find the Gameobjects based on ID
         isHoldingWeapon = true;
         GameObject weaponX = PhotonView.Find(weaponID).gameObject;
-        //GameObject housing = weaponX.transform.parent.gameObject;
         GameObject playerX = PhotonView.Find(playerID).gameObject;
-       
-        //assign values to our script
+        //retrieve the weapon script
         weaponScript = weaponX.GetComponent<weapon>();
-        //weaponScript.weaponGameobject = weaponX;
-        //weaponScript.photonID = weaponID;
         //stop playing the idle animation
         Animator animator = weaponX.GetComponent<Animator>();
         animator.SetBool("isPicked", true);
-        //assign plaer as parent so that weapon moves with him
-       // weaponX.transform.parent = playerX.transform;
-       float facingDirection = gameObject.transform.forward.z;
-       weaponX.transform.parent = playerX.transform;
-       
+        //assign player as parent so that weapon moves with him
+        float facingDirection = gameObject.transform.forward.z;
+        weaponX.transform.parent = playerX.transform;
+        //the weapon is now child of the player, so we want the local rotation to be 0
         weaponX.transform.localRotation = Quaternion.Euler(0,0,0);
         //send info to playerStats
         playerStats stats = playerX.GetComponent<playerStats>();
         stats.currentWeapon = weaponX;
         //rotate the weapon based on the player direction
-        //if facing left then rotate the weapon on y=180 else y = 0
         //transform.forward gives us the facing direction of our player, only z value is changing from 1 to -1
-        
         //move the weapon closer to the player
-        //weaponX.transform.position = playerX.transform.position + new Vector3(-facingDirection, 0.2f, 0);
         weaponX.transform.position = playerX.transform.position + new Vector3(facingDirection, 0.2f, 0);
+        //change the parent of the lifebar so that it does not rotate with the weapon
         changeLifeBarToPlayer(weaponX);
         if (weaponX.name.Contains("Bomb") || weaponX.name.Contains("Gun"))
         {
@@ -100,6 +83,7 @@ public class pickWeapon : MonoBehaviour
         }
         else
         {
+            //rotate the melee weapon
             weaponX.transform.Rotate(0,0,-45);
         }
         //we have to switch this to false bcs otherwise we cannot drop the weapon
@@ -168,7 +152,6 @@ public class pickWeapon : MonoBehaviour
         PhotonView photonView = PhotonView.Get(this);
         //RPC allows us to run a function on network gameobjects
         //we cannot send gameobject in RPC so we have to use photonviewID
-        //GameObject weapon = gameObject.transform.GetChild(0).gameObject;
         int weaponID = weapon.GetPhotonView().ViewID;
         photonView.RPC("dropWeapon", RpcTarget.All,weaponID,delete);
     }
@@ -180,16 +163,15 @@ public class pickWeapon : MonoBehaviour
         //reset the lifebar position
         lifeBar.transform.position = weapon.transform.position + new Vector3(0, 1.2f, 0);
         lifeBar.transform.rotation = Quaternion.Euler(0, 0, 0);
-       
         lifeBar.transform.parent = gameObject.transform;
     }
     IEnumerator changeLifeBarToWeapon(GameObject weapon)
     {
-       
+        //play the rest of the animation really fast
         Animator anim = weapon.GetComponent<Animator>();
         anim.speed = 1000;
         yield return new WaitUntil(() => anim.GetCurrentAnimatorStateInfo(0).IsName("picked"));
-        //check if it is not null, we might have deleted it when the time run out
+        //change the lifebar back to the weapon
         anim.speed = 1;
         lifeBar.transform.position = weapon.transform.position + new Vector3(0, 1.2f, 0);
         lifeBar.transform.rotation = Quaternion.Euler(0, 0, 0);
@@ -197,7 +179,6 @@ public class pickWeapon : MonoBehaviour
         lifeBar.transform.parent = weapon.transform;
         lifeBar = null;
     }
-
     public void deleteLifeBar()
     {
         Destroy(lifeBar);
