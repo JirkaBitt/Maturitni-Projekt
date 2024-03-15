@@ -58,12 +58,6 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         //wait until we have created all assets, then start the game
         StartCoroutine(waitForAsets());
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     public void renamePlayer(string Name, int id, string nickname)
     {
         //rename player renames the player on all clients to the users Id

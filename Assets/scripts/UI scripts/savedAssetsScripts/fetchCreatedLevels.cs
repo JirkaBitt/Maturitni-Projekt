@@ -109,6 +109,7 @@ public class fetchCreatedLevels : MonoBehaviour
     }
     private int[,] decodeAsset(string hex)
     {
+        print(hex);
         List<int> intList = new List<int>();
         foreach (var hexChar in hex)
         {
@@ -161,5 +162,4 @@ public class fetchCreatedLevels : MonoBehaviour
         }
         return binary;
     }
-    
 }

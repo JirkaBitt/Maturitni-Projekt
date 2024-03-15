@@ -237,10 +237,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41ff3566e1edc4b9b98153668e6b74ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 
   triggerLaunch: 0
   bulletPrefab: {fileID: 5475411863845466111, guid: 9e592f867a71e4ad6b807e97c1fa02e4, type: 3}
-  maxScaleMagnitude: 1.2
+  maxScaleMagnitude: 1.6
 --- !u!114 &9184083966844939997
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -300,5 +299,3 @@ MonoBehaviour:
   width: 10.44
   hasSprite: 1
   hasAnimation: 1
-  startScale: {x: 0.17799, y: 0.17799, z: 0.17799}
-  name: Gun

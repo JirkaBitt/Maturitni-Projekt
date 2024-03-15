@@ -5,7 +5,6 @@ using Random = UnityEngine.Random;
 
 public class bulletScript : MonoBehaviour
 {
-    // Start is called before the first frame update
     public Vector3 launchVector = Vector3.zero;
     private bool alreadyAdded = false;
     public GameObject player;
@@ -56,7 +55,7 @@ public class bulletScript : MonoBehaviour
         GameObject enemy = phView.gameObject;
         //add the force to his percentage and launch him with his percentage
         playerStats stats = enemy.GetComponent<playerStats>();
-        //add a litle bit of randomness
+        //add a little bit of randomness
         float randomMultiplier = Random.Range(4, 10);
         randomMultiplier /= 10;
         force *= randomMultiplier;

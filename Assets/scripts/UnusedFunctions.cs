@@ -364,5 +364,27 @@ public class UnusedFunctions : MonoBehaviour
 
         return ClassArray;
     }
+    private string shortenString(string original)
+    {
+        char previous = original[0];
+        string shortened = previous.ToString();
+        int consequentialChars = 0;
+        foreach (var oneChar in original)
+        {
+            if (oneChar == previous)
+            {
+                consequentialChars++;
+            }
+            else
+            {
+                previous = oneChar;
+                shortened += "-" + consequentialChars.ToString();
+                consequentialChars = 0;
+                shortened += oneChar;
+            }
+        }
+
+        return shortened;
+    }
 */
 }

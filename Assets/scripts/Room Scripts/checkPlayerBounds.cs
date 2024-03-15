@@ -17,8 +17,10 @@ public class checkPlayerBounds : MonoBehaviourPunCallbacks
         if (gObject.CompareTag("Player"))
         {
             PhotonView playerView = gObject.GetPhotonView();
-            if (!playerView.IsMine)
+            if (!playerView.IsMine || !controller.gameIsActive)
             {
+                //if this is not my player return
+                //if the game is not active return, when deleting player onCollisionExit is called
                 return;
             }
             playerStats stats = gObject.GetComponent<playerStats>();
@@ -52,8 +54,10 @@ public class checkPlayerBounds : MonoBehaviourPunCallbacks
         }
         else
         {
-            print("Destroy" + gObject.name);
-            Destroy(gObject);
+            if (gObject.name.Contains("Projectile"))
+            {
+                Destroy(gObject);
+            }
         }
     }
 
@@ -70,6 +74,7 @@ public class checkPlayerBounds : MonoBehaviourPunCallbacks
     [PunRPC]
     public void addScore(int addObj, int removeObj, bool hasAttacker)
     {
+        //add a point for the attacker and remove one for the defeated
         GameObject defeated = PhotonView.Find(removeObj).gameObject;
         playerStats defeatedStats = defeated.GetComponent<playerStats>();
         defeatedStats.score -= 1;

@@ -37,6 +37,8 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
     public bool spawningEnabled = true;
     //reference to the playagain button in the result panel, we want to deactivate it when the master starts a game, so that the player isnt able to join after the game was started
     public GameObject playAgainButton;
+    //check if game is in progress
+    public bool gameIsActive = false;
     void Start()
     {
         //set the default fps to 60
@@ -159,8 +161,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
                GameObject weapon = PhotonNetwork.InstantiateRoomObject(WeaponNames[randomWeaponIndex],
                    spawnPoint[randomSpawnIndex],
                    Quaternion.identity, 0);
-
-              
            }
            int randomWait = Random.Range(8, 15);
            yield return new WaitForSeconds(randomWait);
@@ -320,6 +320,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         }
         CreatePrefabs.GetComponent<CreatePrefab>().renamePlayer(playerID, playerView.ViewID,PhotonNetwork.LocalPlayer.NickName);
         photonView.RPC("updateCameraPlayers",RpcTarget.AllBuffered);
+        displayIcons.SetActive(true);
         displayIcons.GetComponent<displayPlayerStats>().addPlayerTexture(playerID);
     }
     [PunRPC]
@@ -328,6 +329,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         //enable movement
         myPlayer.GetComponent<playerMovement>().enabled = true;
         spawningEnabled = true;
+        gameIsActive = true;
         //now start the clock
         clock.GetComponent<countDown>().startCount();
         RoomIDText.SetActive(false);
@@ -336,7 +338,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         playAgainButton.SetActive(false);
         //only the master will spawn the weapons, but we want to run it at all clients in case that one of them bbecomes master
         StartCoroutine(spawnWeapon());
-        
     }
 
     public void callEndGame()
@@ -350,6 +351,7 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         startGameButton.SetActive(false);
         playAgainButton.SetActive(true);
         spawningEnabled = false;
+        gameIsActive = false;
         cameraMovement camScript = Camera.main.GetComponent<cameraMovement>();
         camScript.enabled = false;
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
@@ -400,5 +402,6 @@ public class PUN2_RoomController : MonoBehaviourPunCallbacks
         }
         //stop the coroutine, so that if we play again the weapons dont spawn twice
         StopCoroutine("spawnWeapon");
+       
     }
 }

@@ -5,7 +5,6 @@ using UnityEngine;
 
 public abstract class gunWeapons : weapon
 {
-    // Start is called before the first frame update
     public abstract override void Use();
     public override void launchEnemy(GameObject enemy, Vector3 launchVector, float force)
     {

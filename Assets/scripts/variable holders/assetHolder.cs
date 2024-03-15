@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -57,7 +58,6 @@ public class assetHolder : MonoBehaviour
     private string convertToHex(int[] binary)
     {
         //this func takes 4 ints and converts them into hex number
-        string returnValue = "0";
         int hex = 0;
         for (int i = 0; i < 4; i++)
         {
@@ -68,26 +68,11 @@ public class assetHolder : MonoBehaviour
         }
         if (hex > 9)
         {
-            switch (hex)
-            {
-                case 10: returnValue = "A";
-                    break;
-                case 11: returnValue = "B";
-                    break;
-                case 12: returnValue = "C";
-                    break;
-                case 13: returnValue = "D";
-                    break;
-                case 14: returnValue = "E";
-                    break;
-                case 15: returnValue = "F";
-                    break;
-            }
+            return (Convert.ToChar('A' + (hex - 10))).ToString();
         }
         else
         {
-            returnValue = hex.ToString();
+            return hex.ToString();
         }
-        return returnValue;
     }
 }

@@ -2299,41 +2299,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 527681292}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe7cd3d0232a341c88dc393e50d3c373, type: 3}
+  m_Script: {fileID: 11500000, guid: 60aa88cff28f847f584a5236ecbf0c2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 3568557512222326416, guid: 442e8e4bd41b64771ab1739987c1198c, type: 3}
-  spawnPoint:
-  - {x: 0, y: 0, z: 0}
-  - {x: 2, y: 0, z: 0}
-  - {x: 4.6e-44, y: 3.1781315e+30, z: -5.7202556e+26}
-  - {x: 3e-45, y: -5.7202675e+26, z: 3e-45}
+  spawnPoint: []
   maxWeaponCount: 5
-  weaponPrefabs:
-  - {fileID: 7613326741600582470, guid: bdd384788015743a1b362addea6714fc, type: 3}
-  - {fileID: 6776103268096950887, guid: 490378685513747de87c584414e0cab6, type: 3}
-  - {fileID: 8223472603371931765, guid: fe9f8731c80da41adae2526af94ef773, type: 3}
-  - {fileID: 1875356209240266208, guid: d630e7763c3794e11b539c577ef78874, type: 3}
-  - {fileID: 4883101559898575777, guid: 803fe6e36c0ec47e09496ea552fbaa9d, type: 3}
-  weaponSpawnPoint: {fileID: 6571578089785572926, guid: bdd384788015743a1b362addea6714fc, type: 3}
   WeaponNames:
+  - Axe
   - Sword
   - Spear
-  - Axe
-  - Bomb
   - Gun
   CreatePrefabs: {fileID: 985543087}
   displayIcons: {fileID: 934735527}
   endGUI: {fileID: 149812241}
   endController: {fileID: 2046857600}
   inGameUI: {fileID: 1626432712}
-  hideGUI: 0
   clock: {fileID: 1665803849}
   startGameButton: {fileID: 1842279556}
   RoomIDText: {fileID: 383163165}
-  displayStats: {fileID: 934735527}
   spawningEnabled: 1
   playAgainButton: {fileID: 1935786805}
+  gameIsActive: 0
 --- !u!4 &527681294
 Transform:
   m_ObjectHideFlags: 0
@@ -5554,7 +5540,6 @@ MonoBehaviour:
   - Gun
   - Projectile
   - Bomb
-  PhotonNames: []
   controller: {fileID: 527681292}
   scenebounds: {fileID: 2100512840}
   lifeBar: {fileID: 597734939546170206, guid: aa040de246be3474895f82531d073956, type: 3}
@@ -7730,8 +7715,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff9a0a77b54664c4bbe3d46327d9c05d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Knockouts: 0
-  photonID: 0
   currentWeapon: {fileID: 0}
   percentage: 0
   score: 0

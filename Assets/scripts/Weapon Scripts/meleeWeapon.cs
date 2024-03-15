@@ -9,7 +9,6 @@ using Random = UnityEngine.Random;
 public abstract class meleeWeapon : weapon
 {
    public abstract override void Use();
-   private Vector3[] previousPositions;
 
    public override void launchEnemy(GameObject enemy, Vector3 launchVector, float force)
    {

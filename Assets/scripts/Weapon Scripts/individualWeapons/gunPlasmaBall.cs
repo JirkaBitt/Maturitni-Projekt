@@ -5,9 +5,7 @@ using UnityEngine;
 
 public class gunPlasmaBall : gunWeapons
 {
-    public GameObject bulletPrefab;
-
-    public float maxScaleMagnitude = 1.2f;
+    public float maxScaleMagnitude = 1.6f;
     // Start is called before the first frame update
     public override void Use()
     {
@@ -31,7 +29,7 @@ public class gunPlasmaBall : gunWeapons
         {
             if (scale.magnitude < maxScaleMagnitude)
             {
-                scale += new Vector3(1, 1, 0) * 0.3f * Time.deltaTime;
+                scale += new Vector3(1, 1, 0) * 0.5f * Time.deltaTime;
                 bullet.transform.localScale = scale;
             }
             yield return null;

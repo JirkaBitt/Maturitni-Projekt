@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using Color = UnityEngine.Color;
 using GameObject = UnityEngine.GameObject;
 using Screen = UnityEngine.Screen;
@@ -83,18 +84,12 @@ public class analyzeImage : MonoBehaviour
         public GameObject objectPrefab; 
         //pixel class is a reference to the slate that we draw on, we get the info about the pixels from there
         public pixel[,] pixelClass;
-        public bool isDefault;
-
-        public Vector3 fullScreenPosition;
+      
         public Vector3 fullScreenScale;
         
         public Vector3 smallScreenPosition;
         public Vector3 smallScreenScale;
 
-        public GameObject DefaultGameObject;
-        private Vector3 defaultSize;
-
-        private float pixWidth = 0;
         private Vector2 firstBlackPixel = Vector2.zero;
 
         private GameObject slate;
@@ -103,14 +98,10 @@ public class analyzeImage : MonoBehaviour
         public prefab(GameObject slatee,GameObject objectt, pixel[,] array, string n,bool defaultAsset,GameObject defObj, Vector3 defSize)
         {
 
-            this.objectPrefab = objectt;
-            this.pixelClass = array;//array.Clone() as pixel[,];
-            this.name = n;
-            this.isDefault = defaultAsset;
-            this.DefaultGameObject = defObj;
-            defaultSize = defSize;
-            this.slate = slatee;
-            //we have to instantiate it to get the size
+            objectPrefab = objectt;
+            pixelClass = array;
+            name = n;
+            slate = slatee;
             objectPrefab.SetActive(false);
             int width = pixelClass.GetLength(0);
             int height = pixelClass.GetLength(1);
@@ -178,12 +169,6 @@ public class analyzeImage : MonoBehaviour
             objectPrefab.transform.position = smallScreenPosition;
             objectPrefab.transform.localScale = smallScreenScale;
             
-        }
-        //update values takes the current transform values and saves it
-        public void updateSmallValues(GameObject update)
-        {
-            smallScreenPosition = update.transform.position;
-            smallScreenScale = update.transform.lossyScale;
         }
         public void computeMinimalize(float screenWidth,int assetCount, int index)
         {
@@ -293,8 +278,7 @@ public class analyzeImage : MonoBehaviour
                     SpriteRenderer ren = attach.AddComponent<SpriteRenderer>();
                     ren.sprite = final;
                 }
-                pixWidth = combinedTexture.width / texturePixelSize.x;
-               //go from the middle of the sprite to the bottom corner and from there navigate with firstblackPixel to the first corner of the real sprite, that is the starting position
+                //go from the middle of the sprite to the bottom corner and from there navigate with firstblackPixel to the first corner of the real sprite, that is the starting position
               
                firstBlackPixel = (Vector2)final.bounds.center -
                    new Vector2(combinedTexture.width / 2, combinedTexture.height / 2) * 0.01f + firstBlackPixel;
@@ -365,7 +349,7 @@ public class analyzeImage : MonoBehaviour
             //we should show the popup and wait for user to decide if they want to save the assets
             if (loadLevelsFromSaves && !hasEditedAssets)
             {
-                //if we havent edited anything, there is no need to show the update popup
+                //if we haven not edited anything, there is no need to show the update popup
                 loadingScreen.SetActive(true);
                 toolsScript.startGameButton.SetActive(false);
                 goBackButton.SetActive(false);
@@ -419,7 +403,6 @@ public class analyzeImage : MonoBehaviour
             GameObject parentAsset = new GameObject();
             parentAsset.transform.parent = sceneAssets.transform;
             prefab asset = new prefab( slate,parentAsset, gameLevelPixels, assetNames[i],false,defaultAssets[i],defSize);
-            asset.fullScreenPosition = currentParent.transform.position;
             asset.fullScreenScale = currentParent.transform.localScale;
             asset.addSavedAsset(selectedLevel.assets[i]);
             assetPrefabs.Add(asset);
@@ -463,12 +446,9 @@ public class analyzeImage : MonoBehaviour
 
         if (!result)
         {
-           // SceneManager.LoadScene("ChooseLevel");
-           print("failed to join!!!!!!!!");
+           SceneManager.LoadScene("ChooseLevel");
         }
-       
     }
-
     public void createSlateForSaved(int height)
     {
         //this function is different from normal create slate bcs we coukd have had different height, and we want to match the original height
@@ -529,7 +509,6 @@ public class analyzeImage : MonoBehaviour
                 return false;
             }
         }
-
         StartCoroutine(showWarning());
         return true;
     }
@@ -548,7 +527,6 @@ public class analyzeImage : MonoBehaviour
             pix.finalColor = Color.white;
             pix.reloadColor();
         }
-
         TextMeshProUGUI text = assetDisplayText.GetComponent<TextMeshProUGUI>();
         text.SetText("Please draw the " + assetName);
     }
@@ -605,12 +583,11 @@ public class analyzeImage : MonoBehaviour
     void displayAssets()
     {
         //we want to change the buttons functions to adress the changes
-       toolsScript.changeFunctions();
-       toolsScript.deactivateButtons();
-       toolsScript.enableStartGame();
-       //dont show the text
-       assetDisplayText.SetActive(false);
-     
+        toolsScript.changeFunctions();
+        toolsScript.deactivateButtons();
+        toolsScript.enableStartGame();
+        //dont show the text
+        assetDisplayText.SetActive(false);
         //displayed set to true stops the raycast
         displayed = true;
         int assetCount = assetPrefabs.Count;
@@ -665,7 +642,6 @@ public class analyzeImage : MonoBehaviour
         GameObject parentAsset = new GameObject();
         parentAsset.transform.parent = sceneAssets.transform;
         prefab asset = new prefab( slate,parentAsset, gameLevelPixels, assetNames[assetIndex],false,defaultAssets[assetIndex],defSize);
-        asset.fullScreenPosition = currentParent.transform.position;
         asset.fullScreenScale = currentParent.transform.localScale;
         assetPrefabs.Add(asset);
         assetIndex++;
@@ -675,7 +651,6 @@ public class analyzeImage : MonoBehaviour
         }
         else
         {
-            print("we have created all assets");
             //all assets have been created
             //now show the overview
             if (onlyCharacter)
@@ -689,7 +664,6 @@ public class analyzeImage : MonoBehaviour
             {
                 finalizeAssets();
             }
-            
         }
     }
     void castRaycast()
@@ -726,7 +700,6 @@ public class analyzeImage : MonoBehaviour
                 previousRaycastPos = hitPixel.transform.position;
                 //we have to add hit2d because if toolradius is 0 then we dont have any pixels, so add the default one
                 allHits.Add(hit2D);
-                
                 foreach (var hitPix in allHits)
                 {
                     String pixelName = hitPix.collider.gameObject.name;
