@@ -128,8 +128,8 @@ public class UnusedFunctions : MonoBehaviour
         parent.transform.parent = sceneAssets.transform;
         if (assetName != "Character" && assetName != "Arena" && assetName != "Projectile")
         {
-            //this is a weapon, change its tag
-            parent.tag = "weapon";
+            //this is a Weapon, change its tag
+            parent.tag = "Weapon";
         }
         currentParent = parent;
     }
@@ -251,7 +251,7 @@ public class UnusedFunctions : MonoBehaviour
     
     void fitTheScreenDefault(GameObject parentObject)
     {
-        assetInfo info = parentObject.GetComponent<assetInfo>();
+        AssetInfo info = parentObject.GetComponent<AssetInfo>();
         info.turnOffAnimation();
         info.calculateSize();
         Vector3 assetScale = info.startScale;

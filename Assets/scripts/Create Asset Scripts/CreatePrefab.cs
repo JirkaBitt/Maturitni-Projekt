@@ -49,11 +49,12 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         {
             //if we are the master client, that means we have drawn the assets and we will send the info to the other players
             GameObject sceneAssets = GameObject.Find("AssetHolder");
-            assetHolder holder = sceneAssets.GetComponent<assetHolder>();
+            AssetHolder holder = sceneAssets.GetComponent<AssetHolder>();
             foreach (var AssetName in defaultsNames)
             {
                 Create(holder.assets[AssetName],AssetName);
             }
+            Destroy(sceneAssets);
         }
         //wait until we have created all assets, then start the game
         StartCoroutine(waitForAsets());
@@ -68,7 +69,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         //change the texture of my player on all clients
         GameObject sceneAssets = GameObject.Find("AssetHolder");
-        assetHolder holder = sceneAssets.GetComponent<assetHolder>();
+        AssetHolder holder = sceneAssets.GetComponent<AssetHolder>();
 
         int[,] colors = holder.assets["Character"];
         List<int> color1D = new List<int>();
@@ -85,7 +86,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
 
         int photonID = player.GetPhotonView().ViewID;
         photonView.RPC("changePlayerTexture",RpcTarget.AllBuffered,photonID,color1D.ToArray(),arrayWidth);
-        //sceneAssets.SetActive(false);
+        Destroy(sceneAssets);
     }
     IEnumerator waitForAsets()
     {
@@ -150,9 +151,9 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         newAsset = Instantiate(newAsset);
         if (newAsset.CompareTag("Player"))
         {
-            newAsset.GetComponent<PUN2_PlayerSync>().enabled = true;
+            newAsset.GetComponent<PlayerSync>().enabled = true;
         }
-        assetInfo info = newAsset.GetComponent<assetInfo>();
+        AssetInfo info = newAsset.GetComponent<AssetInfo>();
         newAsset.name = nameRPC;
         //create and assign the texture to this asset, it will also create a new polygon collider
         CombineSpriteArray(newAsset, colorsRPC);
@@ -176,7 +177,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             GameObject bar = Instantiate(lifeBar);
             bar.transform.position = newAsset.transform.position + new Vector3(0, 1.2f, 0);
             bar.transform.parent = newAsset.transform;
-            bar.GetComponent<decreaseWeaponLife>().weapon = newAsset;
+            bar.GetComponent<DecreaseWeaponLife>().weapon = newAsset;
         }
         //check if the object has the ability to create a trail
         if (newAsset.TryGetComponent<CreateTrail>(out var component))

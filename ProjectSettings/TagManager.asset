@@ -13,6 +13,8 @@ TagManager:
   - pixel
   - created
   - roomName
+  - music
+  - sound
   layers:
   - Default
   - TransparentFX

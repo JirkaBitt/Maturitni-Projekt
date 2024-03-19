@@ -86,7 +86,7 @@ public class CreateTrail : MonoBehaviour
 
     private void OnDisable()
     {
-        //if the weapon gets deleted while we are attacking we have to delete the trail afterwards
+        //if the Weapon gets deleted while we are attacking we have to delete the trail afterwards
         foreach (var copy in createdCopies)
         {
             Destroy(copy);
@@ -94,7 +94,7 @@ public class CreateTrail : MonoBehaviour
     }
     private void OnDestroy()
     {
-        //if the weapon gets deleted while we are attacking we have to delete the trail afterwards
+        //if the Weapon gets deleted while we are attacking we have to delete the trail afterwards
         foreach (var copy in createdCopies)
         {
             Destroy(copy);
