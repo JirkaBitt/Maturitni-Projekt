@@ -2456,7 +2456,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 953de0a59c3f3c7498ecb7496a450d69, type: 3}
+  m_Sprite: {fileID: 21300026, guid: 1eaee135ce037439d925cee5e41ce026, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4301,7 +4301,6 @@ MonoBehaviour:
   assetNames:
   - Character
   assetIndex: 0
-  selectText: 
   frame: {fileID: 2158680831449828096, guid: 2aa02a520343140b98df807b1cb4e6b5, type: 3}
   defaultAssets:
   - {fileID: 3568557512222326416, guid: 442e8e4bd41b64771ab1739987c1198c, type: 3}

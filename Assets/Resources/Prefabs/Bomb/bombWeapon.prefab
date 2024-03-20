@@ -79,7 +79,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 619bb6c9042f8634982d80fe157636c0, type: 3}
+  m_Sprite: {fileID: 21300004, guid: 0fd21678280ad9c47aa2d32baf438c5d, type: 3}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -102,7 +102,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae7cbf017e1a44040aaee5cbb475f461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 
   triggerLaunch: 0
   explosionPrefab: {fileID: 4914716930404006884, guid: aed12c224fbc8704d8eaa07a52e88f44, type: 3}
 --- !u!114 &2444396779530598049
@@ -164,8 +163,6 @@ MonoBehaviour:
   width: 5.12
   hasSprite: 1
   hasAnimation: 1
-  startScale: {x: 0.14263, y: 0.14263, z: 0.14263}
-  name: Bomb
 --- !u!58 &6213989572315781396
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -213,6 +210,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e43038e21e4ec4baab5a508f4431a383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  whiteSprite: {fileID: 0}
   oneCopyDuration: 0.3
   numberOfCopies: 70
   fadeSprite: 0

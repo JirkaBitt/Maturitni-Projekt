@@ -33,8 +33,8 @@ Transform:
   m_GameObject: {fileID: 8223472603371931765}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.0317, y: 0.14693165, z: 0}
-  m_LocalScale: {x: 0.38128, y: 0.38128, z: 0.38128}
+  m_LocalPosition: {x: -3.0367, y: 0.14264, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.38128}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: c3be05f5440ab3642967e47c0bea416f, type: 3}
+  m_Sprite: {fileID: 21300004, guid: 0fd21678280ad9c47aa2d32baf438c5d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -150,7 +150,7 @@ PolygonCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 5.12, y: 5.12}
+    oldSize: {x: 3.4133337, y: 3.4133337}
     newSize: {x: 5.12, y: 5.12}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -287,9 +287,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2cab40eb562140809f0617dff9c6f5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 
   triggerLaunch: 0
-  weap: {fileID: 0}
 --- !u!114 &-3376597893866383866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -318,8 +316,6 @@ MonoBehaviour:
   width: 5.12
   hasSprite: 1
   hasAnimation: 1
-  startScale: {x: 0.38128, y: 0.38128, z: 0.38128}
-  name: Sword
 --- !u!114 &3568233135924671263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -332,6 +328,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e43038e21e4ec4baab5a508f4431a383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  whiteSprite: {fileID: 0}
   oneCopyDuration: 0.15
   numberOfCopies: 15
   fadeSprite: 1
