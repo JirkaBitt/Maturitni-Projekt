@@ -40,7 +40,9 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         numberOfCreated = 0;
         pool.ResourceCache.Clear();
         assetData.Clear();
-        
+        //turn down the music
+        GameObject musicPlayer = GameObject.FindWithTag("music");
+        musicPlayer.GetComponent<AudioSource>().volume = 0.2f;
         for (int i = 0; i < defaults.Length; i++)
         {
             assetData.Add(defaultsNames[i],defaults[i]);
@@ -54,7 +56,6 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             {
                 Create(holder.assets[AssetName],AssetName);
             }
-            Destroy(sceneAssets);
         }
         //wait until we have created all assets, then start the game
         StartCoroutine(waitForAsets());
@@ -86,7 +87,6 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
 
         int photonID = player.GetPhotonView().ViewID;
         photonView.RPC("changePlayerTexture",RpcTarget.AllBuffered,photonID,color1D.ToArray(),arrayWidth);
-        Destroy(sceneAssets);
     }
     IEnumerator waitForAsets()
     {
@@ -321,7 +321,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         //we can go up, right, left, down
         //check if we have pixels on the sides of this corner
         Vector2 curPixel = startPixelIndex;
-        Vector2 curDirection = Vector2.right;
+        Vector2 curDirection = Vector2.left;
         Vector2 curCorner = startCorner;
         //save the legacy direction so that we can determine when it changes and save that corner
         Vector2 legacyDirection = curDirection;
@@ -484,7 +484,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         //we are not touching any pixels, so choose a different corner from the same pixel
         if (touchingPixels.Count == 1)
         {
-            //move to the next corner, we will figure it out based on the drection and current offset
+            //move to the next corner, we will figure it out based on the direction and current offset
             Vector2 cornerOffset = cornerPosition - pixelIndex;
             //we want to flip the corner around the direction vector
             if (direction.x != 0)

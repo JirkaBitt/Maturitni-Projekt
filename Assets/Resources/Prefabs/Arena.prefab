@@ -50,8 +50,6 @@ MonoBehaviour:
   width: 40
   hasSprite: 0
   hasAnimation: 0
-  startScale: {x: 1, y: 1, z: 1}
-  name: Arena
 --- !u!114 &-8806639011019316432
 MonoBehaviour:
   m_ObjectHideFlags: 0

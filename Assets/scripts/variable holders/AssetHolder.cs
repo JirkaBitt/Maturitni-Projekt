@@ -23,6 +23,7 @@ public class AssetHolder : MonoBehaviour
         {
             //supply the int array and create a string hexadecimal representation to save space
             string saveThis = assetToHex(asset.Value);
+            print(asset.Key + "-"+saveThis);
             writer.WriteLine(saveThis);
         }
         writer.Close();

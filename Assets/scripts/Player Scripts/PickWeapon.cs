@@ -104,6 +104,8 @@ public class PickWeapon : MonoBehaviour
             //start playing the idle animation again
             Animator animator = weaponX.GetComponent<Animator>();
             animator.SetBool("isPicked", false);
+            //make the weapon fall down to the ground
+            weaponX.GetComponent<Weapon>().StartCoroutine("fallDown");
         }
         else
         {

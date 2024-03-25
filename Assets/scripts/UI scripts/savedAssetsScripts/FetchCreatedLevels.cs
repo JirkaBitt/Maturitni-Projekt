@@ -67,6 +67,7 @@ public class FetchCreatedLevels : MonoBehaviour
             reader.Close();
             if (!isCorupted)
             {
+                print(path);
                 //create new instance of this class that houses the assets
                 savedAssets currentSave = new savedAssets(assets, saveName,path.FullName);
                 allSaves.Add(currentSave);
@@ -109,7 +110,6 @@ public class FetchCreatedLevels : MonoBehaviour
     }
     private int[,] decodeAsset(string hex)
     {
-        print(hex);
         List<int> intList = new List<int>();
         foreach (var hexChar in hex)
         {

@@ -296,7 +296,6 @@ public class AnalyzeImage : MonoBehaviour
     }
     void Start()
     {
-        
         //create the parent
         sceneAssets = new GameObject();
         sceneAssets.name = "Scene Assets";

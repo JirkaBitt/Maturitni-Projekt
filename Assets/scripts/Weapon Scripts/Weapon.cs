@@ -1,4 +1,6 @@
 
+using System;
+using System.Collections;
 using UnityEngine;
 
 public abstract class Weapon : MonoBehaviour
@@ -15,5 +17,22 @@ public abstract class Weapon : MonoBehaviour
     {
         CreateTrail trailScript = weapon.GetComponent<CreateTrail>();
         trailScript.createTrail();
+    }
+
+    private void Start()
+    {
+        StartCoroutine(fallDown());
+    }
+    IEnumerator fallDown()
+    {
+        //add a rigidbody that will make the weapon fall due to gravity
+        Rigidbody2D rb = gameObject.AddComponent<Rigidbody2D>();
+        rb.gravityScale = 0.2f;
+        PolygonCollider2D coll = gameObject.GetComponent<PolygonCollider2D>();
+        PolygonCollider2D ground = GameObject.FindWithTag("ground").GetComponent<PolygonCollider2D>();
+        //wait until the weapon hits the ground or some player picks it up
+        yield return new WaitUntil(() => coll.IsTouching(ground) || gameObject.transform.parent != null);
+        //destroy the rb and stop the gravity
+        Destroy(rb);
     }
 }

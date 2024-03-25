@@ -54,10 +54,7 @@ public class CheckGameBounds : MonoBehaviourPunCallbacks
         }
         else
         {
-            if (gObject.name.Contains("Projectile"))
-            {
-                Destroy(gObject);
-            }
+            Destroy(gObject);
         }
     }
 

@@ -21,6 +21,9 @@ public class ChooseLevel : MonoBehaviour
         else
         {
             Destroy(musicPlayer);
+            //reset the volume
+            GameObject existingPlayer = GameObject.FindWithTag("music");
+            existingPlayer.GetComponent<AudioSource>().volume = 1f;
         }
     }
     public void createNew()
