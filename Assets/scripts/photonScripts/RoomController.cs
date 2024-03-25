@@ -286,6 +286,18 @@ public class RoomController : MonoBehaviourPunCallbacks
     {
         //AllViaServer should call it on all clients at the same time
         photonView.RPC("startGame",RpcTarget.AllViaServer);
+        int playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
+        //spawn a weapon for every player
+        for (int i = 0; i < playerCount; i++)
+        {
+            int randomWeaponIndex = Random.Range(0, WeaponNames.Length);
+            //find random spawn position
+            int randomSpawnIndex = Random.Range(0, spawnPoint.Length);
+            //spawn the Weapon, we want it as a room object so when master leaves it does not destroy all the weapons
+            GameObject weapon = PhotonNetwork.InstantiateRoomObject(WeaponNames[randomWeaponIndex],
+                spawnPoint[randomSpawnIndex],
+                Quaternion.identity, 0);
+        }
         PhotonNetwork.CurrentRoom.IsOpen = false;
     }
     public void playAgain()
@@ -376,6 +388,8 @@ public class RoomController : MonoBehaviourPunCallbacks
         for (int i = 0; i < playerCount; i++)
         {
             stats[i] = players[i].GetComponent<PlayerStats>();
+            //reset the weapon, bcs we have deleted it so that when player is deleted it does not throw an error when it wants to drop the weapon that does not exist
+            stats[i].currentWeapon = null;
             scores.Add(players[i].name,stats[i].score);
             //here we cannot add the name of the gameobject bcs we dont know if it matches with the photon array
             nicks.Add(PhotonNetwork.PlayerList[i].UserId,PhotonNetwork.PlayerList[i].NickName);

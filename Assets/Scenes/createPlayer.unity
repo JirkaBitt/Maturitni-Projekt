@@ -4079,7 +4079,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11670900036531107, guid: 9bfc70c8249124631aaa3e8ff925cf59, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -19.4
+      value: -19.400024
       objectReference: {fileID: 0}
     - target: {fileID: 11670900036531107, guid: 9bfc70c8249124631aaa3e8ff925cf59, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -4297,7 +4297,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfPixelsX: 80
-  currentTool: Eraser
+  currentTool: Pencil
   assetNames:
   - Character
   assetIndex: 0

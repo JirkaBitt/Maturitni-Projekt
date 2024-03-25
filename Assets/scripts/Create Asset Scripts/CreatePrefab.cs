@@ -633,10 +633,12 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         CombineSpriteArray(player, colorsRPC);
         ResizeAssets(player,characterSize);
         //reset the nickname holder
-        GameObject nameHolder = player.transform.GetChild(0).gameObject;
-        nameHolder.transform.localScale = new Vector3(1, 1, 1);
-        nameHolder.transform.localPosition = new Vector3(0, 1.4f, 0);
+        GameObject nameHolder = Instantiate(playerName);
+        nameHolder.transform.position = player.transform.position + new Vector3(0, 1.4f, 0);
         nameHolder.transform.rotation = Quaternion.Euler(0,0,0);
+        nameHolder.transform.parent = player.transform;
+        //set the nickname
+        nameHolder.GetComponent<TMP_Text>().text = PhotonNetwork.LocalPlayer.NickName;
         //we have to change the trail texture, bcs otherwise it would use the master clients texture
         player.GetComponent<CreateTrail>().createTexture();
     }
