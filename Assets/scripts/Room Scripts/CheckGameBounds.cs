@@ -15,14 +15,9 @@ public class CheckGameBounds : MonoBehaviourPunCallbacks
         GameObject gObject = other.gameObject;
         if (!gObject.CompareTag("Player"))
         {
-            if (gObject.transform.parent != null && gObject.CompareTag("weapon"))
+            if (gObject.transform.parent == null && gObject.GetPhotonView().IsMine)
             {
-                GameObject player = gObject.transform.parent.gameObject;
-                player.GetComponent<PickWeapon>().drop(true,gObject);
-            }
-            else
-            {
-                Destroy(gObject);
+                PhotonNetwork.Destroy(gObject);
             }
             return;
         }
@@ -63,17 +58,6 @@ public class CheckGameBounds : MonoBehaviourPunCallbacks
         Camera.main.transform.position =
             new Vector3(selectedPoint.x, selectedPoint.y, Camera.main.transform.position.z);
     }
-
-    [PunRPC]
-    public void deleteWeapon(int weaponID, int playerID)
-    {
-        GameObject player = PhotonView.Find(playerID).gameObject;
-        GameObject weapon = PhotonView.Find(weaponID).gameObject;
-        PickWeapon pickScript = player.GetComponent<PickWeapon>();
-        //drop the Weapon on all instances
-        pickScript.drop(true,weapon);
-    }
-
     [PunRPC]
     public void addScore(int addObj, int removeObj, bool hasAttacker)
     {

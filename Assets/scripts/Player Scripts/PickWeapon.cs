@@ -48,7 +48,6 @@ public class PickWeapon : MonoBehaviour
                 _weaponScript.Use();
                 //waitForIsUsing prevents the player from spamming attacks
                 StartCoroutine(waitForIsUsing());
-
             }
     }
     //PunRPC mark is used that we can send this script over the network for other instances to call 
@@ -96,10 +95,10 @@ public class PickWeapon : MonoBehaviour
         //remove the Weapon from parent
         //find Weapon based on photonId
         GameObject weaponX = PhotonView.Find(weaponID).gameObject;
-        weaponX.transform.parent = null;
-        lifeBar.transform.parent = null;
         if (!delete)
         {
+            weaponX.transform.parent = null;
+            lifeBar.transform.parent = null;
             StartCoroutine(changeLifeBarToWeapon(weaponX));
             //start playing the idle animation again
             Animator animator = weaponX.GetComponent<Animator>();
@@ -149,6 +148,10 @@ public class PickWeapon : MonoBehaviour
     //this func is called when the lifetime of the Weapon runs out
     public void drop(bool delete, GameObject weapon)
     {
+        if (weapon == null)
+        {
+            return;
+        }
         PhotonView photonView = PhotonView.Get(this);
         //RPC allows us to run a function on network gameobjects
         //we cannot send gameobject in RPC so we have to use photonviewID

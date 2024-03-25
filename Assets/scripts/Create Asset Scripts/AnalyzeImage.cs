@@ -75,7 +75,8 @@ public class AnalyzeImage : MonoBehaviour
     public GameObject loadingScreen;
 //this is a reference to the inputfield where players input their names
     public GameObject inputName;
-    
+
+    public GameObject nicknamePopUp;
 //the prefab class houses the necessary information for each asset and manipulates(maximize, minimalize, refresh) 
     class prefab
     {
@@ -322,7 +323,6 @@ public class AnalyzeImage : MonoBehaviour
         castRaycast();
     }
     
-
     public void startGame()
     {
         //create room and return the room name
@@ -336,14 +336,7 @@ public class AnalyzeImage : MonoBehaviour
         }
         //this ensures that the assets stay there when we start the gam
         DontDestroyOnLoad(assetHolderObj);
-        if (onlyCharacter)
-        {
-            loadingScreen.SetActive(true);
-            toolsScript.startGameButton.SetActive(false);
-            goBackButton.SetActive(false);
-            createRoom();
-        }
-        else
+        if (!onlyCharacter)
         {
             //we should show the popup and wait for user to decide if they want to save the assets
             if (loadLevelsFromSaves && !hasEditedAssets)
@@ -410,6 +403,11 @@ public class AnalyzeImage : MonoBehaviour
         }
         finalizeAssets();
     }
+
+    public void showNicknamePopup()
+    {
+        nicknamePopUp.SetActive(true);
+    }
     public void joinGame()
     {
         //we have to check if the player has drawn something
@@ -425,7 +423,6 @@ public class AnalyzeImage : MonoBehaviour
         {
             //remove white pixels
             pref.finalize(holder);
-            
         }
         //this ensures that the assets stay there when we start the game
         DontDestroyOnLoad(assetHolderObj);
@@ -659,7 +656,7 @@ public class AnalyzeImage : MonoBehaviour
                 loadingScreen.SetActive(true);
                 toolsScript.startGameButton.SetActive(false);
                 goBackButton.SetActive(false);
-                joinGame();
+                showNicknamePopup();
             }
             else
             {

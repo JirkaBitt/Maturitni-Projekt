@@ -43,13 +43,12 @@ public class Gun : GunWeaponses
         launchVector *= scale.magnitude * 1.5f;
         bull.launchVector = launchVector;
     }
-
     [PunRPC]
     public void addParent(int parentID, int bulletID)
     {
         GameObject bullet = PhotonView.Find(bulletID).gameObject;
         GameObject parent = PhotonView.Find(parentID).gameObject;
-        bullet.transform.parent = parent.transform;
+        bullet.transform.parent = gameObject.transform;
         //assign the player so that we know who hit the enemy
         bullet.GetComponent<Bullet>().player = parent;
     }

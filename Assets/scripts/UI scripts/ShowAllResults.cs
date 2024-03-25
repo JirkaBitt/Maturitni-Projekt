@@ -12,6 +12,12 @@ public class ShowAllResults : MonoBehaviour
     public GameObject[] podiumWinners = new GameObject[3]; //0 is first, 1 is second, 2 is third
     public void showResults(GameObject[] players, Dictionary<string,int> placements,Dictionary<string,string> nicks)
     {
+        //first clean up the previous results
+        int resultCount = resultContainer.transform.childCount;
+        for (int i = 0; i < resultCount; i++)
+        {
+            Destroy(resultContainer.transform.GetChild(i).gameObject);
+        }
         foreach (var player in players)
         {
             GameObject result = Instantiate(resultPrefab);
@@ -44,14 +50,20 @@ public class ShowAllResults : MonoBehaviour
     {
         //make his icon green and start him the game
         GameObject result = GameObject.Find(name);
-        result.GetComponent<ShowPlayerResult>().voteYes();
+        if (result != null)
+        {
+            result.GetComponent<ShowPlayerResult>().voteYes();
+        }
     }
     [PunRPC]
     public void leaveRPC(string name)
     {
         //make the icon red and leave
         GameObject result = GameObject.Find(name);
-        result.GetComponent<ShowPlayerResult>().voteNo();
+        if (result != null)
+        {
+            result.GetComponent<ShowPlayerResult>().voteNo();
+        }
     }
     private void addPodium(GameObject winner, int placement)
     {

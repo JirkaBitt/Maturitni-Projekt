@@ -376,6 +376,11 @@ public class RoomController : MonoBehaviourPunCallbacks
                 PhotonNetwork.Destroy(weap);
             }
         }
+        GameObject[] bullets = GameObject.FindGameObjectsWithTag("Bullet");
+        foreach (var bull in bullets)
+        {
+            Destroy(bull);
+        }
         int playerCount = players.Length;
         endGUI.SetActive(true);
         //show the results based on score

@@ -12,6 +12,11 @@ public class ChooseLevel : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = 60;
+        GameObject assets = GameObject.Find("AssetHolder");
+        if (assets != null)
+        {
+            Destroy(assets);
+        }
         //find if we have already started playing music
         int musicPlayersCount = GameObject.FindGameObjectsWithTag("music").Length;
         if (musicPlayersCount == 1)
