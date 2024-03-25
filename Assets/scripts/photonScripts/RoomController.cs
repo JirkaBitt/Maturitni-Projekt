@@ -120,8 +120,8 @@ public class RoomController : MonoBehaviourPunCallbacks
         //we have to call it on the photonview of the roomcontroller because that is the only one with namePlayer function
         CreatePrefab createScript = CreatePrefabs.GetComponent<CreatePrefab>();
         string playerID = PhotonNetwork.LocalPlayer.UserId;
-        createScript.renamePlayer(playerID, playerView.ViewID,PhotonNetwork.LocalPlayer.NickName);
         createScript.changePlayer(player);
+        createScript.renamePlayer(playerID, playerView.ViewID,PhotonNetwork.LocalPlayer.NickName);
         //add the icon of this player to the bottom of the screen
         displayIcons.GetComponent<DisplayPlayerStats>().addPlayerTexture(playerID);
         //add the player to all camera movement scripts

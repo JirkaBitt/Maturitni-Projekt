@@ -34,7 +34,7 @@ public class Bullet : MonoBehaviour
                 if (bulletPhotonView.IsMine)
                 {
                     PhotonView enemyPhotonView = hit.GetPhotonView();
-                    bulletPhotonView.RPC("addForceBullet", RpcTarget.AllViaServer, enemyPhotonView.ViewID, launchVector, 80f);
+                    bulletPhotonView.RPC("addForceBullet", RpcTarget.AllViaServer, enemyPhotonView.ViewID, launchVector, 60f);
                 }
             }
             if (hit.CompareTag("ground"))

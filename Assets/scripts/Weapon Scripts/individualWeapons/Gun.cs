@@ -3,7 +3,7 @@ using System.Collections;
 using Photon.Pun;
 using UnityEngine;
 
-public class Gun : GunWeaponses
+public class Gun : GunWeapon
 {
     public float maxScaleMagnitude = 1.6f;
     // Start is called before the first frame update
@@ -24,13 +24,14 @@ public class Gun : GunWeaponses
     IEnumerator chargingGun(GameObject bullet)
     {
         //check if we are still charging
-        Vector3 scale = bullet.transform.localScale;
+        Vector3 scale = new Vector3(0.5f,0.5f,0.5f);
         while (Input.GetMouseButton(0))
         {
             if (scale.magnitude < maxScaleMagnitude)
             {
-                scale += new Vector3(1, 1, 0) * 0.5f * Time.deltaTime;
-                bullet.transform.localScale = scale;
+                Vector3 step = new Vector3(1, 1, 0) * 0.5f * Time.deltaTime;
+                scale += step;
+                bullet.transform.localScale += step;
             }
             yield return null;
         }

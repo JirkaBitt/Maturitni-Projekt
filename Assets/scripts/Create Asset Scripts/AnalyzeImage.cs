@@ -415,6 +415,9 @@ public class AnalyzeImage : MonoBehaviour
         {
             return;
         }
+        loadingScreen.SetActive(true);
+        toolsScript.startGameButton.SetActive(false);
+        goBackButton.SetActive(false);
         Destroy(slate);
         GameObject assetHolderObj = new GameObject();
         assetHolderObj.name = "AssetHolder";
@@ -653,9 +656,6 @@ public class AnalyzeImage : MonoBehaviour
             //now show the overview
             if (onlyCharacter)
             {
-                loadingScreen.SetActive(true);
-                toolsScript.startGameButton.SetActive(false);
-                goBackButton.SetActive(false);
                 showNicknamePopup();
             }
             else

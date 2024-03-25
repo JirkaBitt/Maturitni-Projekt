@@ -15,6 +15,7 @@ TagManager:
   - roomName
   - music
   - sound
+  - copy
   layers:
   - Default
   - TransparentFX

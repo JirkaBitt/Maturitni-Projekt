@@ -4,7 +4,7 @@ using System.Collections;
 using Photon.Pun;
 using UnityEngine;
 
-public class Bomb : ConsumableWeaponses
+public class Bomb : ConsumableWeapon
 {
     public GameObject explosionPrefab;
     public override void Use()

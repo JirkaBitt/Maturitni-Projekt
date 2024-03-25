@@ -46,6 +46,7 @@ public class CreateTrail : MonoBehaviour
     {
         //create one instance of the copy
         GameObject copy = new GameObject("copy");
+        copy.tag = "copy";
         createdCopies.Add(copy);
         SpriteRenderer rend = copy.AddComponent<SpriteRenderer>();
         rend.sprite = sprite;
@@ -76,7 +77,6 @@ public class CreateTrail : MonoBehaviour
             StartCoroutine(createCopy(whiteSprite));
             yield return new WaitForSeconds(0.02f);
         }
-        createdCopies.Clear();
     }
 
     public void createTrail()

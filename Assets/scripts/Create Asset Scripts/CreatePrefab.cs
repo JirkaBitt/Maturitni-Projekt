@@ -42,7 +42,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         assetData.Clear();
         //turn down the music
         GameObject musicPlayer = GameObject.FindWithTag("music");
-        musicPlayer.GetComponent<AudioSource>().volume = 0.2f;
+        musicPlayer.GetComponent<AudioSource>().volume = 0.3f;
         for (int i = 0; i < defaults.Length; i++)
         {
             assetData.Add(defaultsNames[i],defaults[i]);
@@ -65,7 +65,6 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         //rename player renames the player on all clients to the users Id
         photonView.RPC("namePlayer",RpcTarget.AllBuffered,id,Name,nickname);
     }
-
     public void changePlayer(GameObject player)
     {
         //change the texture of my player on all clients
@@ -639,8 +638,6 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         nameHolder.transform.position = player.transform.position + new Vector3(0, 1.4f, 0);
         nameHolder.transform.rotation = Quaternion.Euler(0,0,0);
         nameHolder.transform.parent = player.transform;
-        //set the nickname
-        nameHolder.GetComponent<TMP_Text>().text = PhotonNetwork.LocalPlayer.NickName;
         //we have to change the trail texture, bcs otherwise it would use the master clients texture
         player.GetComponent<CreateTrail>().createTexture();
     }
