@@ -633,6 +633,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         CombineSpriteArray(player, colorsRPC);
         ResizeAssets(player,characterSize);
         //reset the nickname holder
+        Destroy(player.transform.GetChild(0).gameObject);
         GameObject nameHolder = Instantiate(playerName);
         nameHolder.transform.position = player.transform.position + new Vector3(0, 1.4f, 0);
         nameHolder.transform.rotation = Quaternion.Euler(0,0,0);

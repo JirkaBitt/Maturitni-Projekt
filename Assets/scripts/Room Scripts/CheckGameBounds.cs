@@ -13,49 +13,55 @@ public class CheckGameBounds : MonoBehaviourPunCallbacks
     {
         //player left the game space
         GameObject gObject = other.gameObject;
-        //we can only delete the player from isMine
-        if (gObject.CompareTag("Player"))
+        if (!gObject.CompareTag("Player"))
         {
-            PhotonView playerView = gObject.GetPhotonView();
-            if (!playerView.IsMine || !controller.gameIsActive)
+            if (gObject.transform.parent != null && gObject.CompareTag("weapon"))
             {
-                //if this is not my player return
-                //if the game is not active return, when deleting player onCollisionExit is called
-                return;
-            }
-            PlayerStats stats = gObject.GetComponent<PlayerStats>();
-            if (stats.lastAttacker != null)
-            {
-                //we have to credit the last guy that launched us
-                photonView.RPC("addScore",RpcTarget.All,stats.lastAttacker.GetPhotonView().ViewID,playerView.ViewID,true);
+                GameObject player = gObject.transform.parent.gameObject;
+                player.GetComponent<PickWeapon>().drop(true,gObject);
             }
             else
             {
-                photonView.RPC("addScore",RpcTarget.All,0,playerView.ViewID,false);
+                Destroy(gObject);
             }
-            GameObject weapon = stats.currentWeapon;
-            //delete Weapon if player is holding it
-            if (weapon != null)
-            {
-                //PickWeapon pickScript = other.GetComponent<PickWeapon>();
-                int photonID = weapon.GetPhotonView().ViewID;
-                //drop the Weapon and then destroy it
-                photonView.RPC("deleteWeapon",RpcTarget.All,photonID,gObject.GetPhotonView().ViewID);
-            }
-            //respawn the player
-            int randomIndex = Random.Range(0, controller.spawnPoint.Length);
-            Vector3 selectedPoint = controller.spawnPoint[randomIndex];
-            gObject.transform.position = selectedPoint;
-            //reset the velocity
-            gObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-            //move camera with the player
-            Camera.main.transform.position =
-                new Vector3(selectedPoint.x, selectedPoint.y, Camera.main.transform.position.z);
+            return;
+        }
+        //we can only delete the player from isMine
+        PhotonView playerView = gObject.GetPhotonView();
+        if (!playerView.IsMine || !controller.gameIsActive)
+        {
+            //if this is not my player return
+            //if the game is not active return, when deleting player onCollisionExit is called
+            return;
+        }
+        PlayerStats stats = gObject.GetComponent<PlayerStats>();
+        if (stats.lastAttacker != null)
+        {
+            //we have to credit the last guy that launched us
+            photonView.RPC("addScore",RpcTarget.All,stats.lastAttacker.GetPhotonView().ViewID,playerView.ViewID,true);
         }
         else
         {
-            Destroy(gObject);
+            photonView.RPC("addScore",RpcTarget.All,0,playerView.ViewID,false);
         }
+        GameObject weapon = stats.currentWeapon;
+        //delete Weapon if player is holding it
+        if (weapon != null)
+        {
+            //PickWeapon pickScript = other.GetComponent<PickWeapon>();
+            int photonID = weapon.GetPhotonView().ViewID;
+            //drop the Weapon and then destroy it
+            gObject.GetComponent<PickWeapon>().drop(true,weapon);
+        }
+        //respawn the player
+        int randomIndex = Random.Range(0, controller.spawnPoint.Length);
+        Vector3 selectedPoint = controller.spawnPoint[randomIndex];
+        gObject.transform.position = selectedPoint;
+        //reset the velocity
+        gObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        //move camera with the player
+        Camera.main.transform.position =
+            new Vector3(selectedPoint.x, selectedPoint.y, Camera.main.transform.position.z);
     }
 
     [PunRPC]
