@@ -10,7 +10,7 @@ public class ShowAllResults : MonoBehaviour
     public GameObject resultContainer;
     public GameObject resultPrefab;
     public GameObject[] podiumWinners = new GameObject[3]; //0 is first, 1 is second, 2 is third
-    public void showResults(GameObject[] players, Dictionary<string,int> placements,Dictionary<string,string> nicks)
+    public void ShowResults(GameObject[] players, Dictionary<string,int> placements,Dictionary<string,string> nicks)
     {
         //first clean up the previous results
         int resultCount = resultContainer.transform.childCount;
@@ -28,44 +28,44 @@ public class ShowAllResults : MonoBehaviour
             if (placement < 4)
             {
                 //add him to the podium
-                addPodium(player,placement);
+                AddPodium(player,placement);
             }
-            showScript.showResult(player, placement,nick,resultContainer);
+            showScript.ShowResult(player, placement,nick,resultContainer);
         }
     }
 
-    public void stay()
+    public void Stay()
     {
         string playerID = PhotonNetwork.LocalPlayer.UserId;
-        gameObject.GetPhotonView().RPC("stayRPC",RpcTarget.AllBuffered,playerID+"-result");
+        gameObject.GetPhotonView().RPC("StayRPC",RpcTarget.AllBuffered,playerID+"-result");
     }
-    public void leave()
+    public void Leave()
     {
         string playerID = PhotonNetwork.LocalPlayer.UserId;
-        gameObject.GetPhotonView().RPC("leaveRPC",RpcTarget.AllBuffered,playerID+"-result");
+        gameObject.GetPhotonView().RPC("LeaveRPC",RpcTarget.AllBuffered,playerID+"-result");
         PhotonNetwork.LeaveRoom();
     }
     [PunRPC]
-    public void stayRPC(string name)
+    public void StayRPC(string name)
     {
         //make his icon green and start him the game
         GameObject result = GameObject.Find(name);
         if (result != null)
         {
-            result.GetComponent<ShowPlayerResult>().voteYes();
+            result.GetComponent<ShowPlayerResult>().VoteYes();
         }
     }
     [PunRPC]
-    public void leaveRPC(string name)
+    public void LeaveRPC(string name)
     {
         //make the icon red and leave
         GameObject result = GameObject.Find(name);
         if (result != null)
         {
-            result.GetComponent<ShowPlayerResult>().voteNo();
+            result.GetComponent<ShowPlayerResult>().VoteNo();
         }
     }
-    private void addPodium(GameObject winner, int placement)
+    private void AddPodium(GameObject winner, int placement)
     {
         //add player texture to the posium that is next to the results
         GameObject place =  podiumWinners[placement - 1];

@@ -63,6 +63,25 @@ MonoBehaviour:
   - showPlayerThatPlaysAgain
   - endGame
   - addScore
+  - AddScore
+  - ChangePlayerTexture
+  - CopyComponents
+  - DropWeapon
+  - EndGame
+  - NamePlayer
+  - StartGame
+  - UpdateCameraPlayers
+  - AddForce
+  - AddForceBullet
+  - AddParent
+  - AddPlayer
+  - LeaveRPC
+  - PlayAnimation
+  - RemoveParent
+  - ResumeAnimation
+  - StayRPC
+  - StopAnimation
+  - UseRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

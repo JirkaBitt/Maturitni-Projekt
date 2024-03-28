@@ -77,15 +77,15 @@ public class PlayerSync : MonoBehaviourPun, IPunObservable
         }
     }
 
-    public void launchEnemy()
+    public void LaunchEnemy()
     {
         //this is called when we are launching an enemy
         //make the copies ignore the original bcs there is a lot of lag
         ignorePhoton = true;
-        StartCoroutine(wait());
+        StartCoroutine(Wait());
     }
     
-    IEnumerator wait()
+    IEnumerator Wait()
     {
         yield return new WaitForSeconds(0.6f);
         ignorePhoton = false;

@@ -33,11 +33,11 @@ public class CheckGameBounds : MonoBehaviourPunCallbacks
         if (stats.lastAttacker != null)
         {
             //we have to credit the last guy that launched us
-            photonView.RPC("addScore",RpcTarget.All,stats.lastAttacker.GetPhotonView().ViewID,playerView.ViewID,true);
+            photonView.RPC("AddScore",RpcTarget.All,stats.lastAttacker.GetPhotonView().ViewID,playerView.ViewID,true);
         }
         else
         {
-            photonView.RPC("addScore",RpcTarget.All,0,playerView.ViewID,false);
+            photonView.RPC("AddScore",RpcTarget.All,0,playerView.ViewID,false);
         }
         GameObject weapon = stats.currentWeapon;
         //delete Weapon if player is holding it
@@ -45,8 +45,8 @@ public class CheckGameBounds : MonoBehaviourPunCallbacks
         {
             //PickWeapon pickScript = other.GetComponent<PickWeapon>();
             int photonID = weapon.GetPhotonView().ViewID;
-            //drop the Weapon and then destroy it
-            gObject.GetComponent<PickWeapon>().drop(true,weapon);
+            //Drop the Weapon and then destroy it
+            gObject.GetComponent<PickWeapon>().Drop(true,weapon);
         }
         //respawn the player
         int randomIndex = Random.Range(0, controller.spawnPoint.Length);
@@ -59,7 +59,7 @@ public class CheckGameBounds : MonoBehaviourPunCallbacks
             new Vector3(selectedPoint.x, selectedPoint.y, Camera.main.transform.position.z);
     }
     [PunRPC]
-    public void addScore(int addObj, int removeObj, bool hasAttacker)
+    public void AddScore(int addObj, int removeObj, bool hasAttacker)
     {
         //add a point for the attacker and remove one for the defeated
         GameObject defeated = PhotonView.Find(removeObj).gameObject;

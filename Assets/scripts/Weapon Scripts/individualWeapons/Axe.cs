@@ -14,7 +14,7 @@ public class Axe : MeleeWeapon
         //play animation and launch enemy if we touch them
         PhotonView photonView = gameObject.GetPhotonView();
         //we will set trigerlaunch to true in this coroutine
-        photonView.RPC("playAnimation",RpcTarget.All);
+        photonView.RPC("PlayAnimation",RpcTarget.All);
         //we will switch triggerlaunch to false when animation ends in attack script
     }
     private void OnTriggerStay2D(Collider2D other)
@@ -34,8 +34,8 @@ public class Axe : MeleeWeapon
                
                 if (triggerLaunch)
                 {
-                    Vector3 launchV = computeLaunchVector();
-                    launchEnemy(enemyInRange, launchV, 40);
+                    Vector3 launchV = ComputeLaunchVector();
+                    LaunchEnemy(enemyInRange, launchV, 40);
                     triggerLaunch = false;
                 }
 
@@ -43,7 +43,7 @@ public class Axe : MeleeWeapon
         }
     }
 
-    Vector3 computeLaunchVector()
+    Vector3 ComputeLaunchVector()
     {
         GameObject player = gameObject.transform.parent?.gameObject;
         //get vector from player to Weapon, we could use the collision point instead
@@ -57,8 +57,7 @@ public class Axe : MeleeWeapon
         normal /= normal.magnitude;
         return normal;
     }
-
-    IEnumerator waitForDamage()
+    IEnumerator WaitForDamage()
     {
         Animator animator = gameObject.GetComponent<Animator>();
         //we want to wait 0.2s bcs the axe is spinning from the back
@@ -69,17 +68,16 @@ public class Axe : MeleeWeapon
         triggerLaunch = false;
     }
     [PunRPC]
-    void playAnimation()
+    void PlayAnimation()
     {
         Animator animator = gameObject.GetComponent<Animator>();
         animator.SetTrigger("axeAttack");
         //create a trail behind the Weapon as it moves
-        addTrail(gameObject);
-        StartCoroutine(waitForDamage());
+        AddTrail(gameObject);
+        if (gameObject.transform.parent.gameObject.GetPhotonView().IsMine)
+        {
+            StartCoroutine(WaitForDamage());
+        }
     }
-    
-
-    
-    
     
 }

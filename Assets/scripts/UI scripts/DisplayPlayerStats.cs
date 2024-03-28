@@ -69,7 +69,7 @@ public class DisplayPlayerStats : MonoBehaviourPunCallbacks
         base.OnPlayerLeftRoom(otherPlayer);
     }
 
-    public void clearValues()
+    public void ClearValues()
     {
         //reset all values, this is called when the games end
         playerIDs.Clear();
@@ -77,11 +77,11 @@ public class DisplayPlayerStats : MonoBehaviourPunCallbacks
         characterTextures.Clear();
         characterInfos.Clear();
     }
-    public void addPlayerTexture(string id)
+    public void AddPlayerTexture(string id)
     {
-        photonView.RPC("addPlayer",RpcTarget.AllBuffered,id);
+        photonView.RPC("AddPlayer",RpcTarget.AllBuffered,id);
     }
-    [PunRPC]public void addPlayer(string id)
+    [PunRPC]public void AddPlayer(string id)
     {
         //add a player to all the lists
         GameObject player = GameObject.Find(id);

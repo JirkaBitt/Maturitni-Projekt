@@ -16,7 +16,7 @@ public class AnalyzeImage : MonoBehaviour
 // the number of pixels on X axis, Y axis will be calculated based on screen height
     public int numberOfPixelsX = 72;
 //current assets pixels used for raycast and recoloring
-    private pixel[,] gameLevelPixels;
+    private Pixel[,] gameLevelPixels;
 //current tool changed by buttons from ChangeTools script
     public String currentTool = "Pencil";
 //sceneAssets is the parent that holds all assets
@@ -24,7 +24,7 @@ public class AnalyzeImage : MonoBehaviour
 //finder texture is the original fullsize image from user photo library
     private Texture2D finderTexture;
 //reloadThese is a list of highlighted pixels that should be reset in the next frame
-    private List<pixel> reloadThese = new List<pixel>();
+    private List<Pixel> reloadThese = new List<Pixel>();
 //this is a holder for the previous position of our mouse when we make the assets, it is used in receiveskipped
     private Vector2 previousRaycastPos = Vector2.zero;
 //assetNames is an array of assets we want to create
@@ -34,10 +34,10 @@ public class AnalyzeImage : MonoBehaviour
 //the pointer to the current asssets parent
     private GameObject currentParent;
 //list of created assets
-    private List<prefab> assetPrefabs = new List<prefab>();
+    private List<Prefab> assetPrefabs = new List<Prefab>();
 //we want to stop the raycast if we display the assets at the end
     private bool displayed = false;
-//frame prefab
+//frame Prefab
     public GameObject frame;
 //a list of default assets if user decides to skip, we have to keep order in this list
     public GameObject[] defaultAssets;
@@ -77,14 +77,14 @@ public class AnalyzeImage : MonoBehaviour
     public GameObject inputName;
 
     public GameObject nicknamePopUp;
-//the prefab class houses the necessary information for each asset and manipulates(maximize, minimalize, refresh) 
-    class prefab
+//the Prefab class houses the necessary information for each asset and manipulates(maximize, Minimalize, refresh) 
+    class Prefab
     {
         public string name;
         //this is the object that is shown and that we will manipulate
         public GameObject objectPrefab; 
         //pixel class is a reference to the slate that we draw on, we get the info about the pixels from there
-        public pixel[,] pixelClass;
+        public Pixel[,] pixelClass;
       
         public Vector3 fullScreenScale;
         
@@ -96,7 +96,7 @@ public class AnalyzeImage : MonoBehaviour
         private GameObject slate;
         private int[,] colors;
         
-        public prefab(GameObject slatee,GameObject objectt, pixel[,] array, string n,bool defaultAsset,GameObject defObj, Vector3 defSize)
+        public Prefab(GameObject slatee,GameObject objectt, Pixel[,] array, string n,bool defaultAsset,GameObject defObj, Vector3 defSize)
         {
 
             objectPrefab = objectt;
@@ -126,7 +126,7 @@ public class AnalyzeImage : MonoBehaviour
             CombineSpriteArray(objectPrefab, colors);
         }
 
-        public void fitTheScreen()
+        public void FitTheScreen()
         {
             int width = pixelClass.GetLength(0);
             int height = pixelClass.GetLength(1);
@@ -138,13 +138,13 @@ public class AnalyzeImage : MonoBehaviour
                 for (int x = 0; x < width; x++)
                 {
                     pixelClass[x, y].finalColor = colors[x, y] == 1 ? Color.black : Color.white;
-                    pixelClass[x,y].reloadColor();
+                    pixelClass[x,y].ReloadColor();
                 }
             }
         }
-        public void refreshAsset()
+        public void RefreshAsset()
         {
-            //remake the texture and update the int array
+            //Remake the texture and update the int array
             int xLength = pixelClass.GetLength(0);
             int yLength = pixelClass.GetLength(1);
             for (int y = 0; y < yLength; y++)
@@ -157,13 +157,13 @@ public class AnalyzeImage : MonoBehaviour
             CombineSpriteArray(objectPrefab, colors);
         }
 
-        public void addSavedAsset(int[,] savedInts)
+        public void AddSavedAsset(int[,] savedInts)
         {
             //we have loaded assets from saves, we want to display them right away
             colors = savedInts;
             CombineSpriteArray(objectPrefab, savedInts);
         }
-        public void minimalize()
+        public void Minimalize()
         {
             // show the asset in the overview
             objectPrefab.SetActive(true);
@@ -171,14 +171,14 @@ public class AnalyzeImage : MonoBehaviour
             objectPrefab.transform.localScale = smallScreenScale;
             
         }
-        public void computeMinimalize(float screenWidth,int assetCount, int index)
+        public void ComputeMinimalize(float screenWidth,int assetCount, int index)
         {
             //compute where this asset should be placed in the overview
             float assetWidth = screenWidth / assetCount;
             smallScreenPosition = new Vector3(assetWidth * index - screenWidth/2 + assetWidth/2, 0, 0);
             smallScreenScale = fullScreenScale / assetCount;
             
-            minimalize();
+            Minimalize();
         }
         //combine sprite array creates an texture from the supplied array of color 
         public void CombineSpriteArray(GameObject attach, int[,] colorsRPC)
@@ -286,7 +286,7 @@ public class AnalyzeImage : MonoBehaviour
             
         }
         //find next corner works with direction, pixel index and corner index to determine the next index of the corner and the direction we want to continue
-        public void finalize(AssetHolder holder)
+        public void Finalize(AssetHolder holder)
         {
             // destroy the object, we dont need it anymore
             Destroy(objectPrefab);
@@ -305,25 +305,25 @@ public class AnalyzeImage : MonoBehaviour
        
         if (loadLevelsFromSaves)
         {
-            loadSavedAssets();
+            LoadSavedAssets();
         }
         else
         {
-            createSlate();
+            CreateSlate();
         }
     }
     void Update()
     {
         //firstly reload pixels and then highlight the selected one
         //we will reload only the pixels we marked as red
-        reloadSpecificPixels();
+        ReloadSpecificPixels();
         //refresh frames
-        recolorFrames();
+        RecolorFrames();
         //highligth pixels or frames
-        castRaycast();
+        CastRaycast();
     }
     
-    public void startGame()
+    public void StartGame()
     {
         //create room and return the room name
         Destroy(slate);
@@ -332,7 +332,7 @@ public class AnalyzeImage : MonoBehaviour
         AssetHolder holder = assetHolderObj.AddComponent<AssetHolder>();
         foreach (var pref in assetPrefabs)
         {
-            pref.finalize(holder);
+            pref.Finalize(holder);
         }
         //this ensures that the assets stay there when we start the gam
         DontDestroyOnLoad(assetHolderObj);
@@ -345,7 +345,7 @@ public class AnalyzeImage : MonoBehaviour
                 loadingScreen.SetActive(true);
                 toolsScript.startGameButton.SetActive(false);
                 goBackButton.SetActive(false);
-                createRoom();
+                CreateRoom();
                 return;
             }
             savePopup.SetActive(true);
@@ -359,7 +359,7 @@ public class AnalyzeImage : MonoBehaviour
         }
     }
 
-    public void createRoom()
+    public void CreateRoom()
     {
         Destroy(sceneAssets);
         GameObject holder = GameObject.Find("savedAssets");
@@ -376,42 +376,42 @@ public class AnalyzeImage : MonoBehaviour
             lobby.playerName = "Player";
         }
         //this function creates a room and returns its name
-        lobby.createRoomWithoutUI();
+        lobby.CreateRoom();
     }
-    public void loadSavedAssets()
+    public void LoadSavedAssets()
     {
         GameObject holder = GameObject.Find("savedAssets");
         FetchCreatedLevels dataHolder = holder.GetComponent<FetchCreatedLevels>();
 
-        FetchCreatedLevels.savedAssets selectedLevel = dataHolder.selectedAssets;
-        createSlateForSaved(selectedLevel.assets[0].GetLength(1));
+        FetchCreatedLevels.SavedAssets selectedLevel = dataHolder.selectedAssets;
+        CreateSlateForSaved(selectedLevel.assets[0].GetLength(1));
         gameLevelPixels[0,0].finalColor = Color.black;
         for (int i = 0; i < 8; i++)
         {
             //create new class that holds the object and the pixels so we can delete the  white ones at the end
             //acces the default object size
             AssetInfo info = defaultAssets[i].GetComponent<AssetInfo>();
-            info.calculateSize();
+            info.CalculateSize();
             Vector3 defSize = new Vector3(info.width, info.height, 1);
             //Destroy(temp);
             GameObject parentAsset = new GameObject();
             parentAsset.transform.parent = sceneAssets.transform;
-            prefab asset = new prefab( slate,parentAsset, gameLevelPixels, assetNames[i],false,defaultAssets[i],defSize);
+            Prefab asset = new Prefab( slate,parentAsset, gameLevelPixels, assetNames[i],false,defaultAssets[i],defSize);
             asset.fullScreenScale = currentParent.transform.localScale;
-            asset.addSavedAsset(selectedLevel.assets[i]);
+            asset.AddSavedAsset(selectedLevel.assets[i]);
             assetPrefabs.Add(asset);
         }
-        finalizeAssets();
+        FinalizeAssets();
     }
 
-    public void showNicknamePopup()
+    public void ShowNicknamePopup()
     {
         nicknamePopUp.SetActive(true);
     }
-    public void joinGame()
+    public void JoinGame()
     {
         //we have to check if the player has drawn something
-        if (checkIfBlank())
+        if (CheckIfBlank())
         {
             return;
         }
@@ -425,7 +425,7 @@ public class AnalyzeImage : MonoBehaviour
         foreach (var pref in assetPrefabs)
         {
             //remove white pixels
-            pref.finalize(holder);
+            pref.Finalize(holder);
         }
         //this ensures that the assets stay there when we start the game
         DontDestroyOnLoad(assetHolderObj);
@@ -443,14 +443,14 @@ public class AnalyzeImage : MonoBehaviour
         //this function creates a room and returns its name
         GameObject roomName = GameObject.FindWithTag("roomName");
         
-        bool result = lobby.joinRoomWithName(roomName.name);
+        bool result = lobby.JoinRoomWithID(roomName.name);
 
         if (!result)
         {
            SceneManager.LoadScene("ChooseLevel");
         }
     }
-    public void createSlateForSaved(int height)
+    public void CreateSlateForSaved(int height)
     {
         //this function is different from normal create slate bcs we coukd have had different height, and we want to match the original height
         GameObject parent = new GameObject();
@@ -459,23 +459,23 @@ public class AnalyzeImage : MonoBehaviour
         //big pixels in y
         int pixelsY = height;
 
-        gameLevelPixels = new pixel[numberOfPixelsX, pixelsY];
+        gameLevelPixels = new Pixel[numberOfPixelsX, pixelsY];
         for (int y = 0; y < pixelsY; y++)
         {
             for (int x = 0; x < numberOfPixelsX; x++)
             {
-                gameLevelPixels[x,y] = new pixel(x, y, pixelWidth, Color.white, parent);
+                gameLevelPixels[x,y] = new Pixel(x, y, pixelWidth, Color.white, parent);
             }
         }
         //make it fit the screen
-        fitTheScreen(parent, numberOfPixelsX, pixelsY);
+        FitTheScreen(parent, numberOfPixelsX, pixelsY);
         //add it to the scene parent
         parent.transform.parent = sceneAssets.transform;
         currentParent = parent;
         slate = parent;
     }
     //create slate is called at the start and creates a canvas of pixels to draw to
-    public void createSlate()
+    public void CreateSlate()
     {
         GameObject parent = new GameObject();
         parent.name = "Slate";
@@ -483,16 +483,16 @@ public class AnalyzeImage : MonoBehaviour
         //big pixels in y
         int pixelsY = (int)(Screen.height * (1 - 0.2f)) / pixelWidth;
 
-        gameLevelPixels = new pixel[numberOfPixelsX, pixelsY];
+        gameLevelPixels = new Pixel[numberOfPixelsX, pixelsY];
         for (int y = 0; y < pixelsY; y++)
         {
             for (int x = 0; x < numberOfPixelsX; x++)
             {
-                gameLevelPixels[x,y] = new pixel(x, y, pixelWidth, Color.white, parent);
+                gameLevelPixels[x,y] = new Pixel(x, y, pixelWidth, Color.white, parent);
             }
         }
         //make it fit the screen
-        fitTheScreen(parent, numberOfPixelsX, pixelsY);
+        FitTheScreen(parent, numberOfPixelsX, pixelsY);
         //add it to the scene parent
         parent.transform.parent = sceneAssets.transform;
         currentParent = parent;
@@ -500,7 +500,7 @@ public class AnalyzeImage : MonoBehaviour
         
     }
 
-    public bool checkIfBlank()
+    public bool CheckIfBlank()
     {
         //check if the player has drawn something
         foreach (var pixel in gameLevelPixels)
@@ -510,10 +510,10 @@ public class AnalyzeImage : MonoBehaviour
                 return false;
             }
         }
-        StartCoroutine(showWarning());
+        StartCoroutine(ShowWarning());
         return true;
     }
-    IEnumerator showWarning()
+    IEnumerator ShowWarning()
     {
         warning.SetActive(true);
         yield return new WaitForSeconds(1f);
@@ -526,43 +526,43 @@ public class AnalyzeImage : MonoBehaviour
         foreach (var pix in gameLevelPixels)
         {
             pix.finalColor = Color.white;
-            pix.reloadColor();
+            pix.ReloadColor();
         }
         TextMeshProUGUI text = assetDisplayText.GetComponent<TextMeshProUGUI>();
         text.SetText("Please draw the " + assetName);
     }
-    //remake allows the user to refresh the slate at the current asset and draw again
-    public void remake()
+    //Remake allows the user to refresh the slate at the current asset and draw again
+    public void Remake()
     {
         refreshSlate(assetNames[assetIndex]);
     }
-    public void remakeClicked()
+    public void RemakeClicked()
     {
         int index = assetIndex;
-        prefab pref = assetPrefabs[index];
+        Prefab pref = assetPrefabs[index];
         assetIndex = index;
         refreshSlate(pref.name);
     }
     //submit change is called when we click the submit button when editing an asset
-    public void submitChange()
+    public void SubmitChange()
     {
-        if (checkIfBlank())
+        if (CheckIfBlank())
         {
             return;
         }
         goBackButton.GetComponent<GoBack>().cancelEditing = false;
-        //update prefab
+        //update Prefab
         hasEditedAssets = true;
         int index = assetIndex;
-        prefab pref = assetPrefabs[index];
-        pixel[,] pixArray = gameLevelPixels;
+        Prefab pref = assetPrefabs[index];
+        Pixel[,] pixArray = gameLevelPixels;
         
         pref.pixelClass = pixArray;
-        pref.refreshAsset();
-        minimalizeAsset(pref);
+        pref.RefreshAsset();
+        MinimalizeAsset(pref);
     }
     //recolor frames refreshes the frames from highlighted to white
-    void recolorFrames()
+    void RecolorFrames()
     {
         //refresh highligthed frames
         foreach (var ren in reloadFrames)
@@ -572,28 +572,28 @@ public class AnalyzeImage : MonoBehaviour
 
         reloadFrames.Clear();
     }
-    //finalize assets is called when we create all assets and we want to display them
-    void finalizeAssets()
+    //Finalize assets is called when we create all assets and we want to display them
+    void FinalizeAssets()
     {
         refreshSlate("");
         slate.SetActive(false);
         //now we have the final assets prepared, without white background and we can use them
-        displayAssets();
+        DisplayAssets();
     }
     //display assets creates frames for every asset and frames them
-    void displayAssets()
+    void DisplayAssets()
     {
         //we want to change the buttons functions to adress the changes
-        toolsScript.changeFunctions();
-        toolsScript.deactivateButtons();
-        toolsScript.enableStartGame();
+        toolsScript.ChangeFunctions();
+        toolsScript.DeactivateButtons();
+        toolsScript.EnableStartGame();
         //dont show the text
         assetDisplayText.SetActive(false);
         //displayed set to true stops the raycast
         displayed = true;
         int assetCount = assetPrefabs.Count;
         frames = new GameObject[assetCount];
-        Vector2 screenSize = calculateSceneSize();
+        Vector2 screenSize = CalculateSceneSize();
         float screenWidth = screenSize.x;
         float assetWidth = screenWidth / assetCount;
         for (int i = 0; i < assetCount; i++)
@@ -608,7 +608,7 @@ public class AnalyzeImage : MonoBehaviour
             //access the text display and set the text to the name of the asset
             GameObject textDisplay = assetFrame.GetComponent<FrameScript>().textDisplay;
             TextMeshProUGUI meshPro = textDisplay.GetComponent<TextMeshProUGUI>();
-            prefab pref = assetPrefabs[i];
+            Prefab pref = assetPrefabs[i];
             meshPro.SetText(pref.name);
             //change the scale to fit every asset, +1 so it is a little smaller
             pref.objectPrefab.transform.localScale /= assetCount;
@@ -622,27 +622,27 @@ public class AnalyzeImage : MonoBehaviour
             //save information for later
             pref.smallScreenPosition = pos;
             pref.smallScreenScale = pref.objectPrefab.transform.localScale;
-            pref.computeMinimalize(calculateSceneSize().x,assetPrefabs.Count,i);
-            pref.minimalize();
+            pref.ComputeMinimalize(CalculateSceneSize().x,assetPrefabs.Count,i);
+            pref.Minimalize();
             frames[i] = assetFrame;
         }
     }
-    //move to the next is called when user clicks next and it saves the asset in a new instance of the class prefab and refreshes the slate
-    public void moveToTheNext()
+    //move to the next is called when user clicks next and it saves the asset in a new instance of the class Prefab and refreshes the slate
+    public void MoveToTheNext()
     {
-        if (checkIfBlank())
+        if (CheckIfBlank())
         {
             return;
         }
         //create new class that holds the object and the pixels so we can delete the  white ones at the end
         //acces the default object size
         AssetInfo info = defaultAssets[assetIndex].GetComponent<AssetInfo>();
-        info.calculateSize();
+        info.CalculateSize();
         Vector3 defSize = new Vector3(info.width, info.height, 1);
         //Destroy(temp);
         GameObject parentAsset = new GameObject();
         parentAsset.transform.parent = sceneAssets.transform;
-        prefab asset = new prefab( slate,parentAsset, gameLevelPixels, assetNames[assetIndex],false,defaultAssets[assetIndex],defSize);
+        Prefab asset = new Prefab( slate,parentAsset, gameLevelPixels, assetNames[assetIndex],false,defaultAssets[assetIndex],defSize);
         asset.fullScreenScale = currentParent.transform.localScale;
         assetPrefabs.Add(asset);
         assetIndex++;
@@ -656,15 +656,15 @@ public class AnalyzeImage : MonoBehaviour
             //now show the overview
             if (onlyCharacter)
             {
-                showNicknamePopup();
+                ShowNicknamePopup();
             }
             else
             {
-                finalizeAssets();
+                FinalizeAssets();
             }
         }
     }
-    void castRaycast()
+    void CastRaycast()
     {
         //cast raycast from camera to mouse
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -687,7 +687,7 @@ public class AnalyzeImage : MonoBehaviour
                 if (previousRaycastPos != Vector2.zero && previousRaycastPos != (Vector2)hitPixel.transform.position)
                 {
                     //we are moving the cursor
-                    allHits.AddRange(addSkippedPixels(previousRaycastPos, hitPixel.transform.position));
+                    allHits.AddRange(AddSkippedPixels(previousRaycastPos, hitPixel.transform.position));
                 }
                 else
                 {
@@ -706,8 +706,8 @@ public class AnalyzeImage : MonoBehaviour
                     int x = Convert.ToInt32(coordinates[0]);
                     int y = Convert.ToInt32(coordinates[1]);
                     //find the class and highligth the pixel
-                    pixel pixelClass = gameLevelPixels[x, y];
-                    pixelClass.changeColor(Color.red);
+                    Pixel pixelClass = gameLevelPixels[x, y];
+                    pixelClass.ChangeColor(Color.red);
                     //add these to a list so we can reload them
                     reloadThese.Add(pixelClass);
                     if (Input.GetMouseButton(0))
@@ -717,14 +717,14 @@ public class AnalyzeImage : MonoBehaviour
                         {
                             //change the color to white
                             pixelClass.finalColor = Color.white;
-                            pixelClass.reloadColor();
+                            pixelClass.ReloadColor();
                         }
     
                         if (currentTool == "Pencil")
                         {
                             //change the color to black
                             pixelClass.finalColor = Color.black;
-                            pixelClass.reloadColor();
+                            pixelClass.ReloadColor();
                         }
                     }
                 }
@@ -743,27 +743,27 @@ public class AnalyzeImage : MonoBehaviour
                 {
                     //we have clicked this frame, load the asset for editing
                     int index = Convert.ToInt32(hitPixel.name);
-                    prefab pref = assetPrefabs[index];
+                    Prefab pref = assetPrefabs[index];
                     //get the size of pixels inside the class
-                    maximazeAsset(pref);
+                    MaximazeAsset(pref);
                     assetIndex = index;
                     //we want to skip the first time
                     previousRaycastPos = Vector2.zero;
                     //dont start drwaning until the mouse is lifted
-                    StartCoroutine(waitForMouseUp());
+                    StartCoroutine(WaitForMouseUp());
                 }
             }
         }
     }
 
-    IEnumerator waitForMouseUp()
+    IEnumerator WaitForMouseUp()
     {
         //pause the recoloring of pixels until the mouse is lifted, so we dont make a spot when opening the asset
         addPixels = false;
         yield return new WaitUntil(() => Input.GetMouseButtonUp(0));
         addPixels = true;
     }
-    RaycastHit2D[] addSkippedPixels(Vector2 origin, Vector2 end)
+    RaycastHit2D[] AddSkippedPixels(Vector2 origin, Vector2 end)
     {
         //get the pixels in line from where we were and where we are now
         RaycastHit2D[] skipped = Physics2D.LinecastAll(origin, end);
@@ -788,23 +788,23 @@ public class AnalyzeImage : MonoBehaviour
         return addThese.ToArray();
     }
     //reload specific pixels will reset the color of supplied list of pixels in the slate
-    void reloadSpecificPixels()
+    void ReloadSpecificPixels()
     {
         foreach (var pix in reloadThese)
         {
             if (pix.isActive)
             {
-                pix.reloadColor();
+                pix.ReloadColor();
             }
         }
         reloadThese.Clear();
     }
-    //maximaze is called when we click on an asset to remake it, it will display the slate with the asset
-    void maximazeAsset(prefab pref)
+    //maximaze is called when we click on an asset to Remake it, it will display the slate with the asset
+    void MaximazeAsset(Prefab pref)
     {
         goBackButton.GetComponent<GoBack>().cancelEditing = true;
         //deactivate assets and frames
-        toolsScript.disableStartGame();
+        toolsScript.DisableStartGame();
         //pref.updateSmallValues(pref.objectPrefab);
         foreach (var preff in assetPrefabs)
         {
@@ -819,11 +819,11 @@ public class AnalyzeImage : MonoBehaviour
        
             foreach (var pix in pref.pixelClass)
             {
-                pix.reactivate();
+                pix.Reactivate();
             }
         
-        toolsScript.activateButtons();
-        pref.fitTheScreen();
+        toolsScript.ActivateButtons();
+        pref.FitTheScreen();
         //we have to reasign the gameLevelpixels because they are used castraycast
         //gameLevelPixels = pref.pixelClass;
         //currentParent = pref.objectPrefab;
@@ -833,12 +833,12 @@ public class AnalyzeImage : MonoBehaviour
         TextMeshProUGUI text = assetDisplayText.GetComponent<TextMeshProUGUI>();
         text.SetText("Please draw the " + pref.name);
     }
-    void minimalizeAsset(prefab pref)
+    void MinimalizeAsset(Prefab pref)
     {
         //update the position and scale
-        toolsScript.enableStartGame();
+        toolsScript.EnableStartGame();
        //pref.updateFullValues(pref.objectPrefab);
-       pref.computeMinimalize(calculateSceneSize().x,assetPrefabs.Count,assetIndex);
+       pref.ComputeMinimalize(CalculateSceneSize().x,assetPrefabs.Count,assetIndex);
         foreach (var preff in assetPrefabs)
         {
             preff.objectPrefab.SetActive(true);
@@ -848,19 +848,19 @@ public class AnalyzeImage : MonoBehaviour
             frame.SetActive(true);
         }
         slate.SetActive(false);
-        toolsScript.deactivateButtons();
-        pref.minimalize();
+        toolsScript.DeactivateButtons();
+        pref.Minimalize();
         displayed = true;
         
         assetDisplayText.SetActive(false);
     }
 
-    public void returnFromEditing()
+    public void ReturnFromEditing()
     {
-        minimalizeAsset(assetPrefabs[assetIndex]);
+        MinimalizeAsset(assetPrefabs[assetIndex]);
     }
     //tuple allows to return two or more variables
-    void fitTheScreen(GameObject parentObject, float numberX, float numberY)
+    void FitTheScreen(GameObject parentObject, float numberX, float numberY)
    {
         //calculate the scale to fit the whole screen
         if (parentObject.transform.childCount == 0)
@@ -877,7 +877,7 @@ public class AnalyzeImage : MonoBehaviour
         float coordinateY = numberY * 0.5f * pixelColl.size.x;
         //calculate scale to fit the screen
        
-        Vector2 screenSize = calculateSceneSize();
+        Vector2 screenSize = CalculateSceneSize();
         float scaleX = screenSize.x / (coordinateX * 2);
         float scaleY = screenSize.y / (coordinateY * 2);
         float scale = 1;
@@ -906,7 +906,7 @@ public class AnalyzeImage : MonoBehaviour
         //scale the level to fit the screen
         parentObject.transform.localScale = Vector3.one * scale;
    }
-   Vector2 calculateSceneSize()
+   Vector2 CalculateSceneSize()
    {
        //some code is from this website
        https://www.loekvandenouweland.com/content/stretch-unity-sprite-to-fill-the-screen.html
@@ -919,7 +919,7 @@ public class AnalyzeImage : MonoBehaviour
        var worldSpaceHeight = topRightCorner.y * 2;
        return new Vector2(worldSpaceWidth, worldSpaceHeight);
    }
-   class pixel
+   class Pixel
     {
         //we will use 80:Y pixels
         public int Size;
@@ -929,7 +929,7 @@ public class AnalyzeImage : MonoBehaviour
 
         public GameObject pixelObject;
         public bool isActive = true;
-        public pixel(int x,int y,int width,Color color, GameObject parent)
+        public Pixel(int x,int y,int width,Color color, GameObject parent)
         {
             //constructor
             Size = width;
@@ -967,7 +967,7 @@ public class AnalyzeImage : MonoBehaviour
             pixelObject.transform.position = new Vector3(startY * -sizeMultiplier, startX * sizeMultiplier, 0);
             pixelObject.transform.parent = parent.transform;
         }
-        public void changeColor(Color update)
+        public void ChangeColor(Color update)
         {
             if (isActive)
             {
@@ -983,7 +983,7 @@ public class AnalyzeImage : MonoBehaviour
                 texture.Apply();
             }
         }
-        public void reloadColor()
+        public void ReloadColor()
         {
             //set the color to finalColor
             //we can use this function after calling an raycast and highlighting this pixel
@@ -997,7 +997,7 @@ public class AnalyzeImage : MonoBehaviour
             texture.SetPixels(colors);
             texture.Apply();
         }
-        public void reactivate()
+        public void Reactivate()
         {
             if (!isActive)
             {

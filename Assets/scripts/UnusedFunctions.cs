@@ -253,7 +253,7 @@ public class UnusedFunctions : MonoBehaviour
     {
         AssetInfo info = parentObject.GetComponent<AssetInfo>();
         info.turnOffAnimation();
-        info.calculateSize();
+        info.CalculateSize();
         Vector3 assetScale = info.startScale;
         //we want to divide by scale to get the dimensions if scale was 1
         float height = info.height ;

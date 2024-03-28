@@ -18,7 +18,7 @@ public class PlayerMovement : MonoBehaviour
     //the nameholder that displays the player nickname
     public GameObject nameBar;
     private Animator animator;
-    //particles that play when we jump
+    //particles that play when we Jump
     private ParticleSystem particles;
     private void Awake()
     {
@@ -28,7 +28,7 @@ public class PlayerMovement : MonoBehaviour
              nameBar = gameObject.transform.GetChild(0).gameObject;
         }
         particles = gameObject.GetComponent<ParticleSystem>();
-        moveParticlesToFeet();
+        MoveParticlesToFeet();
     }
 
     void Update()
@@ -37,23 +37,23 @@ public class PlayerMovement : MonoBehaviour
         if (move != Vector3.zero)
         {
             //rotate the player if we change direction
-            checkFacingDirection(move);
+            CheckFacingDirection(move);
             //move the player
             gameObject.transform.position += move * playerSpeed;
         }
-        //jump
+        //Jump
         if (Input.GetButtonDown("Jump") && performedJumps < numberOfAllowedJumps)
         {
-            jump(jumpForce);
+            Jump(jumpForce);
         }
         //Dash
         if((Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)) && dashAvailable)
         {
-            StartCoroutine(performDash());
+            StartCoroutine(PerformDash());
         }
 
     }
-    void jump(float force)
+    void Jump(float force)
     {
         particles.Play();
         rb.AddForce(new Vector3(0, force, 0));
@@ -85,7 +85,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
-    void checkFacingDirection(Vector3 movingVector)
+    void CheckFacingDirection(Vector3 movingVector)
     {
         if (movingVector.x != 0)
         {
@@ -117,18 +117,18 @@ public class PlayerMovement : MonoBehaviour
         
     }
 
-    void moveParticlesToFeet()
+    void MoveParticlesToFeet()
     {
         Collider2D coll = gameObject.GetComponent<Collider2D>();
         float height = coll.bounds.size.y;
         //move the particles below the feet
         particles.transform.position = gameObject.transform.position - new Vector3(0, height / 2 + 0.2f, 0);
     }
-    IEnumerator performDash()
+    IEnumerator PerformDash()
     {
         dashAvailable = false;
         //create a trail behind the player
-        gameObject.GetComponent<CreateTrail>().createTrail();
+        gameObject.GetComponent<CreateTrail>().ShowTrail();
         if (playerFacing == 0)
         {
             //dash right

@@ -20,19 +20,19 @@ public class ChangeTools : MonoBehaviour
         controllerScript = GameObject.Find("controller").GetComponent<AnalyzeImage>();
         
         Button erase = eraseButton.GetComponent<Button>();
-        erase.onClick.AddListener(changeToEraser);
+        erase.onClick.AddListener(ChangeToEraser);
 
         Button pencil = pencilButton.GetComponent<Button>();
-        pencil.onClick.AddListener(changeToPencil);
+        pencil.onClick.AddListener(ChangeToPencil);
 
         Button submit = submitButton.GetComponent<Button>();
-        submit.onClick.AddListener(moveToNext);
+        submit.onClick.AddListener(MoveToNext);
        
         Button remake = remakeButton.GetComponent<Button>();
         remake.onClick.AddListener(Remake);
 
         Button startGame = startGameButton.GetComponent<Button>();
-        startGame.onClick.AddListener(startGameScript);
+        startGame.onClick.AddListener(StartGameScript);
     }
 
     // Update is called once per frame
@@ -41,40 +41,40 @@ public class ChangeTools : MonoBehaviour
         AdjustToolCursor();
     }
 
-    void changeToPencil()
+    void ChangeToPencil()
     {
         controllerScript.currentTool = "Pencil";
     }
 
-    void changeToEraser()
+    void ChangeToEraser()
     {
         controllerScript.currentTool = "Eraser";
     }
 
-    void moveToNext()
+    void MoveToNext()
     {
-        controllerScript.moveToTheNext();
+        controllerScript.MoveToTheNext();
     }
 
     void Remake()
     {
-        controllerScript.remake();
+        controllerScript.Remake();
     }
 
-    public void changeFunctions()
+    public void ChangeFunctions()
     {
         //we have displayed the assets and now change the functions of these buttons to modify them
         submitButton.GetComponentInChildren<TextMeshProUGUI>().SetText("Save");
         Button submit = submitButton.GetComponent<Button>();
         submit.onClick.RemoveAllListeners();
-        submit.onClick.AddListener(saveChange);
+        submit.onClick.AddListener(SaveChange);
 
         Button remake = remakeButton.GetComponent<Button>();
         remake.onClick.RemoveAllListeners();
-        remake.onClick.AddListener(remakeClicked);
+        remake.onClick.AddListener(RemakeClicked);
     }
 
-    public void deactivateButtons()
+    public void DeactivateButtons()
     {
         submitButton.SetActive(false);
         remakeButton.SetActive(false);
@@ -82,30 +82,30 @@ public class ChangeTools : MonoBehaviour
         eraseButton.SetActive(false);
     }
 
-    public void activateButtons()
+    public void ActivateButtons()
     {
         submitButton.SetActive(true);
         remakeButton.SetActive(true);
         pencilButton.SetActive(true);
         eraseButton.SetActive(true);
     }
-    void saveChange()
+    void SaveChange()
     {
-        controllerScript.submitChange();
+        controllerScript.SubmitChange();
     }
-    void remakeClicked()
+    void RemakeClicked()
     {
-        controllerScript.remakeClicked();
+        controllerScript.RemakeClicked();
     }
-    void startGameScript()
+    void StartGameScript()
     {
-        controllerScript.startGame();
+        controllerScript.StartGame();
     }
-    public void enableStartGame()
+    public void EnableStartGame()
     {
         startGameButton.SetActive(true);
     }
-    public void disableStartGame()
+    public void DisableStartGame()
     {
         startGameButton.SetActive(false);
     }

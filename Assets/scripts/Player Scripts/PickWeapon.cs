@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using Photon.Pun;
@@ -19,36 +20,46 @@ public class PickWeapon : MonoBehaviour
     private GameObject lifeBar;
     //if we decide to pickup the Weapon it is stored here
     public GameObject currentWeapon;
+    private PhotonView playerView;
+
+    void Start()
+    {
+        playerView = gameObject.GetPhotonView();
+    }
     void Update()
     {
-            if (Input.GetKeyDown(KeyCode.E) && isHoldingWeapon)
+        if (!playerView.IsMine)
+        {
+            return;
+        }
+        if (Input.GetKeyDown(KeyCode.E) && isHoldingWeapon)
+        {
+             //Drop the Weapon
+             Drop(false, currentWeapon);
+             return;
+        }
+        //ontriggerenter changes the isInRange and we only have to check it here
+        if (isInRange)
+        {
+            if (Input.GetKeyDown(KeyCode.E) && !isHoldingWeapon)
             {
-                 //drop the Weapon
-                 drop(false, currentWeapon);
-                 return;
+                //we have to use ids because we are sending them over the network
+                int pickedWeaponID = weaponInRange.GetComponent<PhotonView>().ViewID;
+                int currentPlayerID = gameObject.GetComponent<PhotonView>().ViewID;
+                PhotonView photonView = PhotonView.Get(this);
+                //we cannot send gameobject in RPC so we have to use photonviewID
+                //it does not need to be buffered bcs all players are in room
+                photonView.RPC("AssignPlayerWeapon", RpcTarget.AllViaServer, currentPlayerID, pickedWeaponID);
             }
-            //ontriggerenter changes the isInRange and we only have to check it here
-            if (isInRange)
-            {
-                if (Input.GetKeyDown(KeyCode.E) && !isHoldingWeapon)
-                {
-                    //we have to use ids because we are sending them over the network
-                    int pickedWeaponID = weaponInRange.GetComponent<PhotonView>().ViewID;
-                    int currentPlayerID = gameObject.GetComponent<PhotonView>().ViewID;
-                    PhotonView photonView = PhotonView.Get(this);
-                    //we cannot send gameobject in RPC so we have to use photonviewID
-                    //it does not need to be buffered bcs all players are in room
-                    photonView.RPC("AssignPlayerWeapon", RpcTarget.AllViaServer, currentPlayerID, pickedWeaponID);
-                }
 
-            }
-            if (isHoldingWeapon && Input.GetMouseButtonDown(0) && !alreadyUsing)
-            {
-                alreadyUsing = true;
-                _weaponScript.Use();
-                //waitForIsUsing prevents the player from spamming attacks
-                StartCoroutine(waitForIsUsing());
-            }
+        }
+        if (isHoldingWeapon && Input.GetMouseButtonDown(0) && !alreadyUsing)
+        {
+            alreadyUsing = true;
+            _weaponScript.Use();
+            //WaitForIsUsing prevents the player from spamming attacks
+            StartCoroutine(WaitForIsUsing());
+        }
     }
     //PunRPC mark is used that we can send this script over the network for other instances to call 
     [PunRPC] public void AssignPlayerWeapon(int playerID, int weaponID)
@@ -75,7 +86,7 @@ public class PickWeapon : MonoBehaviour
         //move the Weapon closer to the player
         weaponX.transform.position = playerX.transform.position + new Vector3(facingDirection, 0.2f, 0);
         //change the parent of the lifebar so that it does not rotate with the Weapon
-        changeLifeBarToPlayer(weaponX);
+        ChangeLifeBarToPlayer(weaponX);
         if (weaponX.name.Contains("Bomb") || weaponX.name.Contains("Gun"))
         {
             
@@ -85,12 +96,12 @@ public class PickWeapon : MonoBehaviour
             //rotate the melee Weapon
             weaponX.transform.Rotate(0,0,-45);
         }
-        //we have to switch this to false bcs otherwise we cannot drop the Weapon
+        //we have to switch this to false bcs otherwise we cannot Drop the Weapon
         weaponInRange = null;
         isInRange = false;
         currentWeapon = weaponX;
     }
-    [PunRPC] public void dropWeapon(int weaponID,bool delete)
+    [PunRPC] public void DropWeapon(int weaponID,bool delete)
     {
         //remove the Weapon from parent
         //find Weapon based on photonId
@@ -99,12 +110,12 @@ public class PickWeapon : MonoBehaviour
         {
             weaponX.transform.parent = null;
             lifeBar.transform.parent = null;
-            StartCoroutine(changeLifeBarToWeapon(weaponX));
+            StartCoroutine(ChangeLifeBarToWeapon(weaponX));
             //start playing the idle animation again
             Animator animator = weaponX.GetComponent<Animator>();
             animator.SetBool("isPicked", false);
             //make the weapon fall down to the ground
-            weaponX.GetComponent<Weapon>().StartCoroutine("fallDown");
+            weaponX.GetComponent<Weapon>().StartCoroutine("FallDown");
         }
         else
         {
@@ -140,13 +151,13 @@ public class PickWeapon : MonoBehaviour
             isInRange = false;
         }
     }
-    IEnumerator waitForIsUsing()
+    IEnumerator WaitForIsUsing()
     {
         yield return new WaitForSeconds(0.5f);
         alreadyUsing = false;
     }
     //this func is called when the lifetime of the Weapon runs out
-    public void drop(bool delete, GameObject weapon)
+    public void Drop(bool delete, GameObject weapon)
     {
         if (weapon == null)
         {
@@ -156,10 +167,10 @@ public class PickWeapon : MonoBehaviour
         //RPC allows us to run a function on network gameobjects
         //we cannot send gameobject in RPC so we have to use photonviewID
         int weaponID = weapon.GetPhotonView().ViewID;
-        photonView.RPC("dropWeapon", RpcTarget.AllViaServer,weaponID,delete);
+        photonView.RPC("DropWeapon", RpcTarget.AllViaServer,weaponID,delete);
     }
     //change the parent so that the bar does not move with the Weapon when attacking
-    void changeLifeBarToPlayer(GameObject weapon)
+    private void ChangeLifeBarToPlayer(GameObject weapon)
     {
         //wait until it is picked, because if a player dropped the Weapon and we quickly picked it up, the lifebar would not be the child of the Weapon
         lifeBar = weapon.transform.GetChild(0).gameObject;
@@ -168,7 +179,7 @@ public class PickWeapon : MonoBehaviour
         lifeBar.transform.rotation = Quaternion.Euler(0, 0, 0);
         lifeBar.transform.parent = gameObject.transform;
     }
-    IEnumerator changeLifeBarToWeapon(GameObject weapon)
+    IEnumerator ChangeLifeBarToWeapon(GameObject weapon)
     {
         //play the rest of the animation really fast
         Animator anim = weapon.GetComponent<Animator>();
@@ -182,7 +193,7 @@ public class PickWeapon : MonoBehaviour
         lifeBar.transform.parent = weapon.transform;
         lifeBar = null;
     }
-    public void deleteLifeBar()
+    public void DeleteLifeBar()
     {
         Destroy(lifeBar);
     }

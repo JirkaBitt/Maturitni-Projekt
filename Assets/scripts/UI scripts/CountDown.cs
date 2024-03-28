@@ -15,11 +15,11 @@ public class CountDown : MonoBehaviour
         TextMeshProUGUI clock = gameObject.GetComponent<TextMeshProUGUI>();
         clock.SetText(minutes + ":00");
     }
-    public void startCount()
+    public void StartCount()
     {
-        StartCoroutine(count());
+        StartCoroutine(Count());
     }
-    IEnumerator count()
+    IEnumerator Count()
     {
         //start the countdown
         TextMeshProUGUI clock = gameObject.GetComponent<TextMeshProUGUI>();
@@ -53,7 +53,7 @@ public class CountDown : MonoBehaviour
         {  
             //end the game
             RoomController roomController = controller.GetComponent<RoomController>();
-            roomController.callEndGame();
+            roomController.CallEndGame();
         }
     }
 }

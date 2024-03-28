@@ -8,7 +8,7 @@ public class ShowPlayerResult : MonoBehaviour
     public GameObject playerName;
     public GameObject playerPlacement;
     public GameObject playerDecision;
-    public void showResult(GameObject player, int placement, string playerNick, GameObject contentHolder)
+    public void ShowResult(GameObject player, int placement, string playerNick, GameObject contentHolder)
     {
         //instantiate and adjust the prefab to display the player result with his icon and his decision if he wants to play again
         gameObject.name = player.name + "-result";
@@ -27,12 +27,12 @@ public class ShowPlayerResult : MonoBehaviour
         gameObject.transform.localPosition = new Vector3(155, -25 - (placement - 1) * 40);
         gameObject.transform.localScale = Vector3.one;
     }
-    public void voteYes()
+    public void VoteYes()
     {
         playerDecision.GetComponent<UnityEngine.UI.Image>().color = Color.green;
     }
 
-    public void voteNo()
+    public void VoteNo()
     {
         playerDecision.GetComponent<UnityEngine.UI.Image>().color = Color.red;
     }

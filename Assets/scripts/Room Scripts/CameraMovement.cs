@@ -67,28 +67,28 @@ public class CameraMovement : MonoBehaviourPunCallbacks
             mainCamera.transform.position += toPlayer;
         }
         //zoom in and out to capture all players
-        updateCameraZoom();
+        UpdateCameraZoom();
     }
 
-    public void  updatePlayers()
+    public void  UpdatePlayers()
     {
         players = GameObject.FindGameObjectsWithTag("Player");
     }
-    void updateCameraZoom()
+    void UpdateCameraZoom()
     {
         float cameraSize = 0;
         try
         {
              foreach (var onePlayer in players)
-            {
+             {
                 Vector3 difference = onePlayer.transform.position - player.transform.position;
                 cameraSize += difference.magnitude;
-            }
+             }
         }
         catch (Exception e)
         {
             //some player could have left the game via crash or something else, so we have to have catch and update the players in there
-            updatePlayers();
+            UpdatePlayers();
             Console.WriteLine(e);
             throw;
         }

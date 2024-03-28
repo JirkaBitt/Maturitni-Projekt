@@ -22,11 +22,11 @@ public class DecreaseWeaponLife : MonoBehaviour
     void Start()
     {
         rend = lifeBar.GetComponent<SpriteRenderer>();
-        WidthX = rend.sprite.bounds.size.x;
+        WidthX = rend.sprite.bounds.size.x/2;
         startScaleX = lifeBar.transform.localScale.x;
-        StartCoroutine(decrease());
+        StartCoroutine(Decrease());
     }
-    IEnumerator decrease()
+    IEnumerator Decrease()
     {
         float rate = ratePerSecond * interval;
         while (lifePercentage > 0)
@@ -52,7 +52,7 @@ public class DecreaseWeaponLife : MonoBehaviour
                 //remove the Weapon from player
                 GameObject player = weapon.transform.parent.gameObject;
                 PickWeapon pickScript = player.GetComponent<PickWeapon>();
-                pickScript.drop(true,weapon);
+                pickScript.Drop(true,weapon);
             }
             else
             {

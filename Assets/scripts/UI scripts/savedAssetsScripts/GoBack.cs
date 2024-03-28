@@ -6,14 +6,14 @@ public class GoBack : MonoBehaviour
 {
     public bool cancelEditing = false;
     public GameObject analyzeImageObj;
-    public void goBacktoChooseLevel()
+    public void GoBacktoChooseLevel()
     {
         if (cancelEditing)
         {
             //if we are editing an asset we just want to cancel it
             cancelEditing = false;
             AnalyzeImage imageScript = analyzeImageObj.GetComponent<AnalyzeImage>();
-            imageScript.returnFromEditing();
+            imageScript.ReturnFromEditing();
         }
         else
         {
@@ -21,14 +21,14 @@ public class GoBack : MonoBehaviour
             SceneManager.LoadScene("ChooseLevel");
         }
     }
-    public void goBacktoSaved()
+    public void GoBacktoSaved()
     {
         if (cancelEditing)
         {
             //if we are editing an asset we just want to cancel it
             cancelEditing = false;
             AnalyzeImage imageScript = analyzeImageObj.GetComponent<AnalyzeImage>();
-            imageScript.returnFromEditing();
+            imageScript.ReturnFromEditing();
         }
         else
         {

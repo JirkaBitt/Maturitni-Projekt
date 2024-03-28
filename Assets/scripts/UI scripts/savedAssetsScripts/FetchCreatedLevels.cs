@@ -9,22 +9,22 @@ using UnityEngine.UI;
 public class FetchCreatedLevels : MonoBehaviour
 {
     // Start is called before the first frame update
-    private List<savedAssets> allSaves = new List<savedAssets>();
+    private List<SavedAssets> allSaves = new List<SavedAssets>();
     //this is the selected one
-    public savedAssets selectedAssets;
+    public SavedAssets selectedAssets;
     //this is a reference to the prefab that is instantiated for every save
     public GameObject assetButton;
     //the scrollview to which we will place the prefabs
     public GameObject scrollview;
     //all the instatiated prefabs
     private List<GameObject> buttons = new List<GameObject>();
-    public class savedAssets
+    public class SavedAssets
     {
         //keep track of all the assets ints
         public int[][,] assets = new int[8][,];
         public string saveName;
         public string path;
-        public savedAssets(int[][,] input, string name, string pathToFile)
+        public SavedAssets(int[][,] input, string name, string pathToFile)
         {
             assets = input;
             saveName = name;
@@ -62,14 +62,14 @@ public class FetchCreatedLevels : MonoBehaviour
                     break;
                 }
                 //decode it from hex string to 2D int arrray
-                assets[i] = decodeAsset(assetRepresentation);
+                assets[i] = DecodeAsset(assetRepresentation);
             }
             reader.Close();
             if (!isCorupted)
             {
                 print(path);
                 //create new instance of this class that houses the assets
-                savedAssets currentSave = new savedAssets(assets, saveName,path.FullName);
+                SavedAssets currentSave = new SavedAssets(assets, saveName,path.FullName);
                 allSaves.Add(currentSave);
                 //create the button for these assets
                 GameObject newButton = Instantiate(assetButton);
@@ -95,12 +95,12 @@ public class FetchCreatedLevels : MonoBehaviour
                     File.Delete(path.FullName);
                     Destroy(newButton);
                     //refresh the buttons position so that there isnt a gap
-                    refreshButtons();
+                    RefreshButtons();
                 });
             }
         }
     }
-    private void refreshButtons()
+    private void RefreshButtons()
     {
         //move all buttons when one is deleted
         for (int i = 0; i < buttons.Count; i++)
@@ -108,7 +108,7 @@ public class FetchCreatedLevels : MonoBehaviour
             buttons[i].transform.localPosition = new Vector3(buttons[i].transform.localPosition.x,-30 - 40 * i,0);
         }
     }
-    private int[,] decodeAsset(string hex)
+    private int[,] DecodeAsset(string hex)
     {
         List<int> intList = new List<int>();
         foreach (var hexChar in hex)

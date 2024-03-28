@@ -10,9 +10,9 @@ public class AssetInfo : MonoBehaviour
     public bool hasAnimation;
     void Start()
     {
-        calculateSize();
+        CalculateSize();
     }
-    public void calculateSize()
+    public void CalculateSize()
     {
         //calculate the width and height so we can resize the new created assets
         if (hasSprite)

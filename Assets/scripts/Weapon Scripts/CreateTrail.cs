@@ -18,7 +18,7 @@ public class CreateTrail : MonoBehaviour
     public Color trailColor = Color.white;
     //list of the instantiated copies 
     private List<GameObject> createdCopies = new List<GameObject>();
-    public void createTexture()
+    public void CreateTexture()
     {
         SpriteRenderer rend = gameObject.GetComponent<SpriteRenderer>();
         Texture2D tex = rend.sprite.texture;
@@ -42,7 +42,7 @@ public class CreateTrail : MonoBehaviour
         newTex.Apply();
         whiteSprite = Sprite.Create(newTex, originalSprite.rect, new Vector2(0.5f, 0.5f));
     }
-    IEnumerator createCopy(Sprite sprite)
+    IEnumerator CreateCopy(Sprite sprite)
     {
         //create one instance of the copy
         GameObject copy = new GameObject("copy");
@@ -70,18 +70,18 @@ public class CreateTrail : MonoBehaviour
         Destroy(copy);
     }
 
-    IEnumerator createTrailCoroutine()
+    IEnumerator CreateTrailCoroutine()
     {
         for (int i = 0; i < numberOfCopies; i++)
         {
-            StartCoroutine(createCopy(whiteSprite));
+            StartCoroutine(CreateCopy(whiteSprite));
             yield return new WaitForSeconds(0.02f);
         }
     }
 
-    public void createTrail()
+    public void ShowTrail()
     {
-        StartCoroutine(createTrailCoroutine());
+        StartCoroutine(CreateTrailCoroutine());
     }
 
     private void OnDisable()

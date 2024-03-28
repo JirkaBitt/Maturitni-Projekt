@@ -31,24 +31,24 @@ public class ChooseLevel : MonoBehaviour
             existingPlayer.GetComponent<AudioSource>().volume = 1f;
         }
     }
-    public void createNew()
+    public void CreateNew()
     {
         //create new assets
         SceneManager.LoadScene("createPrefabs");
     }
 
-    public void loadLevels()
+    public void LoadLevels()
     {
         //load created assets
         SceneManager.LoadScene("savedLevels");
     }
-    public void joinRoom()
+    public void JoinRoom()
     {
         //check ID from input with room names if it matches than join that room
         TMP_InputField inputText = inputID.GetComponent<TMP_InputField>();
         Lobby lobbyScript = lobby.GetComponent<Lobby>();
         //if result is false there was a problem
-        bool result = lobbyScript.checkIfRoomExists(inputText.text);
+        bool result = lobbyScript.CheckIfRoomExists(inputText.text);
         if (result)
         {
             //room holder holds the id of the room as its name, we need it to join the room from create prefabs
@@ -64,7 +64,7 @@ public class ChooseLevel : MonoBehaviour
             warning.SetActive(true);
         }
     }
-    public void hideWarning()
+    public void HideWarning()
     {
         warning.SetActive(false);
     }

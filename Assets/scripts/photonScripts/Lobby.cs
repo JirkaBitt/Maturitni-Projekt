@@ -48,7 +48,7 @@ public class Lobby : MonoBehaviourPunCallbacks
         //After this callback, update the room list
         createdRooms = roomList;
     }
-    public void createRoomWithoutUI()
+    public void CreateRoom()
     {
         //create random roomName with random name 
         roomName = Random.Range(10000,99999).ToString();
@@ -62,20 +62,20 @@ public class Lobby : MonoBehaviourPunCallbacks
         print("join Lobby");
         PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
     }
-    public bool joinRoomWithName(string joinName)
+    public bool JoinRoomWithID(string roomID)
     {
         joiningRoom = true;
         //Set our Player name
         PhotonNetwork.NickName = playerName;
-        PhotonNetwork.JoinRoom(joinName);
+        PhotonNetwork.JoinRoom(roomID);
         return true;
     }
 
-    public bool checkIfRoomExists(string joinName)
+    public bool CheckIfRoomExists(string roomID)
     {
         foreach (var roomInfo in createdRooms)
         {
-            if (roomInfo.Name == joinName)
+            if (roomInfo.Name == roomID)
             {
                 return true;
             }

@@ -17,11 +17,11 @@ public class Gun : GunWeapon
             int playerID = gameObject.transform.parent.gameObject.GetPhotonView().ViewID;
             //we have to add the bullet as a parent because localScale is relative to parent
             int bulletID = bullet.GetPhotonView().ViewID;
-            gameObject.GetPhotonView().RPC("addParent",RpcTarget.All,playerID,bulletID);
-            StartCoroutine(chargingGun(bullet));
+            gameObject.GetPhotonView().RPC("AddParent",RpcTarget.All,playerID,bulletID);
+            StartCoroutine(ChargingGun(bullet));
     }
 
-    IEnumerator chargingGun(GameObject bullet)
+    IEnumerator ChargingGun(GameObject bullet)
     {
         //check if we are still charging
         Vector3 scale = new Vector3(0.5f,0.5f,0.5f);
@@ -40,12 +40,12 @@ public class Gun : GunWeapon
         Vector3 launchVector = gameObject.transform.right * 2;
         //with this we will set the bullet flying, we can adjust the speed adding scale to the the vector
         int bulletID = bullet.GetPhotonView().ViewID;
-        gameObject.GetPhotonView().RPC("removeParent",RpcTarget.All,bulletID);
+        gameObject.GetPhotonView().RPC("RemoveParent",RpcTarget.All,bulletID);
         launchVector *= scale.magnitude * 1.5f;
         bull.launchVector = launchVector;
     }
     [PunRPC]
-    public void addParent(int parentID, int bulletID)
+    public void AddParent(int parentID, int bulletID)
     {
         GameObject bullet = PhotonView.Find(bulletID).gameObject;
         GameObject parent = PhotonView.Find(parentID).gameObject;
@@ -55,7 +55,7 @@ public class Gun : GunWeapon
     }
 
     [PunRPC]
-    public void removeParent(int bulletID)
+    public void RemoveParent(int bulletID)
     { 
         GameObject bullet = PhotonView.Find(bulletID).gameObject;
         bullet.transform.parent = null;

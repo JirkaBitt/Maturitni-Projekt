@@ -10,9 +10,9 @@ public class Sword : MeleeWeapon
     {
         //attack
         PhotonView photonView = gameObject.GetPhotonView();
-        photonView.RPC("playAnimation",RpcTarget.All);
+        photonView.RPC("PlayAnimation",RpcTarget.All);
     }
-    Vector3 computeLaunchVector()
+    Vector3 ComputeLaunchVector()
     {
         GameObject player = gameObject.transform.parent?.gameObject;
         //get vector from player to Weapon, we could use the collision point instead
@@ -50,26 +50,30 @@ public class Sword : MeleeWeapon
                 if (triggerLaunch)
                 {
                     print("launch enemy");
-                    Vector3 launchV = computeLaunchVector();
-                    launchEnemy(enemyInRange, launchV, 40);
+                    Vector3 launchV = ComputeLaunchVector();
+                    LaunchEnemy(possibleEnemy, launchV, 40);
                     triggerLaunch = false;
                 }
             }
         }
     }
-    IEnumerator waitForAnimationEnd()
+    IEnumerator WaitForAnimationEnd()
     {
+        triggerLaunch = true;
         Animator animator = gameObject.GetComponent<Animator>();
         yield return new WaitUntil((() => animator.GetCurrentAnimatorStateInfo(0).IsName("picked")));
+        yield return new WaitForSeconds(0.2f);
         triggerLaunch = false;
     }
     [PunRPC]
-    void playAnimation()
-    { 
-        triggerLaunch = true;
+    public void PlayAnimation()
+    {
         Animator animator = gameObject.GetComponent<Animator>();
         animator.SetTrigger("swordAttack");
-        addTrail(gameObject);
-        StartCoroutine(waitForAnimationEnd());
+        AddTrail(gameObject);
+        if (gameObject.transform.parent.gameObject.GetPhotonView().IsMine)
+        {
+            StartCoroutine(WaitForAnimationEnd());
+        }
     }
 }

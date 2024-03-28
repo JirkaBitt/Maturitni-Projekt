@@ -56,8 +56,8 @@ public class StartGameButton : MonoBehaviourPunCallbacks
             textObject.SetActive(true);
         }
     }
-    public void startGame()
+    public void StartGame()
     {
-        controller.GetComponent<RoomController>().startGameButtonCallBack();
+        controller.GetComponent<RoomController>().StartGameButtonCallBack();
     }
 }

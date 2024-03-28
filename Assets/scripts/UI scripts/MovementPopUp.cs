@@ -7,12 +7,12 @@ public class MovementPopUp : MonoBehaviour
     // Start is called before the first frame update
     public GameObject popup;
     private bool isActive = false;
-    public void startPopup()
+    public void StartPopup()
     {
         //show the movement guide popup
-        StartCoroutine(showPopup());
+        StartCoroutine(ShowPopup());
     }
-    IEnumerator showPopup()
+    IEnumerator ShowPopup()
     {
         if (!isActive)
         {

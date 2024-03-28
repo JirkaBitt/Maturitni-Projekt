@@ -318,7 +318,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 280239379}
         m_TargetAssemblyTypeName: closePopupWithClick, Assembly-CSharp
-        m_MethodName: startPopup
+        m_MethodName: StartPopup
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1828,7 +1828,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2046857602}
         m_TargetAssemblyTypeName: showAllResults, Assembly-CSharp
-        m_MethodName: leave
+        m_MethodName: Leave
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4137,7 +4137,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 527681293}
         m_TargetAssemblyTypeName: PUN2_RoomController, Assembly-CSharp
-        m_MethodName: leave
+        m_MethodName: Leave
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4377,7 +4377,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1842279558}
         m_TargetAssemblyTypeName: startGameButton, Assembly-CSharp
-        m_MethodName: startGame
+        m_MethodName: StartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4664,7 +4664,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2046857602}
         m_TargetAssemblyTypeName: showAllResults, Assembly-CSharp
-        m_MethodName: stay
+        m_MethodName: Stay
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4676,7 +4676,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 527681293}
         m_TargetAssemblyTypeName: PUN2_RoomController, Assembly-CSharp
-        m_MethodName: playAgain
+        m_MethodName: PlayAgain
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

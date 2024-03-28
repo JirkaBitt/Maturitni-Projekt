@@ -34,7 +34,8 @@ public class Bullet : MonoBehaviour
                 if (bulletPhotonView.IsMine)
                 {
                     PhotonView enemyPhotonView = hit.GetPhotonView();
-                    bulletPhotonView.RPC("addForceBullet", RpcTarget.AllViaServer, enemyPhotonView.ViewID, launchVector, 60f);
+                    float RandomMult = Random.Range(5, 10) / 10f;
+                    bulletPhotonView.RPC("AddForceBullet", RpcTarget.AllViaServer, enemyPhotonView.ViewID, launchVector, 30f * RandomMult);
                 }
             }
             if (hit.CompareTag("ground"))
@@ -48,22 +49,18 @@ public class Bullet : MonoBehaviour
             }
         }
     }
-    [PunRPC] public void addForceBullet(int photonViewID, Vector3 launchVector, float force)
+    [PunRPC] public void AddForceBullet(int photonViewID, Vector3 launchVector, float force)
     {
         // we will run this script on all instances of this Weapon, so in the instance of the enemy the Weapon will launch him
         PhotonView phView = PhotonView.Find(photonViewID);
         GameObject enemy = phView.gameObject;
         //add the force to his percentage and launch him with his percentage
         PlayerStats stats = enemy.GetComponent<PlayerStats>();
-        //add a little bit of randomness
-        float randomMultiplier = Random.Range(4, 10);
-        randomMultiplier /= 10;
-        force *= randomMultiplier;
         stats.percentage += (int)(force/10  + force * stats.percentage/200);
         stats.lastAttacker = player;
         Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();
         rb.AddForce(launchVector * (force + stats.percentage*2));
-        enemy.GetComponent<CreateTrail>().createTrail();
+        enemy.GetComponent<CreateTrail>().ShowTrail();
         if (gameObject.GetPhotonView().IsMine)
         {
             PhotonNetwork.Destroy(gameObject);

@@ -8,7 +8,7 @@ using UnityEngine;
 public class AssetHolder : MonoBehaviour
 {
     public Dictionary<string, int[,]> assets = new Dictionary<string, int[,]>();
-    public void saveAssets(string name)
+    public void SaveAssets(string name)
     {
         //check how many saves already exist
         string[] existingAssets = Directory.GetFiles(@Application.persistentDataPath + "/");
@@ -22,14 +22,14 @@ public class AssetHolder : MonoBehaviour
         foreach (var asset in assets)
         {
             //supply the int array and create a string hexadecimal representation to save space
-            string saveThis = assetToHex(asset.Value);
+            string saveThis = AssetToHex(asset.Value);
             print(asset.Key + "-"+saveThis);
             writer.WriteLine(saveThis);
         }
         writer.Close();
     }
 
-    private string assetToHex(int[,] input)
+    private string AssetToHex(int[,] input)
     {
         //this takes an int and divides it into 4 space int arrays and creates a hex representation
         string hexRepresentation = "";
@@ -45,7 +45,7 @@ public class AssetHolder : MonoBehaviour
                 if (currentIndex == 3)
                 {
                     //this is the forth int
-                    hexRepresentation += convertToHex(intArray);
+                    hexRepresentation += ConvertToHex(intArray);
                     currentIndex = 0;
                 }
                 else
@@ -56,7 +56,7 @@ public class AssetHolder : MonoBehaviour
         }
         return hexRepresentation;
     }
-    private string convertToHex(int[] binary)
+    private string ConvertToHex(int[] binary)
     {
         //this func takes 4 ints and converts them into hex number
         int hex = 0;

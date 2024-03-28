@@ -5,7 +5,7 @@ using UnityEngine;
 public class PopUpController : MonoBehaviour
 {
     public GameObject buttons;
-    public void closePopUp()
+    public void ClosePopUp()
     {
         buttons.SetActive(true);
         gameObject.SetActive(false);

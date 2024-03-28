@@ -10,24 +10,24 @@ public class Bomb : ConsumableWeapon
     public override void Use()
     {
         //throw the Weapon, this script is in consumableWeapon
-       PhotonView.Get(this).RPC("useRPC",RpcTarget.All);
+       PhotonView.Get(this).RPC("UseRPC",RpcTarget.All);
     }
-    [PunRPC]public void useRPC()
+    [PunRPC]public void UseRPC()
     {
         GameObject player = transform.parent.gameObject;
-        throwWeapon(200);
-        addTrail(gameObject);
+        ThrowWeapon(200);
+        AddTrail(gameObject);
         //update all scripts
         PlayerStats stats = player.GetComponent<PlayerStats>();
         stats.currentWeapon = null;
         PickWeapon pickscript = player.GetComponent<PickWeapon>();
         pickscript.isHoldingWeapon = false;
         pickscript.currentWeapon = null;
-        pickscript.deleteLifeBar();
+        pickscript.DeleteLifeBar();
         //detonate the Weapon
-        StartCoroutine(blowUp(3));
+        StartCoroutine(BlowUp(3));
     }
-    IEnumerator blowUp(int timeDetonate)
+    IEnumerator BlowUp(int timeDetonate)
     {
         yield return new WaitForSeconds(timeDetonate);
         
@@ -41,30 +41,27 @@ public class Bomb : ConsumableWeapon
        
         coll.isTrigger = true;
         //check for players in range of explosion, this creates a circle and returns colliders that are within that circle
-        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(gameObject.transform.position, 5);
-        foreach (var hitted in hitColliders)
-        {
-            GameObject player = hitted.gameObject;
-            print(player.name);
-            if (player.CompareTag("Player"))
-            {
-                launchEnemy(player, computeVector(player), 100);
-            }
-        }
-        
         if (PhotonView.Get(this).IsMine)
         {
-           GameObject explode = PhotonNetwork.Instantiate(explosionPrefab.name,gameObject.transform.position,Quaternion.identity);
-           //make the Bomb invisible, we cannot destroy it because the script is tied to it, we will destroy it with the explosion
-           SpriteRenderer renderer = gameObject.GetComponent<SpriteRenderer>();
-           renderer.enabled = false;
-
-           //wait before deleting the explosion
-           StartCoroutine(waitBeforeDeletion(explode));
+            Collider2D[] hitColliders = Physics2D.OverlapCircleAll(gameObject.transform.position, 5);
+            foreach (var hitted in hitColliders)
+            {
+                GameObject player = hitted.gameObject;
+                if (player.CompareTag("Player"))
+                {
+                    LaunchEnemy(player, ComputeVector(player), 100);
+                }
+            }
+            GameObject explode = PhotonNetwork.Instantiate(explosionPrefab.name,gameObject.transform.position,Quaternion.identity);
+            //make the Bomb invisible, we cannot destroy it because the script is tied to it, we will destroy it with the explosion
+            SpriteRenderer renderer = gameObject.GetComponent<SpriteRenderer>();
+            renderer.enabled = false;
+            //wait before deleting the explosion
+            StartCoroutine(WaitBeforeDeletion(explode));
         }
     }
 
-    IEnumerator waitBeforeDeletion(GameObject deleteThis)
+    IEnumerator WaitBeforeDeletion(GameObject deleteThis)
     {
         yield return new WaitForSeconds(1);
         PhotonNetwork.Destroy(deleteThis);
@@ -85,7 +82,7 @@ public class Bomb : ConsumableWeapon
             }
         }
     }
-    Vector3 computeVector(GameObject enemy)
+    Vector3 ComputeVector(GameObject enemy)
     {
         Vector3 vector = enemy.transform.position - gameObject.transform.position;
         //jednotkovy vektor

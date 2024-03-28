@@ -35,15 +35,15 @@ public class SavePopUpButtons : MonoBehaviour
                 loadingScreen.SetActive(true);
                 //delete the existing file and create new one with the same name
                 File.Delete(dataHolder.selectedAssets.path);
-                saveAssetHolder.saveAssets(dataHolder.selectedAssets.saveName);
+                saveAssetHolder.SaveAssets(dataHolder.selectedAssets.saveName);
                 //we dont need saveObj any more
-                imageScript.createRoom();
+                imageScript.CreateRoom();
 
             });
             notSaveButton.GetComponent<Button>().onClick.AddListener(() =>
             {
                 loadingScreen.SetActive(true);
-                imageScript.createRoom();
+                imageScript.CreateRoom();
             });
         }
         else
@@ -63,13 +63,13 @@ public class SavePopUpButtons : MonoBehaviour
                     return;
                 }
                 loadingScreen.SetActive(true);
-                saveAssetHolder.saveAssets(inputText.text);
-                imageScript.createRoom();
+                saveAssetHolder.SaveAssets(inputText.text);
+                imageScript.CreateRoom();
             });
             notSaveButton.GetComponent<Button>().onClick.AddListener(() =>
             {
                 loadingScreen.SetActive(true);
-                imageScript.createRoom();
+                imageScript.CreateRoom();
             });
         }
     }

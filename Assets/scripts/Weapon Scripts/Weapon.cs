@@ -10,20 +10,20 @@ public abstract class Weapon : MonoBehaviour
     public bool triggerLaunch;
     //abstract Use is here that we can call it not matter the type of Weapon, it will run the override use on the lowest level of the script chain(Axe)
     public abstract void Use();
-    public abstract void launchEnemy(GameObject enemy, Vector3 launchVector, float force);
+    public abstract void LaunchEnemy(GameObject enemy, Vector3 launchVector, float force);
     //in launch enemy we will call RPC for addforce
-    public abstract void addForce(int photonViewID, Vector3 launchVector, float force);
-    public void addTrail(GameObject weapon)
+    public abstract void AddForce(int photonViewID, Vector3 launchVector, float force);
+    public void AddTrail(GameObject weapon)
     {
         CreateTrail trailScript = weapon.GetComponent<CreateTrail>();
-        trailScript.createTrail();
+        trailScript.ShowTrail();
     }
 
     private void Start()
     {
-        StartCoroutine(fallDown());
+        StartCoroutine(FallDown());
     }
-    IEnumerator fallDown()
+    IEnumerator FallDown()
     {
         //add a rigidbody that will make the weapon fall due to gravity
         Rigidbody2D rb = gameObject.AddComponent<Rigidbody2D>();
