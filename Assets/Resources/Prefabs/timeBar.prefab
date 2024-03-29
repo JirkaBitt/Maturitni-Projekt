@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifeBar: {fileID: 3493453852368229926}
-  ratePerSecond: 1
+  ratePerSecond: 2
   lifePercentage: 100
   interval: 0.5
   weapon: {fileID: 0}

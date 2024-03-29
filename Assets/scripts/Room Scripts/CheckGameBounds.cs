@@ -12,18 +12,24 @@ public class CheckGameBounds : MonoBehaviourPunCallbacks
     private void OnTriggerExit2D(Collider2D other)
     {
         //player left the game space
+        if (!controller.gameIsActive)
+        {
+            return;
+        }
         GameObject gObject = other.gameObject;
         if (!gObject.CompareTag("Player"))
         {
-            if (gObject.transform.parent == null && gObject.GetPhotonView().IsMine)
+            //dont delete bombs, bombs change to trigger and that triggers this deletion
+            if (gObject.transform.parent == null && gObject.GetPhotonView().IsMine && !gObject.name.Contains("Bomb") && !gObject.name.Contains("Boom"))
             {
+                print(gObject.name + "Deleted");
                 PhotonNetwork.Destroy(gObject);
             }
             return;
         }
         //we can only delete the player from isMine
         PhotonView playerView = gObject.GetPhotonView();
-        if (!playerView.IsMine || !controller.gameIsActive)
+        if (!playerView.IsMine)
         {
             //if this is not my player return
             //if the game is not active return, when deleting player onCollisionExit is called

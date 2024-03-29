@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -142,6 +143,28 @@ public class PlayerMovement : MonoBehaviour
         //wait for cooldown
         yield return new WaitForSeconds(dashCooldown);
         dashAvailable = true;
+    }
+    IEnumerator RemoveGravity(float totalForce,GameObject enemy)
+    {
+        Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();
+        PolygonCollider2D coll = enemy.GetComponent<PolygonCollider2D>();
+        rb.gravityScale = 0;
+        //only target non trigger objects
+        ContactFilter2D filter2D = new ContactFilter2D();
+        filter2D.useTriggers = false;
+        //wait until we hit an object
+        float waitTime = totalForce / 50;
+        Stopwatch timer = new Stopwatch();
+        timer.Start();
+        //remove gravity from the launched enemy for set time or until he hits a solid object
+        yield return new WaitUntil(() => coll.IsTouching(filter2D) || timer.Elapsed.Seconds > waitTime);
+        timer.Stop();
+        rb.gravityScale = 1;
+    }
+
+    public void RemoveGrav(float force, GameObject enemy)
+    {
+        StartCoroutine(RemoveGravity(force, enemy));
     }
     
 }

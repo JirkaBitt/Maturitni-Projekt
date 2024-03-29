@@ -1,9 +1,11 @@
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
-
+using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 
 public class Lobby : MonoBehaviourPunCallbacks
@@ -50,6 +52,10 @@ public class Lobby : MonoBehaviourPunCallbacks
     }
     public void CreateRoom()
     {
+        if (!PhotonNetwork.IsConnected)
+        {
+            SceneManager.LoadScene("ChooseLevel");
+        }
         //create random roomName with random name 
         roomName = Random.Range(10000,99999).ToString();
         joiningRoom = true;
@@ -59,7 +65,6 @@ public class Lobby : MonoBehaviourPunCallbacks
         roomOptions.MaxPlayers = (byte)4; //Set any number
         //this is for finding our players stats
         roomOptions.PublishUserId = true;
-        print("join Lobby");
         PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
     }
     public bool JoinRoomWithID(string roomID)

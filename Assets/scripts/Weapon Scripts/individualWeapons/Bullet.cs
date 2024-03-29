@@ -26,26 +26,25 @@ public class Bullet : MonoBehaviour
         //check if we have shot the gun
         if (launchVector != Vector3.zero)
         {
+            PhotonView photonView = gameObject.GetPhotonView();
+            if (!photonView.IsMine)
+            {
+                return;
+            }
             GameObject hit = col.gameObject;
             if (hit.CompareTag("Player"))
             {
                 //hit the player
-                PhotonView bulletPhotonView = gameObject.GetPhotonView();
-                if (bulletPhotonView.IsMine)
-                {
-                    PhotonView enemyPhotonView = hit.GetPhotonView();
-                    float RandomMult = Random.Range(5, 10) / 10f;
-                    bulletPhotonView.RPC("AddForceBullet", RpcTarget.AllViaServer, enemyPhotonView.ViewID, launchVector, 30f * RandomMult);
-                }
+                PhotonView enemyPhotonView = hit.GetPhotonView();
+                float RandomMult = Random.Range(5, 10) / 10f;
+                photonView.RPC("AddForceBullet", RpcTarget.AllViaServer, enemyPhotonView.ViewID, launchVector, 30f * RandomMult);
+                
             }
             if (hit.CompareTag("ground"))
             {
                 //we hit the ground, delete the bullet
-                PhotonView photonView = gameObject.GetPhotonView();
-                if (photonView.IsMine)
-                {
-                    PhotonNetwork.Destroy(gameObject);
-                }
+                //only set the bullet to false, bcs it will trigger the checkgamebounds to delete it
+                gameObject.SetActive(false);
             }
         }
     }
@@ -59,11 +58,12 @@ public class Bullet : MonoBehaviour
         stats.percentage += (int)(force/10  + force * stats.percentage/200);
         stats.lastAttacker = player;
         Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();
-        rb.AddForce(launchVector * (force + stats.percentage*2));
-        enemy.GetComponent<CreateTrail>().ShowTrail();
+        rb.AddForce(launchVector * (force * 2 + stats.percentage * 2));
+        enemy.GetComponent<CreateTrail>().ShowTrail(); 
         if (gameObject.GetPhotonView().IsMine)
         {
-            PhotonNetwork.Destroy(gameObject);
+            //this will ensure that CheckGameBounds deletes the bullet
+            gameObject.SetActive(false);
         }
     }
 }

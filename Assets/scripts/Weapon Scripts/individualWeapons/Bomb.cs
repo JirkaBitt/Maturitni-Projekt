@@ -40,8 +40,11 @@ public class Bomb : ConsumableWeapon
         //set exploded to true so we check it in ontrigger enter
        
         coll.isTrigger = true;
+        //make the Bomb invisible, we cannot destroy it because the script is tied to it, we will destroy it with the explosion
+        SpriteRenderer renderer = gameObject.GetComponent<SpriteRenderer>();
+        renderer.enabled = false;
         //check for players in range of explosion, this creates a circle and returns colliders that are within that circle
-        if (PhotonView.Get(this).IsMine)
+        if (gameObject.GetPhotonView().IsMine)
         {
             Collider2D[] hitColliders = Physics2D.OverlapCircleAll(gameObject.transform.position, 5);
             foreach (var hitted in hitColliders)
@@ -49,13 +52,10 @@ public class Bomb : ConsumableWeapon
                 GameObject player = hitted.gameObject;
                 if (player.CompareTag("Player"))
                 {
-                    LaunchEnemy(player, ComputeVector(player), 100);
+                    LaunchEnemy(player, ComputeVector(player), 70);
                 }
             }
             GameObject explode = PhotonNetwork.Instantiate(explosionPrefab.name,gameObject.transform.position,Quaternion.identity);
-            //make the Bomb invisible, we cannot destroy it because the script is tied to it, we will destroy it with the explosion
-            SpriteRenderer renderer = gameObject.GetComponent<SpriteRenderer>();
-            renderer.enabled = false;
             //wait before deleting the explosion
             StartCoroutine(WaitBeforeDeletion(explode));
         }

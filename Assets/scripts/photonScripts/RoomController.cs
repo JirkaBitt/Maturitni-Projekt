@@ -379,7 +379,11 @@ public class RoomController : MonoBehaviourPunCallbacks
         GameObject[] bullets = GameObject.FindGameObjectsWithTag("Bullet");
         foreach (var bull in bullets)
         {
-            Destroy(bull);
+            if (bull.GetPhotonView().IsMine)
+            {
+                Debug.Log("Destroy bulllet at the end of the game from player:" + PhotonNetwork.LocalPlayer.NickName);
+                PhotonNetwork.Destroy(bull);
+            }
         }
         int playerCount = players.Length;
         endGUI.SetActive(true);

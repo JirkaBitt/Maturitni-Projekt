@@ -26,6 +26,7 @@ public abstract class ConsumableWeapon : Weapon
         stats.percentage += (int)(force/10  + force * stats.percentage/200);
         Rigidbody2D rb = enemy.GetComponent<Rigidbody2D>();
         rb.AddForce(launchVector * (force*6 + stats.percentage*2));
+        enemy.GetComponent<CreateTrail>().ShowTrail();
     }
 
     public void ThrowWeapon(float distance)
