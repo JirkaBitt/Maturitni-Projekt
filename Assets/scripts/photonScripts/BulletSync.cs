@@ -1,6 +1,5 @@
 using Photon.Pun;
 using UnityEngine;
-
 public class BulletSync : MonoBehaviourPun, IPunObservable
 {
     Vector3 latestPos;
@@ -27,7 +26,7 @@ public class BulletSync : MonoBehaviourPun, IPunObservable
     {
         if (!photonView.IsMine)
         {
-            //Update remote player (smooth this, this looks good, at the cost of some accuracy)
+            //Update Network players
             //Lerp is linear transformation
             //0 == transform.position and 1 is instant transformation to latestPos
             transform.position = Vector3.Lerp(transform.position, latestPos, Time.deltaTime * 5);

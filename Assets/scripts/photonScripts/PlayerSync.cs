@@ -66,7 +66,6 @@ public class PlayerSync : MonoBehaviourPun, IPunObservable
             //we only want the non original instances of this player, the original one is controlled by the player
             if (!photonView.IsMine)
             {
-                //Update remote player (smooth this, this looks good, at the cost of some accuracy)
                 //Lerp is linear transformation
                 //0 == transform.position and 1 is instant transformation to latestPos
                 transform.position = Vector3.Lerp(transform.position, latestPos, Time.deltaTime * 5);
@@ -84,7 +83,6 @@ public class PlayerSync : MonoBehaviourPun, IPunObservable
         ignorePhoton = true;
         StartCoroutine(Wait());
     }
-    
     IEnumerator Wait()
     {
         yield return new WaitForSeconds(0.6f);

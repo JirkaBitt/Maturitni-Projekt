@@ -55,16 +55,14 @@ public class CameraMovement : MonoBehaviourPunCallbacks
             float velocity = rb.velocity.y;
             float toPlayerDirection = player.transform.position.y - mainCamera.transform.position.y;
             toPlayerDirection /= Mathf.Abs(toPlayerDirection);
-            bool isStatic = (velocity < 0.1f && velocity > -0.1f);
-            mainCamera.transform.position += Vector3.up * (isStatic ? toPlayerDirection * cameraSpeed:velocity) * Time.deltaTime;
+            bool isStatic = velocity < 0.1f && velocity > -0.1f;
+            mainCamera.transform.position += Vector3.up * (isStatic ? (toPlayerDirection * cameraSpeed):velocity) * Time.deltaTime;
         }
         //check if we are really far away
         if (Mathf.Abs(viewPos.y) > 1.5 || Mathf.Abs(viewPos.x) > 1.5)
         {
             //teleport the camera to the player
-            Vector3 toPlayer = player.transform.position - mainCamera.transform.position;
-            toPlayer.z = 0;
-            mainCamera.transform.position += toPlayer;
+            JumpToPlayer();
         }
         //zoom in and out to capture all players
         UpdateCameraZoom();
@@ -92,12 +90,19 @@ public class CameraMovement : MonoBehaviourPunCallbacks
             Console.WriteLine(e);
             throw;
         }
-       
         //we want to divide cameraSize with playercount so it reflects an avarage value
         cameraSize /= ((players.Length) * cameraZoomDivider);
         //5 is default value
         cameraSize += 5;
         //this zooms out the camera
         mainCamera.orthographicSize = cameraSize;
+    }
+
+    public void JumpToPlayer()
+    {
+        //teleport the camera to the player position
+        Vector3 toPlayer = player.transform.position - mainCamera.transform.position;
+        toPlayer.z = 0;
+        mainCamera.transform.position += toPlayer;
     }
 }

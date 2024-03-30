@@ -318,6 +318,7 @@ public class RoomController : MonoBehaviourPunCallbacks
         camScript.player = player;
         camScript.rb = player.GetComponent<Rigidbody2D>();
         camScript.UpdatePlayers();
+        camScript.JumpToPlayer();
         //we have to call it on create prefabs because room controller is disabled at the start of the game
         string playerID = PhotonNetwork.LocalPlayer.UserId;
         //only set the room to open if the master has clicked to play again
@@ -381,7 +382,6 @@ public class RoomController : MonoBehaviourPunCallbacks
         {
             if (bull.GetPhotonView().IsMine)
             {
-                Debug.Log("Destroy bulllet at the end of the game from player:" + PhotonNetwork.LocalPlayer.NickName);
                 PhotonNetwork.Destroy(bull);
             }
         }

@@ -7,7 +7,7 @@ public class WeaponSync : MonoBehaviourPun, IPunObservable
     Quaternion latestRot;
     void Update()
     {
-        //even tho weapons are a roomobject, for the master client is isMine true, so he is the controller of the weapons
+        //even the weapons are a roomobject, for the master client is isMine true, so he is the controller of the weapons
         if (!photonView.IsMine && transform.parent == null)
         {
             //if this isnt mine instance and we are not picked up then update the transform
