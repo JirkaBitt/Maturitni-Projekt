@@ -4,11 +4,7 @@ using Random = UnityEngine.Random;
 
 public class CheckGameBounds : MonoBehaviourPunCallbacks
 {
-    private RoomController controller;
-    void Start()
-    {
-        controller = GameObject.Find("_RoomController").GetComponent<RoomController>();
-    }
+    public RoomController controller;
     private void OnTriggerExit2D(Collider2D other)
     {
         //player left the game space

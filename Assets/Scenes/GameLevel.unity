@@ -1108,12 +1108,12 @@ GameObject:
   - component: {fileID: 527681293}
   - component: {fileID: 527681295}
   m_Layer: 0
-  m_Name: _RoomController
+  m_Name: RoomController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &527681293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5432,7 +5432,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2100512841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5445,6 +5445,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 040e43afe724d4631a8c3ff78b3922e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controller: {fileID: 527681293}
 --- !u!61 &2100512842
 BoxCollider2D:
   m_ObjectHideFlags: 0

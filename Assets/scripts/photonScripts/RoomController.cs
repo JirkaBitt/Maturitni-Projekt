@@ -39,7 +39,7 @@ public class RoomController : MonoBehaviourPunCallbacks
     public GameObject playAgainButton;
     //check if game is in progress
     public bool gameIsActive = false;
-    void Start()
+    public void PrepareGame()
     {
         //set the default fps to 60
         Application.targetFrameRate = 60;
@@ -49,39 +49,37 @@ public class RoomController : MonoBehaviourPunCallbacks
         {
             //some error occured, return to the lobby
             SceneManager.LoadScene("ChooseLevel");
+            return;
+        }
+        if (PhotonNetwork.IsMasterClient)
+        {
+            //spawn character, this is only for the room creator, others are created in OnJoinedRoom
+            PhotonNetwork.InstantiateRoomObject("Arena", Vector3.zero, Quaternion.identity);
+            print("instantiate from start");
+            spawnPoint = FindRespawnPositions();
+            //spawn the player
+            int randonSpawn = Random.Range(0, spawnPoint.Length);
+            GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[randonSpawn], Quaternion.identity);
+            //we have to assign the position again, bcs it can spawn us in the middle of the platform
+            player.transform.position = spawnPoint[randonSpawn];
+            myPlayer = player;
+            //disable some scripts before the start
+            BeforeStart(player);
+            PhotonView playerView = player.GetPhotonView();
+            //name him after the player so we can find him in onGUI
+            CameraMovement camScript = Camera.main.GetComponent<CameraMovement>();
+            camScript.enabled = true;
+            camScript.player = player;
+            camScript.rb = player.GetComponent<Rigidbody2D>();
+            //we have to call it on create prefabs because room controller is disabled at the start of the game
+            string playerID = PhotonNetwork.LocalPlayer.UserId;
+            //we want to rename the player on all clients to his id and change his texture to the one the player has drawn
+            CreatePrefabs.GetComponent<CreatePrefab>().RenamePlayer(playerID, playerView.ViewID,PhotonNetwork.LocalPlayer.NickName);
+            displayIcons.GetComponent<DisplayPlayerStats>().AddPlayerTexture(playerID);
         }
         else
         {
-            if (PhotonNetwork.IsMasterClient)
-            {
-                //spawn character, this is only for the room creator, others are created in OnJoinedRoom
-                PhotonNetwork.InstantiateRoomObject("Arena", Vector3.zero, Quaternion.identity);
-                print("instantiate from start");
-                spawnPoint = FindRespawnPositions();
-                //spawn the player
-                int randonSpawn = Random.Range(0, spawnPoint.Length);
-                GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[randonSpawn], Quaternion.identity);
-                //we have to assign the position again, bcs it can spawn us in the middle of the platform
-                player.transform.position = spawnPoint[randonSpawn];
-                myPlayer = player;
-                //disable some scripts before the start
-                BeforeStart(player);
-                PhotonView playerView = player.GetPhotonView();
-                //name him after the player so we can find him in onGUI
-                CameraMovement camScript = Camera.main.GetComponent<CameraMovement>();
-                camScript.enabled = true;
-                camScript.player = player;
-                camScript.rb = player.GetComponent<Rigidbody2D>();
-                //we have to call it on create prefabs because room controller is disabled at the start of the game
-                string playerID = PhotonNetwork.LocalPlayer.UserId;
-                //we want to rename the player on all clients to his id and change his texture to the one the player has drawn
-                CreatePrefabs.GetComponent<CreatePrefab>().RenamePlayer(playerID, playerView.ViewID,PhotonNetwork.LocalPlayer.NickName);
-                displayIcons.GetComponent<DisplayPlayerStats>().AddPlayerTexture(playerID);
-            }
-            else
-            {
-                JoinedFromCreate();
-            }
+            JoinedFromCreate();
         }
     }
     public void Leave()
@@ -164,7 +162,7 @@ public class RoomController : MonoBehaviourPunCallbacks
            }
            int randomWait = Random.Range(8, 15);
            yield return new WaitForSeconds(randomWait);
-       }
+        }
     }
     Vector3[] FindRespawnPositions()
     {
@@ -221,18 +219,6 @@ public class RoomController : MonoBehaviourPunCallbacks
         }
         //return found spawnPoints
         return spawnList.ToArray();
-    }
-    private void DisplaySpawnPoints()
-    {
-        //this is used just to visualize the spawn point for debugging 
-        foreach (var spawn in spawnPoint)
-        {
-            GameObject dis = new GameObject();
-            SpriteRenderer rend = dis.AddComponent<SpriteRenderer>();
-            rend.sprite = myPlayer.GetComponent<SpriteRenderer>().sprite;
-            dis.transform.localScale = new Vector3(0.05f, 0.05f, 1);
-            dis.transform.position = spawn;
-        }
     }
     private Tuple<Vector2, Vector2> GetBounds(Vector2[] path,PolygonCollider2D coll)
     {

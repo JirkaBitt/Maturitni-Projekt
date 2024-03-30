@@ -67,7 +67,6 @@ public class FetchCreatedLevels : MonoBehaviour
             reader.Close();
             if (!isCorupted)
             {
-                print(path);
                 //create new instance of this class that houses the assets
                 SavedAssets currentSave = new SavedAssets(assets, saveName,path.FullName);
                 allSaves.Add(currentSave);

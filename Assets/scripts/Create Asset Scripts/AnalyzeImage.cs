@@ -85,20 +85,17 @@ public class AnalyzeImage : MonoBehaviour
         public GameObject objectPrefab; 
         //pixel class is a reference to the slate that we draw on, we get the info about the pixels from there
         public Pixel[,] pixelClass;
-      
+        //information for manipulating the object
         public Vector3 fullScreenScale;
-        
         public Vector3 smallScreenPosition;
         public Vector3 smallScreenScale;
-
+        
         private Vector2 firstBlackPixel = Vector2.zero;
-
+        //reference to the drawing object
         private GameObject slate;
         private int[,] colors;
-        
-        public Prefab(GameObject slatee,GameObject objectt, Pixel[,] array, string n,bool defaultAsset,GameObject defObj, Vector3 defSize)
+        public Prefab(GameObject slatee,GameObject objectt, Pixel[,] array, string n)
         {
-
             objectPrefab = objectt;
             pixelClass = array;
             name = n;
@@ -177,7 +174,6 @@ public class AnalyzeImage : MonoBehaviour
             float assetWidth = screenWidth / assetCount;
             smallScreenPosition = new Vector3(assetWidth * index - screenWidth/2 + assetWidth/2, 0, 0);
             smallScreenScale = fullScreenScale / assetCount;
-            
             Minimalize();
         }
         //combine sprite array creates an texture from the supplied array of color 
@@ -293,7 +289,6 @@ public class AnalyzeImage : MonoBehaviour
             //add the int array with the name to the object that will go to the next scene where it will create the final asset
             holder.assets.Add(name,colors);
         }
-       
     }
     void Start()
     {
@@ -378,7 +373,7 @@ public class AnalyzeImage : MonoBehaviour
         //this function creates a room and returns its name
         lobby.CreateRoom();
     }
-    public void LoadSavedAssets()
+    private void LoadSavedAssets()
     {
         GameObject holder = GameObject.Find("savedAssets");
         FetchCreatedLevels dataHolder = holder.GetComponent<FetchCreatedLevels>();
@@ -396,7 +391,7 @@ public class AnalyzeImage : MonoBehaviour
             //Destroy(temp);
             GameObject parentAsset = new GameObject();
             parentAsset.transform.parent = sceneAssets.transform;
-            Prefab asset = new Prefab( slate,parentAsset, gameLevelPixels, assetNames[i],false,defaultAssets[i],defSize);
+            Prefab asset = new Prefab( slate,parentAsset, gameLevelPixels, assetNames[i]);
             asset.fullScreenScale = currentParent.transform.localScale;
             asset.AddSavedAsset(selectedLevel.assets[i]);
             assetPrefabs.Add(asset);
@@ -404,7 +399,7 @@ public class AnalyzeImage : MonoBehaviour
         FinalizeAssets();
     }
 
-    public void ShowNicknamePopup()
+    private void ShowNicknamePopup()
     {
         nicknamePopUp.SetActive(true);
     }
@@ -450,7 +445,7 @@ public class AnalyzeImage : MonoBehaviour
            SceneManager.LoadScene("ChooseLevel");
         }
     }
-    public void CreateSlateForSaved(int height)
+    private void CreateSlateForSaved(int height)
     {
         //this function is different from normal create slate bcs we coukd have had different height, and we want to match the original height
         GameObject parent = new GameObject();
@@ -475,7 +470,7 @@ public class AnalyzeImage : MonoBehaviour
         slate = parent;
     }
     //create slate is called at the start and creates a canvas of pixels to draw to
-    public void CreateSlate()
+    private void CreateSlate()
     {
         GameObject parent = new GameObject();
         parent.name = "Slate";
@@ -500,7 +495,7 @@ public class AnalyzeImage : MonoBehaviour
         
     }
 
-    public bool CheckIfBlank()
+    private bool CheckIfBlank()
     {
         //check if the player has drawn something
         foreach (var pixel in gameLevelPixels)
@@ -520,7 +515,7 @@ public class AnalyzeImage : MonoBehaviour
         warning.SetActive(false);
     }
     //refresh slate makes every pixel in the canvas white again
-    public void refreshSlate(string assetName)
+    private void refreshSlate(string assetName)
     {
         previousRaycastPos = Vector2.zero;
         foreach (var pix in gameLevelPixels)
@@ -555,9 +550,7 @@ public class AnalyzeImage : MonoBehaviour
         hasEditedAssets = true;
         int index = assetIndex;
         Prefab pref = assetPrefabs[index];
-        Pixel[,] pixArray = gameLevelPixels;
-        
-        pref.pixelClass = pixArray;
+        pref.pixelClass = gameLevelPixels;
         pref.RefreshAsset();
         MinimalizeAsset(pref);
     }
@@ -569,7 +562,6 @@ public class AnalyzeImage : MonoBehaviour
         {
             ren.material.color = Color.white;
         }
-
         reloadFrames.Clear();
     }
     //Finalize assets is called when we create all assets and we want to display them
@@ -642,7 +634,7 @@ public class AnalyzeImage : MonoBehaviour
         //Destroy(temp);
         GameObject parentAsset = new GameObject();
         parentAsset.transform.parent = sceneAssets.transform;
-        Prefab asset = new Prefab( slate,parentAsset, gameLevelPixels, assetNames[assetIndex],false,defaultAssets[assetIndex],defSize);
+        Prefab asset = new Prefab( slate,parentAsset, gameLevelPixels, assetNames[assetIndex]);
         asset.fullScreenScale = currentParent.transform.localScale;
         assetPrefabs.Add(asset);
         assetIndex++;
@@ -755,7 +747,6 @@ public class AnalyzeImage : MonoBehaviour
             }
         }
     }
-
     IEnumerator WaitForMouseUp()
     {
         //pause the recoloring of pixels until the mouse is lifted, so we dont make a spot when opening the asset
@@ -792,10 +783,7 @@ public class AnalyzeImage : MonoBehaviour
     {
         foreach (var pix in reloadThese)
         {
-            if (pix.isActive)
-            {
-                pix.ReloadColor();
-            }
+            pix.ReloadColor();
         }
         reloadThese.Clear();
     }
@@ -805,30 +793,23 @@ public class AnalyzeImage : MonoBehaviour
         goBackButton.GetComponent<GoBack>().cancelEditing = true;
         //deactivate assets and frames
         toolsScript.DisableStartGame();
-        //pref.updateSmallValues(pref.objectPrefab);
         foreach (var preff in assetPrefabs)
         {
             preff.objectPrefab.SetActive(false);
         }
-        
         foreach (var frame in frames)
         {
             frame.SetActive(false);
         }
         //activate the selected asset
-       
-            foreach (var pix in pref.pixelClass)
-            {
-                pix.Reactivate();
-            }
-        
+        foreach (var pix in pref.pixelClass)
+        {
+            pix.Reactivate();
+        }
+        //show the drawing interface again
         toolsScript.ActivateButtons();
         pref.FitTheScreen();
-        //we have to reasign the gameLevelpixels because they are used castraycast
-        //gameLevelPixels = pref.pixelClass;
-        //currentParent = pref.objectPrefab;
         displayed = false;
-        
         assetDisplayText.SetActive(true);
         TextMeshProUGUI text = assetDisplayText.GetComponent<TextMeshProUGUI>();
         text.SetText("Please draw the " + pref.name);
@@ -837,8 +818,7 @@ public class AnalyzeImage : MonoBehaviour
     {
         //update the position and scale
         toolsScript.EnableStartGame();
-       //pref.updateFullValues(pref.objectPrefab);
-       pref.ComputeMinimalize(CalculateSceneSize().x,assetPrefabs.Count,assetIndex);
+        pref.ComputeMinimalize(CalculateSceneSize().x,assetPrefabs.Count,assetIndex);
         foreach (var preff in assetPrefabs)
         {
             preff.objectPrefab.SetActive(true);
@@ -847,21 +827,22 @@ public class AnalyzeImage : MonoBehaviour
         {
             frame.SetActive(true);
         }
+        //show the overview again
         slate.SetActive(false);
         toolsScript.DeactivateButtons();
         pref.Minimalize();
         displayed = true;
-        
         assetDisplayText.SetActive(false);
     }
 
     public void ReturnFromEditing()
     {
+        //this is called from back button
         MinimalizeAsset(assetPrefabs[assetIndex]);
     }
-    //tuple allows to return two or more variables
     void FitTheScreen(GameObject parentObject, float numberX, float numberY)
    {
+        //Fit the slate to the screensize
         //calculate the scale to fit the whole screen
         if (parentObject.transform.childCount == 0)
         {
@@ -926,84 +907,61 @@ public class AnalyzeImage : MonoBehaviour
         public int startX;
         public int startY;
         public Color finalColor;
-
         public GameObject pixelObject;
-        public bool isActive = true;
         public Pixel(int x,int y,int width,Color color, GameObject parent)
         {
             //constructor
             Size = width;
-           
             startX = x;
             startY = y;
-
             finalColor = color;
-
             //create gameobject for scene
             pixelObject = new GameObject();
             pixelObject.name =  startX +":"+ startY;
             pixelObject.tag = "pixel";
-           // pixelObject.tag = "ground";
             //create texture and add it to a new sprite
             Texture2D pixelTexture = new Texture2D(Size, Size);
             //create e new color array we will supply to the texture
-            Color[] colors = new Color[Size * Size];
-            for (int i = 0; i < Size*Size; i++)
+            int arraySize = Size * Size;
+            Color[] colors = new Color[arraySize];
+            for (int i = 0; i < arraySize; i++)
             {
                 colors[i] = finalColor;
             }
-            
             pixelTexture.SetPixels(colors);
             pixelTexture.Apply();
             Sprite sprite = Sprite.Create(pixelTexture,new Rect(0, 0, Size, Size), new Vector2());
-
             //add sprite to the gameobject
             SpriteRenderer renderer =  pixelObject.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;
-            
             BoxCollider2D coll = pixelObject.AddComponent<BoxCollider2D>();
-
+            //100 pixels is 1 unity unit
             float sizeMultiplier = Size * 0.01f;
             pixelObject.transform.position = new Vector3(startY * -sizeMultiplier, startX * sizeMultiplier, 0);
             pixelObject.transform.parent = parent.transform;
         }
         public void ChangeColor(Color update)
         {
-            if (isActive)
+            int arraySize = Size * Size;
+            Color[] colors = new Color[arraySize];
+            for (int i = 0; i < arraySize; i++)
             {
-                Color[] colors = new Color[Size * Size];
-                for (int i = 0; i < Size * Size; i++)
-                {
-                    colors[i] = update;
-                }
-
-                //without .Apply it doesnt work
-                Texture2D texture = pixelObject.GetComponent<SpriteRenderer>().sprite.texture;
-                texture.SetPixels(colors);
-                texture.Apply();
+                colors[i] = update;
             }
+            //without .Apply it doesnt work
+            Texture2D texture = pixelObject.GetComponent<SpriteRenderer>().sprite.texture;
+            texture.SetPixels(colors);
+            texture.Apply();
         }
         public void ReloadColor()
         {
             //set the color to finalColor
             //we can use this function after calling an raycast and highlighting this pixel
-            Color[] colors = new Color[Size * Size];
-            for (int i = 0; i < Size*Size; i++)
-            {
-                colors[i] = finalColor;
-            }
-            //without .Apply it doesnt work
-            Texture2D texture =  pixelObject.GetComponent<SpriteRenderer>().sprite.texture;
-            texture.SetPixels(colors);
-            texture.Apply();
+            ChangeColor(finalColor);
         }
         public void Reactivate()
         {
-            if (!isActive)
-            {
-                isActive = true;
-                pixelObject.SetActive(true);
-            }
+            pixelObject.SetActive(true);
         }
     }
 }

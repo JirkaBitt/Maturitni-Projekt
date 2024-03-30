@@ -1,8 +1,7 @@
-
 using System;
 using System.Collections.Generic;
 using System.IO;
-
+using System.Linq;
 using UnityEngine;
 
 public class AssetHolder : MonoBehaviour
@@ -15,6 +14,12 @@ public class AssetHolder : MonoBehaviour
         //we want to add a number at the end to differentiate them
         int currentIndex = existingAssets.Length;
         string path = Application.persistentDataPath + "/created"+ currentIndex +".brawlGame";
+        //make sure we wont override another save
+        while (existingAssets.Contains(path))
+        {
+            currentIndex++;
+            path = Application.persistentDataPath + "/created" + currentIndex + ".brawlGame";
+        }
         FileStream file = File.Create(path);
         StreamWriter writer = new StreamWriter(file);
         //the fist line is the save name
@@ -23,7 +28,6 @@ public class AssetHolder : MonoBehaviour
         {
             //supply the int array and create a string hexadecimal representation to save space
             string saveThis = AssetToHex(asset.Value);
-            print(asset.Key + "-"+saveThis);
             writer.WriteLine(saveThis);
         }
         writer.Close();
@@ -71,9 +75,6 @@ public class AssetHolder : MonoBehaviour
         {
             return (Convert.ToChar('A' + (hex - 10))).ToString();
         }
-        else
-        {
-            return hex.ToString();
-        }
+        return hex.ToString();
     }
 }

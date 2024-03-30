@@ -386,5 +386,17 @@ public class UnusedFunctions : MonoBehaviour
 
         return shortened;
     }
+     private void DisplaySpawnPoints()
+    {
+        //this is used just to visualize the spawn point for debugging 
+        foreach (var spawn in spawnPoint)
+        {
+            GameObject dis = new GameObject();
+            SpriteRenderer rend = dis.AddComponent<SpriteRenderer>();
+            rend.sprite = myPlayer.GetComponent<SpriteRenderer>().sprite;
+            dis.transform.localScale = new Vector3(0.05f, 0.05f, 1);
+            dis.transform.position = spawn;
+        }
+    }
 */
 }

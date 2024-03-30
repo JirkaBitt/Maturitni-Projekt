@@ -1,7 +1,3 @@
-
-using System.Collections;
-
-using System.Diagnostics;
 using Photon.Pun;
 using UnityEngine;
 using Random = UnityEngine.Random;

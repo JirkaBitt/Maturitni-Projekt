@@ -11,14 +11,14 @@ public class PlayerSync : MonoBehaviourPun, IPunObservable
     //Values that will be synced over network
     Vector3 latestPos;
     Quaternion latestRot;
-    private PlayerStats stats;
+    public PlayerStats stats;
     //ignore photon is for launching the player, it will remove it for a while from the updating via network
     public bool ignorePhoton = false;
     private GameObject textHolder;
     // Use this for initialization
     void Start()
     {
-        stats = gameObject.GetComponent<PlayerStats>();
+        //stats = gameObject.GetComponent<PlayerStats>();
         gameObject.tag = "Player";
         if (!photonView.IsMine){
             //Player is Remote, deactivate the scripts and object that should only be enabled for the local player

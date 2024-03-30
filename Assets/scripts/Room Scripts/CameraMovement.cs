@@ -1,10 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Photon.Pun;
-using Photon.Realtime;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class CameraMovement : MonoBehaviourPunCallbacks
 {
@@ -24,11 +20,8 @@ public class CameraMovement : MonoBehaviourPunCallbacks
         players = GameObject.FindGameObjectsWithTag("Player");
         mainCamera = Camera.main;
         //move camera to player
-        Vector2 toPlayer = player.transform.position - mainCamera.transform.position;
-        mainCamera.transform.position += (Vector3)toPlayer;
-
+        JumpToPlayer();
     }
-    // Update is called once per frame
     void Update()
     {
         //if x values are between 0 and 1 then the player is seen by the camera
@@ -88,7 +81,6 @@ public class CameraMovement : MonoBehaviourPunCallbacks
             //some player could have left the game via crash or something else, so we have to have catch and update the players in there
             UpdatePlayers();
             Console.WriteLine(e);
-            throw;
         }
         //we want to divide cameraSize with playercount so it reflects an avarage value
         cameraSize /= ((players.Length) * cameraZoomDivider);
