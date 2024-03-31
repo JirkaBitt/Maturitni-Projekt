@@ -45,8 +45,6 @@ public class CheckGameBounds : MonoBehaviourPunCallbacks
         //delete Weapon if player is holding it
         if (weapon != null)
         {
-            //PickWeapon pickScript = other.GetComponent<PickWeapon>();
-            int photonID = weapon.GetPhotonView().ViewID;
             //Drop the Weapon and then destroy it
             gObject.GetComponent<PickWeapon>().Drop(true,weapon);
         }
