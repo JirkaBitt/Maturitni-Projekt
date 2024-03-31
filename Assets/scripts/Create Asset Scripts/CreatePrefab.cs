@@ -38,8 +38,6 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         pool.ResourceCache.Clear();
         assetData.Clear();
         //turn down the music
-        GameObject musicPlayer = GameObject.FindWithTag("music");
-        musicPlayer.GetComponent<AudioSource>().volume = 0.3f;
         for (int i = 0; i < defaults.Length; i++)
         {
             assetData.Add(defaultsNames[i],defaults[i]);
@@ -249,13 +247,14 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
                             foundCorner = true;
                             firstBlackPixelCur = new Vector2((x-firstX) * spritesWidth * 0.01f, (y-firstY) * spritesHeight * 0.01f);
                         }
+                        //set the pixels to black
                         combinedTexture.SetPixels32(x * spritesWidth - firstX * spritesWidth, y * spritesHeight - firstY *spritesHeight, spritesWidth,
                             spritesHeight,
                             black);
                     }
                     else
                     {
-                      //  set it transparent
+                        //  set it transparent
                         combinedTexture.SetPixels32(x * spritesWidth- firstX * spritesWidth, y * spritesHeight - firstY *spritesHeight, spritesWidth,
                             spritesHeight,
                             transparent);
@@ -288,12 +287,12 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             }
             //this is the width of one pixel in pixels(not unity units)
             float pixWidth = combinedTexture.width / texturePixelSize.x;
-           //go from the middle of the sprite to the bottom corner and from there navigate with firstblackPixel to the first corner of the real sprite, that is the starting position
-           //find the offset of the texture and the coordinates of the first black pixel, so that we can allign the collider
-           firstBlackPixelCur = (Vector2)final.bounds.center -
+            //go from the middle of the sprite to the bottom corner and from there navigate with firstblackPixel to the first corner of the real sprite, that is the starting position
+            //find the offset of the texture and the coordinates of the first black pixel, so that we can allign the collider
+            firstBlackPixelCur = (Vector2)final.bounds.center -
                new Vector2(combinedTexture.width / 2, combinedTexture.height / 2) * 0.01f + firstBlackPixelCur;
          
-           CreatePollygonCollider(pixWidth,firstBlackPixelCur,attach, colorsRPC);
+            CreatePollygonCollider(pixWidth,firstBlackPixelCur,attach, colorsRPC);
     }
     private Vector2[] GetColliderPoints(ref int[,] array)
     {

@@ -127,7 +127,7 @@ public class PlayerMovement : MonoBehaviour
     {
         dashAvailable = false;
         //create a trail behind the player
-        gameObject.GetComponent<CreateTrail>().ShowTrail();
+        gameObject.GetComponent<CreateTrail>().ShowDash();
         if (playerFacing == 0)
         {
             //dash right

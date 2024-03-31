@@ -297,7 +297,6 @@ public class AnalyzeImage : MonoBehaviour
         sceneAssets.name = "Scene Assets";
         sceneAssets.tag = "created";
         toolsScript = buttonUI.GetComponent<ChangeTools>();
-       
         if (loadLevelsFromSaves)
         {
             LoadSavedAssets();

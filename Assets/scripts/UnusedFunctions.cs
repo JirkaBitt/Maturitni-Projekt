@@ -398,5 +398,18 @@ public class UnusedFunctions : MonoBehaviour
             dis.transform.position = spawn;
         }
     }
+    IEnumerator FallDownCoroutine()
+    {
+        yield return new WaitForSeconds(0.5f);
+        oneCopyDuration *= 2;
+        falling = true;
+        while (falling)
+        {
+            StartCoroutine(CreateCopy(whiteSprite));
+            yield return new WaitForSeconds(0.02f);
+        }
+        DestroyAllCopies();
+        oneCopyDuration /= 2;
+    }
 */
 }

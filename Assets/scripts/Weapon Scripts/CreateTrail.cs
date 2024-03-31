@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,7 @@ public class CreateTrail : MonoBehaviour
 {
     //white sprite is the copy of the original sprite with changed color
     public Sprite whiteSprite;
+    public Sprite dashSprite;
     //how long should one copy live
     public float oneCopyDuration;
     //the number of copies that will be created
@@ -16,6 +18,7 @@ public class CreateTrail : MonoBehaviour
     public bool fadeSprite = true;
     //the color of the trail, player has red weapons white
     public Color trailColor = Color.white;
+    public Color dashColor = Color.green;
     //list of the instantiated copies 
     private List<GameObject> createdCopies = new List<GameObject>();
     public void CreateTexture()
@@ -41,6 +44,30 @@ public class CreateTrail : MonoBehaviour
         newTex.SetPixels(texColors);
         newTex.Apply();
         whiteSprite = Sprite.Create(newTex, originalSprite.rect, new Vector2(0.5f, 0.5f));
+        if (gameObject.CompareTag("Player"))
+        {
+            CreateDashTexture();
+        }
+    }
+    public void CreateDashTexture()
+    {
+        SpriteRenderer rend = gameObject.GetComponent<SpriteRenderer>();
+        Texture2D tex = rend.sprite.texture;
+        Color[] texColors = tex.GetPixels();
+        float texLength = texColors.Length;
+        //change every black pixel to the corresponding color
+        for (int i = 0; i < texLength; i++)
+        {
+            if (texColors[i] == Color.black)
+            {
+                texColors[i] = dashColor;
+            }
+        }
+        Sprite originalSprite = rend.sprite;
+        Texture2D newTex = new Texture2D(tex.width,tex.height);
+        newTex.SetPixels(texColors);
+        newTex.Apply();
+        dashSprite = Sprite.Create(newTex, originalSprite.rect, new Vector2(0.5f, 0.5f));
     }
     IEnumerator CreateCopy(Sprite sprite)
     {
@@ -69,35 +96,38 @@ public class CreateTrail : MonoBehaviour
         createdCopies.Remove(copy);
         Destroy(copy);
     }
-
-    IEnumerator CreateTrailCoroutine()
+    IEnumerator CreateTrailCoroutine(Sprite trail)
     {
         for (int i = 0; i < numberOfCopies; i++)
         {
-            StartCoroutine(CreateCopy(whiteSprite));
+            StartCoroutine(CreateCopy(trail));
             yield return new WaitForSeconds(0.02f);
         }
     }
-
-    public void ShowTrail()
+    private void DestroyAllCopies()
     {
-        StartCoroutine(CreateTrailCoroutine());
-    }
-
-    private void OnDisable()
-    {
-        //if the Weapon gets deleted while we are attacking we have to delete the trail afterwards
         foreach (var copy in createdCopies)
         {
             Destroy(copy);
         }
+    }
+    public void ShowTrail()
+    {
+        StartCoroutine(CreateTrailCoroutine(whiteSprite));
+    }
+
+    public void ShowDash()
+    {
+        StartCoroutine(CreateTrailCoroutine(dashSprite));
+    }
+    private void OnDisable()
+    {
+        //if the Weapon gets deleted while we are attacking we have to delete the trail afterwards
+        DestroyAllCopies();
     }
     private void OnDestroy()
     {
         //if the Weapon gets deleted while we are attacking we have to delete the trail afterwards
-        foreach (var copy in createdCopies)
-        {
-            Destroy(copy);
-        }
+        DestroyAllCopies();
     }
 }

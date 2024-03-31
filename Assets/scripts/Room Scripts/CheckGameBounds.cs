@@ -18,7 +18,6 @@ public class CheckGameBounds : MonoBehaviourPunCallbacks
             //dont delete bombs, bombs change to trigger and that triggers this deletion
             if (gObject.transform.parent == null && gObject.GetPhotonView().IsMine && !gObject.name.Contains("Bomb") && !gObject.name.Contains("Boom"))
             {
-                print(gObject.name + "Deleted");
                 PhotonNetwork.Destroy(gObject);
             }
             return;

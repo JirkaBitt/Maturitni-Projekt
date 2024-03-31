@@ -44,6 +44,8 @@ public class RoomController : MonoBehaviourPunCallbacks
         //set the default fps to 60
         Application.targetFrameRate = 60;
         inGameUI.SetActive(true);
+        GameObject musicPlayer = GameObject.FindWithTag("music");
+        musicPlayer.GetComponent<AudioSource>().volume = 0.8f;
         //In case we started this demo with the wrong scene being active, simply load the menu scene
         if (PhotonNetwork.CurrentRoom == null)
         {
@@ -51,36 +53,34 @@ public class RoomController : MonoBehaviourPunCallbacks
             SceneManager.LoadScene("ChooseLevel");
             return;
         }
-        if (PhotonNetwork.IsMasterClient)
-        {
-            //spawn character, this is only for the room creator, others are created in OnJoinedRoom
-            PhotonNetwork.InstantiateRoomObject("Arena", Vector3.zero, Quaternion.identity);
-            print("instantiate from start");
-            spawnPoint = FindRespawnPositions();
-            //spawn the player
-            int randonSpawn = Random.Range(0, spawnPoint.Length);
-            GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[randonSpawn], Quaternion.identity);
-            //we have to assign the position again, bcs it can spawn us in the middle of the platform
-            player.transform.position = spawnPoint[randonSpawn];
-            myPlayer = player;
-            //disable some scripts before the start
-            BeforeStart(player);
-            PhotonView playerView = player.GetPhotonView();
-            //name him after the player so we can find him in onGUI
-            CameraMovement camScript = Camera.main.GetComponent<CameraMovement>();
-            camScript.enabled = true;
-            camScript.player = player;
-            camScript.rb = player.GetComponent<Rigidbody2D>();
-            //we have to call it on create prefabs because room controller is disabled at the start of the game
-            string playerID = PhotonNetwork.LocalPlayer.UserId;
-            //we want to rename the player on all clients to his id and change his texture to the one the player has drawn
-            CreatePrefabs.GetComponent<CreatePrefab>().RenamePlayer(playerID, playerView.ViewID,PhotonNetwork.LocalPlayer.NickName);
-            displayIcons.GetComponent<DisplayPlayerStats>().AddPlayerTexture(playerID);
-        }
-        else
+
+        if (!PhotonNetwork.IsMasterClient)
         {
             JoinedFromCreate();
         }
+        //spawn character, this is only for the room creator, others are created in OnJoinedRoom
+        PhotonNetwork.InstantiateRoomObject("Arena", Vector3.zero, Quaternion.identity);
+        print("instantiate from start");
+        spawnPoint = FindRespawnPositions();
+        //spawn the player
+        int randonSpawn = Random.Range(0, spawnPoint.Length);
+        GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[randonSpawn], Quaternion.identity);
+        //we have to assign the position again, bcs it can spawn us in the middle of the platform
+        player.transform.position = spawnPoint[randonSpawn];
+        myPlayer = player;
+        //disable some scripts before the start
+        BeforeStart(player);
+        PhotonView playerView = player.GetPhotonView();
+        //name him after the player so we can find him in onGUI
+        CameraMovement camScript = Camera.main.GetComponent<CameraMovement>();
+        camScript.enabled = true;
+        camScript.player = player;
+        camScript.rb = player.GetComponent<Rigidbody2D>();
+        //we have to call it on create prefabs because room controller is disabled at the start of the game
+        string playerID = PhotonNetwork.LocalPlayer.UserId;
+        //we want to rename the player on all clients to his id and change his texture to the one the player has drawn
+        CreatePrefabs.GetComponent<CreatePrefab>().RenamePlayer(playerID, playerView.ViewID,PhotonNetwork.LocalPlayer.NickName);
+        displayIcons.GetComponent<DisplayPlayerStats>().AddPlayerTexture(playerID);
     }
     public void Leave()
     {
@@ -93,7 +93,6 @@ public class RoomController : MonoBehaviourPunCallbacks
         photonView.RPC("UpdateCameraPlayers",RpcTarget.All);
         SceneManager.LoadScene("ChooseLevel");
     }
-
     public void JoinedFromCreate()
     {
         base.OnJoinedRoom();
@@ -128,38 +127,35 @@ public class RoomController : MonoBehaviourPunCallbacks
 
     IEnumerator SpawnWeapon()
     { 
-        while (true)
+        while (spawningEnabled)
         {
            //only the master client can spawn weapons, this is here because when master leaves, someone else will be master
            while (!PhotonNetwork.IsMasterClient)
            {
                yield return new WaitForSeconds(5);
            }
-           if (spawningEnabled)
+           GameObject[] weapons = GameObject.FindGameObjectsWithTag("weapon");
+           while (weapons.Length >= maxWeaponCount)
            {
-               GameObject[] weapons = GameObject.FindGameObjectsWithTag("weapon");
-               while (weapons.Length >= maxWeaponCount)
-               {
-                   yield return new WaitForSeconds(5);
-                   weapons = GameObject.FindGameObjectsWithTag("weapon");
-                   if (!spawningEnabled)
-                   {
-                       break;
-                   }
-               }
-               //it can happen that we will have max weapons and when we destroy them that we get here because we are in the previos loop, so we want to skip this iteration, because it would spawn a Weapon when we are showing the results
+               yield return new WaitForSeconds(5);
+               weapons = GameObject.FindGameObjectsWithTag("weapon");
                if (!spawningEnabled)
                {
-                   continue;
+                   break;
                }
-               int randomWeaponIndex = Random.Range(0, WeaponNames.Length);
-               //find random spawn position
-               int randomSpawnIndex = Random.Range(0, spawnPoint.Length);
-               //spawn the Weapon, we want it as a room object so when master leaves it does not destroy all the weapons
-               GameObject weapon = PhotonNetwork.InstantiateRoomObject(WeaponNames[randomWeaponIndex],
-                   spawnPoint[randomSpawnIndex],
-                   Quaternion.identity, 0);
            }
+           //it can happen that we will have max weapons and when we destroy them that we get here because we are in the previos loop, so we want to skip this iteration, because it would spawn a Weapon when we are showing the results
+           if (!spawningEnabled)
+           {
+               continue;
+           }
+           int randomWeaponIndex = Random.Range(0, WeaponNames.Length);
+           //find random spawn position
+           int randomSpawnIndex = Random.Range(0, spawnPoint.Length);
+           //spawn the Weapon, we want it as a room object so when master leaves it does not destroy all the weapons
+           GameObject weapon = PhotonNetwork.InstantiateRoomObject(WeaponNames[randomWeaponIndex],
+               spawnPoint[randomSpawnIndex],
+               Quaternion.identity, 0);
            int randomWait = Random.Range(8, 15);
            yield return new WaitForSeconds(randomWait);
         }
@@ -411,7 +407,5 @@ public class RoomController : MonoBehaviourPunCallbacks
         }
         myPlayer = null;
         //stop the coroutine, so that if we play again the weapons dont spawn twice
-        StopCoroutine("SpawnWeapon");
-       
     }
 }

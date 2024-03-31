@@ -1,6 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 public class Lobby : MonoBehaviourPunCallbacks
@@ -12,6 +14,8 @@ public class Lobby : MonoBehaviourPunCallbacks
     List<RoomInfo> createdRooms = new List<RoomInfo>();
     //use this name when creating a Room
     string roomName = "Room 1";
+    //Gameobjects that display network status
+    public GameObject[] networkStatus;
     void Start()
     {
         //this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
@@ -20,14 +24,23 @@ public class Lobby : MonoBehaviourPunCallbacks
         {
             //set the App version before connecting
             PhotonNetwork.PhotonServerSettings.AppSettings.AppVersion = gameVersion;
-            //connect to the photon masterserver
-            PhotonNetwork.ConnectUsingSettings();
+            //connect to the photon master server
+            StartCoroutine(TryConnect());
+        }
+        else
+        {
+            //we are connected, display it
+            networkStatus[0].SetActive(false);
+            networkStatus[1].SetActive(true);
         }
     }
     public override void OnConnectedToMaster()
     {
         //after we connected to Master server, join the Lobby
         PhotonNetwork.JoinLobby(TypedLobby.Default);
+        //display connect status
+        networkStatus[0].SetActive(false);
+        networkStatus[1].SetActive(true);
     }
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
@@ -87,5 +100,15 @@ public class Lobby : MonoBehaviourPunCallbacks
         //load the game
         PhotonNetwork.LoadLevel("GameLevel");
        
+    }
+
+    IEnumerator TryConnect()
+    {
+        //try to connect to photon servers, if it fails, try it again after 5 seconds
+        while (!PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.ConnectUsingSettings();
+            yield return new WaitForSeconds(5);
+        }
     }
 }
