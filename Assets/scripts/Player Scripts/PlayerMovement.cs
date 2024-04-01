@@ -17,8 +17,6 @@ public class PlayerMovement : MonoBehaviour
     //the nameholder that displays the player nickname
     public GameObject nameBar;
     private Animator animator;
-    //particles that play when we Jump
-    private ParticleSystem particles;
     private void Awake()
     {
         rb = gameObject.GetComponent<Rigidbody2D>();
@@ -26,8 +24,6 @@ public class PlayerMovement : MonoBehaviour
         {
              nameBar = gameObject.transform.GetChild(0).gameObject;
         }
-        particles = gameObject.GetComponent<ParticleSystem>();
-        MoveParticlesToFeet();
     }
 
     void Update()
@@ -54,7 +50,6 @@ public class PlayerMovement : MonoBehaviour
     }
     void Jump(float force)
     {
-        particles.Play();
         rb.AddForce(new Vector3(0, force, 0));
         performedJumps++;
     }
@@ -114,14 +109,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         
-    }
-
-    void MoveParticlesToFeet()
-    {
-        Collider2D coll = gameObject.GetComponent<Collider2D>();
-        float height = coll.bounds.size.y;
-        //move the particles below the feet
-        particles.transform.position = gameObject.transform.position - new Vector3(0, height / 2 + 0.2f, 0);
     }
     IEnumerator PerformDash()
     {
