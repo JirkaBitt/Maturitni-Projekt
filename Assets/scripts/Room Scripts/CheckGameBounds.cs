@@ -61,8 +61,13 @@ public class CheckGameBounds : MonoBehaviourPunCallbacks
     public void AddScore(int addObj, int removeObj, bool hasAttacker)
     {
         //add a point for the attacker and remove one for the defeated
-        GameObject defeated = PhotonView.Find(removeObj).gameObject;
-        PlayerStats defeatedStats = defeated.GetComponent<PlayerStats>();
+        PhotonView defeatedView = PhotonView.Find(removeObj);
+        //it can happen when player is leaving that this gets called and the player does not exist anymore, so check if the player exists
+        if (defeatedView == null)
+        {
+            return;
+        }
+        PlayerStats defeatedStats = defeatedView.gameObject.GetComponent<PlayerStats>();
         defeatedStats.score -= 1;
         defeatedStats.percentage = 0;
         if (hasAttacker)

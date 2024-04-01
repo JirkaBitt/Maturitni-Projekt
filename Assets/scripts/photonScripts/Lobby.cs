@@ -14,6 +14,8 @@ public class Lobby : MonoBehaviourPunCallbacks
     List<RoomInfo> createdRooms = new List<RoomInfo>();
     //use this name when creating a Room
     string roomName = "Room 1";
+    //check if we are in the menu where we can display network status
+    public bool isMenu = false;
     //Gameobjects that display network status
     public GameObject[] networkStatus;
     void Start()
@@ -27,7 +29,7 @@ public class Lobby : MonoBehaviourPunCallbacks
             //connect to the photon master server
             StartCoroutine(TryConnect());
         }
-        else
+        else if(isMenu)
         {
             //we are connected, display it
             networkStatus[0].SetActive(false);
@@ -39,8 +41,11 @@ public class Lobby : MonoBehaviourPunCallbacks
         //after we connected to Master server, join the Lobby
         PhotonNetwork.JoinLobby(TypedLobby.Default);
         //display connect status
-        networkStatus[0].SetActive(false);
-        networkStatus[1].SetActive(true);
+        if (isMenu)
+        {
+            networkStatus[0].SetActive(false);
+            networkStatus[1].SetActive(true);
+        }
     }
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
