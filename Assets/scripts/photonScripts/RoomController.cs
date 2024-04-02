@@ -57,10 +57,11 @@ public class RoomController : MonoBehaviourPunCallbacks
         if (!PhotonNetwork.IsMasterClient)
         {
             JoinedFromCreate();
+            return;
         }
+        //This is the master client
         //spawn character, this is only for the room creator, others are created in OnJoinedRoom
         PhotonNetwork.InstantiateRoomObject("Arena", Vector3.zero, Quaternion.identity);
-        print("instantiate from start");
         spawnPoint = FindRespawnPositions();
         //spawn the player
         int randonSpawn = Random.Range(0, spawnPoint.Length);

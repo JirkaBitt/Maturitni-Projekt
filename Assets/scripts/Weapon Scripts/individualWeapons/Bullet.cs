@@ -37,7 +37,7 @@ public class Bullet : MonoBehaviour
                 //hit the player
                 PhotonView enemyPhotonView = hit.GetPhotonView();
                 float RandomMult = Random.Range(5, 10) / 10f;
-                photonView.RPC("AddForceBullet", RpcTarget.AllViaServer, enemyPhotonView.ViewID, launchVector, 30f * RandomMult);
+                photonView.RPC("AddForceBullet", RpcTarget.AllViaServer, enemyPhotonView.ViewID, launchVector, 20f * RandomMult);
                 
             }
             if (hit.CompareTag("ground"))
