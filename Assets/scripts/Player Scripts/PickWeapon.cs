@@ -21,13 +21,14 @@ public class PickWeapon : MonoBehaviour
     public GameObject currentWeapon;
     private PhotonView playerView;
     private bool coolDown = false;
+    public bool isEnemyAI = false;
     void Start()
     {
         playerView = gameObject.GetPhotonView();
     }
     void Update()
     {
-        if (!playerView.IsMine || coolDown)
+        if (!playerView.IsMine || coolDown || isEnemyAI)
         {
             return;
         }
@@ -44,15 +45,7 @@ public class PickWeapon : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.E) && !isHoldingWeapon)
             {
-                //we have to use ids because we are sending them over the network
-                int pickedWeaponID = weaponInRange.GetComponent<PhotonView>().ViewID;
-                int currentPlayerID = gameObject.GetComponent<PhotonView>().ViewID;
-                PhotonView photonView = PhotonView.Get(this);
-                //we cannot send gameobject in RPC so we have to use photonviewID
-                //it does not need to be buffered bcs all players are in room
-                photonView.RPC("AssignPlayerWeapon", RpcTarget.All, currentPlayerID, pickedWeaponID);
-                coolDown = true;
-                StartCoroutine(CoolDown());
+                Pick(weaponInRange);
                 return;
             }
         }
@@ -63,6 +56,19 @@ public class PickWeapon : MonoBehaviour
             //WaitForIsUsing prevents the player from spamming attacks
             StartCoroutine(WaitForIsUsing());
         }
+    }
+
+    public void Pick(GameObject weapon)
+    {
+        //we have to use ids because we are sending them over the network
+        int pickedWeaponID = weapon.GetComponent<PhotonView>().ViewID;
+        int currentPlayerID = gameObject.GetComponent<PhotonView>().ViewID;
+        PhotonView photonView = PhotonView.Get(this);
+        //we cannot send gameobject in RPC so we have to use photonviewID
+        //it does not need to be buffered bcs all players are in room
+        photonView.RPC("AssignPlayerWeapon", RpcTarget.All, currentPlayerID, pickedWeaponID);
+        coolDown = true;
+        StartCoroutine(CoolDown());
     }
     //PunRPC mark is used that we can send this script over the network for other instances to call 
     [PunRPC] public void AssignPlayerWeapon(int playerID, int weaponID)
@@ -125,6 +131,12 @@ public class PickWeapon : MonoBehaviour
             lifeBar.transform.parent = weaponX.transform;
             Destroy(weaponX);
             lifeBar = null;
+        }
+
+        if (isEnemyAI)
+        {
+            //say the AI that we dont have a weapon and find a new one
+            gameObject.GetComponent<AIBehaviourTree>().LoseWeapon();
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)

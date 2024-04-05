@@ -31,14 +31,12 @@ public class Axe : MeleeWeapon
             {
                 //we have confirmed that this is an enemy
                 enemyInRange = possibleEnemy;
-               
                 if (triggerLaunch)
                 {
                     Vector3 launchV = ComputeLaunchVector();
                     LaunchEnemy(enemyInRange, launchV, 40);
                     triggerLaunch = false;
                 }
-
             }
         }
     }
@@ -79,5 +77,4 @@ public class Axe : MeleeWeapon
             StartCoroutine(WaitForDamage());
         }
     }
-    
 }

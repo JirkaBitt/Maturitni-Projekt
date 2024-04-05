@@ -41,14 +41,8 @@ public abstract class ConsumableWeapon : Weapon
         Vector3 throwVector = new Vector3(gameObject.transform.right.x, 2, 0);
         weaponRB.AddForce(throwVector * distance);
         //make the gameobject non trigger so it stops when it hits the ground
-        if (gameObject.GetComponent<CircleCollider2D>() != null)
-        {
-            gameObject.GetComponent<CircleCollider2D>().isTrigger = false;
-        }
-        if (gameObject.GetComponent<PolygonCollider2D>() != null)
-        {
-            gameObject.GetComponent<PolygonCollider2D>().isTrigger = false;
-        }
+        gameObject.GetComponent<PolygonCollider2D>().isTrigger = false;
+        
     }
     
 }

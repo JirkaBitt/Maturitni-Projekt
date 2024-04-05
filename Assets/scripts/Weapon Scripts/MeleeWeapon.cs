@@ -33,7 +33,16 @@ public abstract class MeleeWeapon : Weapon
       enemy.GetComponent<CreateTrail>().ShowTrail();
       rb.AddForce(launchVector * (force*10 + stats.percentage*2));
       //we want to remove gravity from the enemy as he is launched
-      enemy.GetComponent<PlayerMovement>().RemoveGrav(force + stats.percentage, enemy);
+      if (enemy.TryGetComponent<PlayerMovement>(out var playerMov))
+      {
+          //this is a real player
+          playerMov.RemoveGrav(force + stats.percentage, enemy);
+      }
+      else
+      {
+         //this is a bot
+         enemy.GetComponent<PathFinder>().AIRemoveGravity(force + stats.percentage, enemy);
+      }
    }
 
 }
