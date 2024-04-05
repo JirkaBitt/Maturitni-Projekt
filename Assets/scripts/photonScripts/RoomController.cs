@@ -335,6 +335,7 @@ public class RoomController : MonoBehaviourPunCallbacks
             //only the master will spawn the weapons, but we want to run it at all clients in case that one of them bbecomes master
             StartCoroutine(SpawnWeapon());
         }
+        PrepareEnemyAI();
     }
     public void CallEndGame()
     {
@@ -408,5 +409,10 @@ public class RoomController : MonoBehaviourPunCallbacks
         }
         myPlayer = null;
         //stop the coroutine, so that if we play again the weapons dont spawn twice
+    }
+    void PrepareEnemyAI()
+    {
+        GameObject enemy = GameObject.Find("Enemy");
+        enemy.GetComponent<AIBehaviourTree>().SetUpEnemy();
     }
 }

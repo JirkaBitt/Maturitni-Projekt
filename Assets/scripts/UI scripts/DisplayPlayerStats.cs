@@ -94,7 +94,10 @@ public class DisplayPlayerStats : MonoBehaviourPunCallbacks
             if (PhotonNetwork.PlayerList[i].UserId == id)
             {
                 playerNicknames.Add(id,PhotonNetwork.PlayerList[i].NickName);
+                break;
             }
+            //if none of the userIDs match then it is a bot
+            playerNicknames.Add(id, "Bot");
         }
     }
 }

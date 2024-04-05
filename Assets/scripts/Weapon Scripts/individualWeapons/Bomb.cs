@@ -14,7 +14,7 @@ public class Bomb : ConsumableWeapon
     }
     [PunRPC]public void UseRPC()
     {
-        GameObject player = transform.parent.gameObject;
+        GameObject player = gameObject.transform.parent.gameObject;
         ThrowWeapon(200);
         AddTrail(gameObject);
         //update all scripts
@@ -24,6 +24,10 @@ public class Bomb : ConsumableWeapon
         pickscript.isHoldingWeapon = false;
         pickscript.currentWeapon = null;
         pickscript.DeleteLifeBar();
+        if (player.TryGetComponent<AIBehaviourTree>(out var AITree))
+        {
+            AITree.LoseWeapon();
+        }
         //detonate the Weapon
         StartCoroutine(BlowUp(3));
     }

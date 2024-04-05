@@ -31,6 +31,8 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
     public GameObject loadingScreen;
     //the size of the player, we have to remember it bcs we will be resizing the other players when theirs texture is changed
     private Vector2 characterSize;
+
+    public int[,] arenaInt;
     void Start()
     {
         //we want to reset the dictionaries, photon remembers them when we load the scene again
@@ -142,6 +144,10 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         newAsset = Instantiate(newAsset);
         AssetInfo info = newAsset.GetComponent<AssetInfo>();
         newAsset.name = nameRPC;
+        if (nameRPC == "Arena")
+        {
+            arenaInt = (int[,])colorsRPC.Clone();
+        }
         //create and assign the texture to this asset, it will also create a new polygon collider
         CombineSpriteArray(newAsset, colorsRPC);
         //resize the asset to the size of the original set size
