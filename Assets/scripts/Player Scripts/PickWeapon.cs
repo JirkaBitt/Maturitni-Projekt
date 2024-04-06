@@ -116,6 +116,11 @@ public class PickWeapon : MonoBehaviour
         stats.currentWeapon = null;
         isHoldingWeapon = false;
         currentWeapon = null;
+        if (isEnemyAI)
+        {
+            //say the AI that we dont have a weapon and find a new one
+            gameObject.GetComponent<AIBehaviourTree>().LoseWeapon();
+        }
         if (!delete)
         {
             weaponX.transform.parent = null;
@@ -131,12 +136,6 @@ public class PickWeapon : MonoBehaviour
             lifeBar.transform.parent = weaponX.transform;
             Destroy(weaponX);
             lifeBar = null;
-        }
-
-        if (isEnemyAI)
-        {
-            //say the AI that we dont have a weapon and find a new one
-            gameObject.GetComponent<AIBehaviourTree>().LoseWeapon();
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)

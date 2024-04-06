@@ -112,11 +112,11 @@ public class PathFinder : MonoBehaviour
     {
         return StartCoroutine(Follow(target));
     }
-    public void MoveTo(Vector2 end)
+    public void MoveTo(GameObject target)
     {
         stopSearch = false;
         //return the path from start to end with points being at the turns
-        end = WorldToMatrix(end);
+        Vector2 end = WorldToMatrix(target.transform.position);
         if (!IsInOriginalBounds(end))
         {
             //check if we are in the bounds of the original not extended area, if not do not follow him, he could be falling down
@@ -152,7 +152,7 @@ public class PathFinder : MonoBehaviour
         {
             StopCoroutine(oldWalk);
         }
-        oldWalk = StartCoroutine(Walk(route));
+        oldWalk = StartCoroutine(Walk(route, target));
     }
     IEnumerator Jump()
     {
@@ -206,12 +206,12 @@ public class PathFinder : MonoBehaviour
         {
             if (target != null)
             {
-                 MoveTo(target.transform.position);
+                 MoveTo(target);
             }
             yield return new WaitForSeconds(1);
         }
     }
-    IEnumerator Walk(Vector2[] route)
+    IEnumerator Walk(Vector2[] route, GameObject target)
     {
         //iterate over the found vectors and set them as the walkPosition that is resolved in update
         float acceptableDistance = 0.4f;
@@ -219,13 +219,18 @@ public class PathFinder : MonoBehaviour
         {
             Vector2 position = route[i];
             WalkPosition = MatrixToWorld(position);
-            if (i == route.Length - 1)
-            {
-                //the last time we can stand further for a space to attack
-                acceptableDistance = 1.4f;
-            }
+            
             yield return new WaitUntil(() => ((Vector2)gameObject.transform.position - WalkPosition).magnitude < acceptableDistance);
             WalkPosition = Vector2.zero;
+            if (target.CompareTag("Player"))
+            {
+                Vector2 diff = (Vector2)target.transform.position - (Vector2)gameObject.transform.position;
+                if (diff.magnitude < 1.8f)
+                {
+                    //we are close enough to the player
+                     yield break;
+                }
+            }
         }
     }
     public Vector2 WorldToMatrix(Vector2 world)

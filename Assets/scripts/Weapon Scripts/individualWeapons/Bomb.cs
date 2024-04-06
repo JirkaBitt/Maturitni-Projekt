@@ -43,7 +43,7 @@ public class Bomb : ConsumableWeapon
         rb.velocity = Vector2.zero;
         //set exploded to true so we check it in ontrigger enter
        
-        coll.isTrigger = true;
+        Destroy(coll);
         //make the Bomb invisible, we cannot destroy it because the script is tied to it, we will destroy it with the explosion
         SpriteRenderer renderer = gameObject.GetComponent<SpriteRenderer>();
         renderer.enabled = false;

@@ -9,9 +9,11 @@ public class AIBehaviourTree : MonoBehaviour
     public CreatePrefab createScript;
     public PathFinder finder;
     public PickWeapon pickScript;
+    public DisplayPlayerStats displayStats;
     private bool hasWeapon = false;
     private GameObject currentWeapon;
     private Coroutine oldPlayer;
+    public string name = "bot";
     void Start()
     {
         
@@ -33,6 +35,8 @@ public class AIBehaviourTree : MonoBehaviour
         AdjustOffsets(3);
         finder.AddBarier(3,createScript.arenaInt);
         StartCoroutine(EnemyAI());
+        gameObject.name = name;
+        displayStats.AddPlayer(name);
     }
 
     IEnumerator EnemyAI()
@@ -86,12 +90,12 @@ public class AIBehaviourTree : MonoBehaviour
         {
             if (currentWeapon == null)
             {
-                hasWeapon = false;
-                break;
+                LoseWeapon();
+                yield break;
             }
             //attack player based on the radius of weapon 
-            float proximity = currentWeapon.name.Contains("Gun") ? 5 : 1.8f;
-            proximity = currentWeapon.name.Contains("Gun") ? 3 : proximity;
+            float proximity = currentWeapon.name.Contains("Gun") ? 6 : 2.2f;
+            proximity = currentWeapon.name.Contains("Bomb") ? 4 : proximity;
             yield return new WaitUntil((() => CheckProximity(proximity, players)));
             //we are in a proximity of a player
             if (currentWeapon != null)
@@ -101,7 +105,7 @@ public class AIBehaviourTree : MonoBehaviour
             }
             else
             {
-                hasWeapon = false;
+                LoseWeapon();
             }
             yield return new WaitForSeconds(0.8f);
         }
@@ -126,61 +130,75 @@ public class AIBehaviourTree : MonoBehaviour
     IEnumerator EnemyPickWeapon()
     {
         //find weapon to pick
-        GameObject[] weapons = GameObject.FindGameObjectsWithTag("weapon");
-        while (weapons.Length == 0)
-        {
-            weapons = GameObject.FindGameObjectsWithTag("weapon");
-            yield return new WaitForSeconds(1);
-        }
         GameObject weapon = null;
-        float lowestDistance = 100000;
-        for (int i = 0; i < weapons.Length; i++)
+        while (weapon == null)
         {
-            //find the closest weapon that isnt picked
-            if (weapons[i].transform.parent != null)
+            GameObject[] weapons = GameObject.FindGameObjectsWithTag("weapon");
+            while (weapons.Length == 0)
             {
-                continue;
+                weapons = GameObject.FindGameObjectsWithTag("weapon");
+                yield return new WaitForSeconds(1);
             }
-            float currDistance = (weapons[i].transform.position - gameObject.transform.position).magnitude;
-            if (currDistance < lowestDistance)
+            //GameObject weapon = null;
+            float lowestDistance = 100000;
+            for (int i = 0; i < weapons.Length; i++)
             {
-                //we found a closer weapon
-                lowestDistance = currDistance;
-                weapon = weapons[i];
+                //find the closest weapon that isnt picked
+                if (weapons[i].transform.parent != null)
+                {
+                    continue;
+                }
+                float currDistance = (weapons[i].transform.position - gameObject.transform.position).magnitude;
+                //check if the collider for the weapon exists, if not it is a thrown bomb
+                if (currDistance < lowestDistance && weapons[i].TryGetComponent<PolygonCollider2D>(out var weaponCollider))
+                {
+                    //we found a closer weapon
+                    if (weaponCollider.isTrigger)
+                    {
+                        //if it is not trigger then it is a thrown bomb
+                         lowestDistance = currDistance;
+                         weapon = weapons[i];
+                    }
+                }
+            } 
+            if (weapon == null)
+            {
+                //we have not found a weapon, wait a second before trying again
+                yield return new WaitForSeconds(1);
             }
         }
-
         PolygonCollider2D myColl = gameObject.GetComponent<PolygonCollider2D>();
         PolygonCollider2D weaponColl = weapon.GetComponent<PolygonCollider2D>();
         Coroutine followCoroutine = finder.StartFollow(weapon);
-        yield return new WaitUntil(() => weapon == null ||
+        yield return new WaitUntil(() => weapon == null  ||
             myColl.IsTouching(weaponColl) ||
             weapon.transform.parent != null);
         //check if the weapon wasnt destroyed
         if (weapon == null)
         {
-            EnemyPickWeapon();
+            finder.StopThisCoroutine(followCoroutine);
+            StartCoroutine(EnemyPickWeapon());
             yield break;
         }
         //one of two things happened, either we are close to the weapon to pick it up, or someone else picked it 
         //check if the weapon is able to be picked, if th collider is not trigger it means that it is a bomb that was thrown
-        if (weapon.transform.parent == null && weaponColl.isTrigger)
+        if (weapon.transform.parent == null && weaponColl !=  null && weaponColl.isTrigger)
         {
             //we are ok to pick it, stop the movement
             finder.StopThisCoroutine(followCoroutine);
             //now pick the weapon
             pickScript.Pick(weapon);
             currentWeapon = weapon;
+            hasWeapon = true;
         }
         else
         {
             //someone else picked it, we want to start again and find new weapon
-            EnemyPickWeapon();
+            finder.StopThisCoroutine(followCoroutine);
+            StartCoroutine(EnemyPickWeapon());
+            yield break;
         }
-        //here we will add a callback, we finally have a weapon and can attack the player
-        hasWeapon = true;
     }
-
     void AdjustOffsets(int spaceBetween)
     {
         int[,] colors = createScript.arenaInt;
@@ -224,8 +242,6 @@ public class AIBehaviourTree : MonoBehaviour
         float offsetFromMiddleX = ((lastX - firstX)/2f + firstX) * onePixelOffset;
         float offsetFromMiddleY = ((lastY - firstY)/2f + firstY) * onePixelOffset;
         GameObject arena = GameObject.FindWithTag("ground");
-        Vector2 offset = new Vector2(length,height);
-        offset *= onePixelOffset;
         //find the middle and from there offset it to the bottom left corner
         Vector2 firstPixel = (Vector2)arena.transform.position - new Vector2(offsetFromMiddleX, offsetFromMiddleY);
         //offset it by the spocebetween + 1 bcs the array gets expanded by this number on both sides

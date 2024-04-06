@@ -383,9 +383,19 @@ public class RoomController : MonoBehaviourPunCallbacks
             stats[i] = players[i].GetComponent<PlayerStats>();
             //reset the weapon, bcs we have deleted it so that when player is deleted it does not throw an error when it wants to Drop the weapon that does not exist
             stats[i].currentWeapon = null;
-            scores.Add(players[i].name,stats[i].score);
+            string playerName = players[i].name;
+            scores.Add(playerName,stats[i].score);
             //here we cannot add the name of the gameobject bcs we dont know if it matches with the photon array
-            nicks.Add(PhotonNetwork.PlayerList[i].UserId,PhotonNetwork.PlayerList[i].NickName);
+            if (i < PhotonNetwork.PlayerList.Length)
+            {
+                //real players
+                nicks.Add(PhotonNetwork.PlayerList[i].UserId,PhotonNetwork.PlayerList[i].NickName);
+            }
+            if(players[i].TryGetComponent<AIBehaviourTree>(out var aiBehaviourTree))
+            {
+                //bots
+                nicks.Add(playerName, "bot");
+            }
         }
         var sortedDict = scores.OrderBy(pair => pair.Value).ToList();
         //order by sorts it in an ascending order, but we want descending, player with highest score wins
