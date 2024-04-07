@@ -82,6 +82,9 @@ public class RoomController : MonoBehaviourPunCallbacks
         //we want to rename the player on all clients to his id and change his texture to the one the player has drawn
         CreatePrefabs.GetComponent<CreatePrefab>().RenamePlayer(playerID, playerView.ViewID,PhotonNetwork.LocalPlayer.NickName);
         displayIcons.GetComponent<DisplayPlayerStats>().AddPlayerTexture(playerID);
+        
+        SpawnBot(1);
+        SpawnBot(2);
     }
     public void Leave()
     {
@@ -157,7 +160,7 @@ public class RoomController : MonoBehaviourPunCallbacks
            GameObject weapon = PhotonNetwork.InstantiateRoomObject(WeaponNames[randomWeaponIndex],
                spawnPoint[randomSpawnIndex],
                Quaternion.identity, 0);
-           int randomWait = Random.Range(8, 15);
+           int randomWait = Random.Range(5, 10);
            yield return new WaitForSeconds(randomWait);
         }
     }
@@ -335,7 +338,6 @@ public class RoomController : MonoBehaviourPunCallbacks
             //only the master will spawn the weapons, but we want to run it at all clients in case that one of them bbecomes master
             StartCoroutine(SpawnWeapon());
         }
-        PrepareEnemyAI();
     }
     public void CallEndGame()
     {
@@ -424,5 +426,14 @@ public class RoomController : MonoBehaviourPunCallbacks
     {
         GameObject enemy = GameObject.Find("Enemy");
         enemy.GetComponent<AIBehaviourTree>().SetUpEnemy();
+    }
+
+    void SpawnBot(int botNumber)
+    {
+        int randonSpawn = Random.Range(0, spawnPoint.Length);
+        GameObject bot = PhotonNetwork.Instantiate("Enemy", spawnPoint[randonSpawn], Quaternion.identity);
+        string botName = "bot" + botNumber;
+        int viewId = bot.GetPhotonView().ViewID;
+        CreatePrefabs.GetComponent<CreatePrefab>().RenamePlayer(botName, viewId,"bot");
     }
 }

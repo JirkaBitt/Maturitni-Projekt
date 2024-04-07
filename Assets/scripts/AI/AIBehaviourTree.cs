@@ -1,22 +1,37 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
+using Photon.Pun;
 using UnityEngine;
 
 public class AIBehaviourTree : MonoBehaviour
 {
     // Start is called before the first frame update
-    public CreatePrefab createScript;
+    private CreatePrefab createScript;
     public PathFinder finder;
     public PickWeapon pickScript;
-    public DisplayPlayerStats displayStats;
+    private DisplayPlayerStats displayStats;
     private bool hasWeapon = false;
     private GameObject currentWeapon;
     private Coroutine oldPlayer;
     public string name = "bot";
     void Start()
     {
-        
+        //remove the number of max players when spawning a bot
+        PhotonNetwork.CurrentRoom.MaxPlayers--;
+        //assign variables
+        createScript = GameObject.Find("createPrefabs").GetComponent<CreatePrefab>();
+        displayStats = GameObject.Find("displayPlayerStats").GetComponent<DisplayPlayerStats>();
+        //create texture for dashing and damage
+        CreateTrail trail = gameObject.GetComponent<CreateTrail>();
+        trail.CreateTexture();
+        trail.CreateDashTexture();
+        //set up the pathfinding script
+        int space = 3;
+        AdjustOffsets(space);
+        finder.AddBarier(space,createScript.arenaInt);
+        //add the icon
+        StartCoroutine(WaitForGameStart());
     }
 
     // Update is called once per frame
@@ -28,17 +43,19 @@ public class AIBehaviourTree : MonoBehaviour
     public void SetUpEnemy()
     {
         //prepare the searching process
-        CreateTrail trail = gameObject.GetComponent<CreateTrail>();
-        trail.CreateTexture();
-        trail.CreateDashTexture();
-        gameObject.GetComponent<Rigidbody2D>().simulated = true;
-        AdjustOffsets(3);
-        finder.AddBarier(3,createScript.arenaInt);
         StartCoroutine(EnemyAI());
-        gameObject.name = name;
-        displayStats.AddPlayer(name);
     }
 
+    IEnumerator WaitForGameStart()
+    {
+        yield return new WaitUntil((() => gameObject.name != "bot"));
+        //we have changed the name
+        name = gameObject.name;
+        displayStats.AddPlayer(name);
+        RoomController controller = GameObject.Find("RoomController").GetComponent<RoomController>();
+        yield return new WaitUntil((() => controller.gameIsActive));
+        SetUpEnemy();
+    }
     IEnumerator EnemyAI()
     {
         while (true)
@@ -59,8 +76,10 @@ public class AIBehaviourTree : MonoBehaviour
     {
         //keep tracking the closest player and attack him when he is in range
         StartCoroutine(CheckForEnemyInRange());
+        int counter = 0;
         while (hasWeapon)
         {
+            counter ++;
             GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
             GameObject playerToAttack = null;
             float lowestDistance = 100000;
@@ -77,7 +96,17 @@ public class AIBehaviourTree : MonoBehaviour
                     playerToAttack = players[i];
                 }
             }
-            oldPlayer = finder.StartFollow(playerToAttack);
+            Vector2 offset = Vector2.zero;
+            if (counter > 1)
+            {
+                offset = new Vector2(Random.Range(-2, 2), Random.Range(-2, 2));
+                counter = 0;
+            }
+            else
+            {
+                offset = new Vector2(Random.Range(-1, 1), Random.Range(-1, 1));
+            }
+            oldPlayer = finder.StartFollow(playerToAttack,offset);
             yield return new WaitForSeconds(2);
             finder.StopThisCoroutine(oldPlayer);
         }
@@ -136,8 +165,10 @@ public class AIBehaviourTree : MonoBehaviour
             GameObject[] weapons = GameObject.FindGameObjectsWithTag("weapon");
             while (weapons.Length == 0)
             {
+                Coroutine evadeCoroutine = finder.StartFollow(gameObject,new Vector2(Random.Range(-4, 4), Random.Range(-4, 4)));
                 weapons = GameObject.FindGameObjectsWithTag("weapon");
                 yield return new WaitForSeconds(1);
+                finder.StopThisCoroutine(evadeCoroutine);
             }
             //GameObject weapon = null;
             float lowestDistance = 100000;
@@ -169,7 +200,7 @@ public class AIBehaviourTree : MonoBehaviour
         }
         PolygonCollider2D myColl = gameObject.GetComponent<PolygonCollider2D>();
         PolygonCollider2D weaponColl = weapon.GetComponent<PolygonCollider2D>();
-        Coroutine followCoroutine = finder.StartFollow(weapon);
+        Coroutine followCoroutine = finder.StartFollow(weapon,Vector2.zero);
         yield return new WaitUntil(() => weapon == null  ||
             myColl.IsTouching(weaponColl) ||
             weapon.transform.parent != null);

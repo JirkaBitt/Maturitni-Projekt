@@ -19,8 +19,6 @@ public class PathFinder : MonoBehaviour
     //posiition that is updated in update
     private Vector2 WalkPosition = Vector2.zero;
     private int performedJumps = 0;
-    //public GameObject WalkHere;
-    public DisplayAI _AI;
     public Rigidbody2D rb;
     private bool dashAvailable = true;
     //information to transform between world coordinates and int array
@@ -30,7 +28,7 @@ public class PathFinder : MonoBehaviour
     public float stepY = 0.2f;
 
     private Coroutine oldWalk;
-    public GameObject visualPoint;
+   // public GameObject visualPoint;
     private Vector3 previousPos;
     private void Update()
     {
@@ -108,15 +106,15 @@ public class PathFinder : MonoBehaviour
         //we have to call stopcoroutine on the same object it was started on
         StopCoroutine(stopThis);
     }
-    public Coroutine StartFollow(GameObject target)
+    public Coroutine StartFollow(GameObject target, Vector2 offset)
     {
-        return StartCoroutine(Follow(target));
+        return StartCoroutine(Follow(target,offset));
     }
-    public void MoveTo(GameObject target)
+    public void MoveTo(GameObject target, Vector2 offset)
     {
         stopSearch = false;
         //return the path from start to end with points being at the turns
-        Vector2 end = WorldToMatrix(target.transform.position);
+        Vector2 end = WorldToMatrix((Vector2)target.transform.position + offset);
         if (!IsInOriginalBounds(end))
         {
             //check if we are in the bounds of the original not extended area, if not do not follow him, he could be falling down
@@ -152,7 +150,7 @@ public class PathFinder : MonoBehaviour
         {
             StopCoroutine(oldWalk);
         }
-        oldWalk = StartCoroutine(Walk(route, target));
+        oldWalk = StartCoroutine(Walk(route, target, offset != Vector2.zero));
     }
     IEnumerator Jump()
     {
@@ -199,19 +197,19 @@ public class PathFinder : MonoBehaviour
         rb.gravityScale = 1;
     }
 
-    IEnumerator Follow(GameObject target)
+    IEnumerator Follow(GameObject target, Vector2 offset)
     {
         //follow supplied object
         while (true)
         {
             if (target != null)
             {
-                 MoveTo(target);
+                 MoveTo(target,offset);
             }
             yield return new WaitForSeconds(1);
         }
     }
-    IEnumerator Walk(Vector2[] route, GameObject target)
+    IEnumerator Walk(Vector2[] route, GameObject target, bool hasOffset)
     {
         //iterate over the found vectors and set them as the walkPosition that is resolved in update
         float acceptableDistance = 0.4f;
@@ -219,18 +217,18 @@ public class PathFinder : MonoBehaviour
         {
             Vector2 position = route[i];
             WalkPosition = MatrixToWorld(position);
-            
-            yield return new WaitUntil(() => ((Vector2)gameObject.transform.position - WalkPosition).magnitude < acceptableDistance);
-            WalkPosition = Vector2.zero;
-            if (target.CompareTag("Player"))
+            if (target.CompareTag("Player") && !hasOffset)
             {
                 Vector2 diff = (Vector2)target.transform.position - (Vector2)gameObject.transform.position;
-                if (diff.magnitude < 1.8f)
+                if (diff.magnitude < 2f)
                 {
                     //we are close enough to the player
-                     yield break;
+                    WalkPosition = Vector2.zero;
+                    yield break;
                 }
             }
+            yield return new WaitUntil(() => ((Vector2)gameObject.transform.position - WalkPosition).magnitude < acceptableDistance);
+            WalkPosition = Vector2.zero;
         }
     }
     public Vector2 WorldToMatrix(Vector2 world)
@@ -383,7 +381,6 @@ public class PathFinder : MonoBehaviour
     {
         //add a  safe barier around the arena so the AI would not get stuck
         addedSafeArea = spaceBetween + 1;
-        visualPoint.transform.localScale = new Vector3(stepX, stepX, 1);
         int height = map.GetLength(1);
         int width = map.GetLength(0);
         arrayHeight = height + 2*spaceBetween + 2;
