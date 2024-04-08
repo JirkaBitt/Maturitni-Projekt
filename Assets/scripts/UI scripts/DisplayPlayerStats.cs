@@ -61,13 +61,17 @@ public class DisplayPlayerStats : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         //if player leaves we want to remove him from the lists
-        playerIDs.Remove(otherPlayer.UserId);
-        playerNicknames.Remove(otherPlayer.UserId);
-        characterTextures.Remove(otherPlayer.UserId);
-        characterInfos.Remove(otherPlayer.UserId);
+        RemovePlayer(otherPlayer.UserId);
         base.OnPlayerLeftRoom(otherPlayer);
     }
 
+    public void RemovePlayer(string playerID)
+    {
+        playerIDs.Remove(playerID);
+        playerNicknames.Remove(playerID);
+        characterTextures.Remove(playerID);
+        characterInfos.Remove(playerID);
+    }
     public void ClearValues()
     {
         //reset all values, this is called when the games end

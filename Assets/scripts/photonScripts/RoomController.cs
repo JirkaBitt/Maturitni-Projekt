@@ -83,8 +83,6 @@ public class RoomController : MonoBehaviourPunCallbacks
         CreatePrefabs.GetComponent<CreatePrefab>().RenamePlayer(playerID, playerView.ViewID,PhotonNetwork.LocalPlayer.NickName);
         displayIcons.GetComponent<DisplayPlayerStats>().AddPlayerTexture(playerID);
         
-        SpawnBot(1);
-        SpawnBot(2);
     }
     public void Leave()
     {
@@ -290,7 +288,7 @@ public class RoomController : MonoBehaviourPunCallbacks
         //we have decided from the results that we want to play again
         endGUI.SetActive(false);
         inGameUI.SetActive(true);
-        RoomIDText.SetActive(true);
+        RoomIDText.transform.parent.gameObject.SetActive(true);
         //we have deleted the player so we have to spawn a new one
         int randomIndex = Random.Range(0, spawnPoint.Length);
         GameObject player = PhotonNetwork.Instantiate("Character", spawnPoint[randomIndex], Quaternion.identity);
@@ -334,7 +332,7 @@ public class RoomController : MonoBehaviourPunCallbacks
             gameIsActive = true;
             //now start the clock
             clock.GetComponent<CountDown>().StartCount();
-            RoomIDText.SetActive(false);
+            RoomIDText.transform.parent.gameObject.SetActive(false);
             //only the master will spawn the weapons, but we want to run it at all clients in case that one of them bbecomes master
             StartCoroutine(SpawnWeapon());
         }
@@ -421,19 +419,5 @@ public class RoomController : MonoBehaviourPunCallbacks
         }
         myPlayer = null;
         //stop the coroutine, so that if we play again the weapons dont spawn twice
-    }
-    void PrepareEnemyAI()
-    {
-        GameObject enemy = GameObject.Find("Enemy");
-        enemy.GetComponent<AIBehaviourTree>().SetUpEnemy();
-    }
-
-    void SpawnBot(int botNumber)
-    {
-        int randonSpawn = Random.Range(0, spawnPoint.Length);
-        GameObject bot = PhotonNetwork.Instantiate("Enemy", spawnPoint[randonSpawn], Quaternion.identity);
-        string botName = "bot" + botNumber;
-        int viewId = bot.GetPhotonView().ViewID;
-        CreatePrefabs.GetComponent<CreatePrefab>().RenamePlayer(botName, viewId,"bot");
     }
 }
