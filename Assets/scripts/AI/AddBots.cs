@@ -42,6 +42,7 @@ public class AddBots : MonoBehaviour
         //remove the last spawned bot
         if (spawnedBots.Count > 0)
         {
+            PhotonNetwork.CurrentRoom.MaxPlayers++;
             GameObject destroyThis = spawnedBots[^1];
             displayStats.RemovePlayer(destroyThis.name);
             spawnedBots.Remove(destroyThis);

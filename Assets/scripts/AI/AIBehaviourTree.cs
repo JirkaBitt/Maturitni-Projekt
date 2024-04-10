@@ -97,14 +97,16 @@ public class AIBehaviourTree : MonoBehaviour
                 }
             }
             Vector2 offset = Vector2.zero;
+            Vector2 toPlayer = (Vector2)playerToAttack.transform.position - (Vector2)gameObject.transform.position;
+            //we want to go a liitle bit back from the player
             if (counter > 1)
             {
-                offset = new Vector2(Random.Range(-2, 2), Random.Range(-2, 2));
+                offset = new Vector2(Random.Range(0, 4) * -toPlayer.normalized.x, Random.Range(-2, 2));
                 counter = 0;
             }
             else
             {
-                offset = new Vector2(Random.Range(-1, 1), Random.Range(-1, 1));
+                offset = new Vector2(Random.Range(0, 2) * -toPlayer.normalized.x, Random.Range(-1, 1));
             }
             oldPlayer = finder.StartFollow(playerToAttack,offset);
             yield return new WaitForSeconds(2);

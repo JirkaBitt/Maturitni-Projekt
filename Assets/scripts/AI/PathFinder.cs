@@ -217,6 +217,11 @@ public class PathFinder : MonoBehaviour
         {
             Vector2 position = route[i];
             WalkPosition = MatrixToWorld(position);
+            if (target == null)
+            {
+                //if the weapon was deleted
+                yield break;
+            }
             if (target.CompareTag("Player") && !hasOffset)
             {
                 Vector2 diff = (Vector2)target.transform.position - (Vector2)gameObject.transform.position;
