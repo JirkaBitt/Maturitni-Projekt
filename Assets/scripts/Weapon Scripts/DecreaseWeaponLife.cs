@@ -44,19 +44,20 @@ public class DecreaseWeaponLife : MonoBehaviour
 
     void RemoveWeapon()
     {
-        if (weapon.GetPhotonView().IsMine)
+        if (!weapon.GetPhotonView().IsMine)
         {
-            if (weapon.transform.parent != null)
-            {
-                //remove the Weapon from player
-                GameObject player = weapon.transform.parent.gameObject;
-                PickWeapon pickScript = player.GetComponent<PickWeapon>();
-                pickScript.Drop(true,weapon);
-            }
-            else
-            {
-                PhotonNetwork.Destroy(weapon);
-            }
+            return;
+        }
+        if (weapon.transform.parent != null)
+        {
+            //remove the Weapon from player
+            GameObject player = weapon.transform.parent.gameObject;
+            PickWeapon pickScript = player.GetComponent<PickWeapon>();
+            pickScript.Drop(true,weapon);
+        }
+        else
+        {
+            PhotonNetwork.Destroy(weapon);
         }
     }
 }

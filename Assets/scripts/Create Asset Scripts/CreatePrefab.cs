@@ -123,7 +123,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
             CopyComponents(intArray,width,assetName);
         }
     }
-    [PunRPC] public void CopyComponents(int[] colors1D,int width, string nameRPC)
+    private void CopyComponents(int[] colors1D,int width, string nameRPC)
     {
         if (numberOfCreated == assetData.Count)
         {
