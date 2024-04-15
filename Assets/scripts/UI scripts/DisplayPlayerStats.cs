@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
@@ -97,11 +98,11 @@ public class DisplayPlayerStats : MonoBehaviourPunCallbacks
         {
             if (PhotonNetwork.PlayerList[i].UserId == id)
             {
-                playerNicknames.Add(id,PhotonNetwork.PlayerList[i].NickName);
-                break;
+                playerNicknames.TryAdd(id,PhotonNetwork.PlayerList[i].NickName);
+                return;
             }
-            //if none of the userIDs match then it is a bot
-            playerNicknames.Add(id, "Bot");
         }
+        //it is not a real player
+        playerNicknames.TryAdd(id, "Bot");
     }
 }
