@@ -16,6 +16,7 @@ TagManager:
   - music
   - sound
   - copy
+  - bomb
   layers:
   - Default
   - TransparentFX

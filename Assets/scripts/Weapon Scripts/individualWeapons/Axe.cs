@@ -34,7 +34,7 @@ public class Axe : MeleeWeapon
                 if (triggerLaunch)
                 {
                     Vector3 launchV = ComputeLaunchVector();
-                    LaunchEnemy(enemyInRange, launchV, 40);
+                    LaunchEnemy(enemyInRange, launchV, 30);
                     triggerLaunch = false;
                 }
             }

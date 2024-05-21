@@ -36,7 +36,15 @@ public abstract class ConsumableWeapon : Weapon
         //we have to destroy animator because Animator.apply root motion causes the gameobject to fly upwards!!!
         Animator animator = gameObject.GetComponent<Animator>();
         Destroy(animator);
-        Rigidbody2D weaponRB = gameObject.AddComponent<Rigidbody2D>(); 
+        Rigidbody2D weaponRB = null;
+        if(gameObject.TryGetComponent<Rigidbody2D>(out var bombRB))
+        {
+            weaponRB = bombRB;
+        }
+        else
+        {
+            weaponRB = gameObject.AddComponent<Rigidbody2D>();
+        }//gameObject.AddComponent<Rigidbody2D>(); 
         //throw it in 45 degrees up, x value changes but y is always 1
         Vector3 throwVector = new Vector3(gameObject.transform.right.x, 2, 0);
         weaponRB.AddForce(throwVector * distance);

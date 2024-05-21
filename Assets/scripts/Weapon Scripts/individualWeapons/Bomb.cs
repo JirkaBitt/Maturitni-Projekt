@@ -14,6 +14,7 @@ public class Bomb : ConsumableWeapon
     }
     [PunRPC]public void UseRPC()
     {
+        gameObject.tag = "bomb";
         GameObject player = gameObject.transform.parent.gameObject;
         ThrowWeapon(200);
         AddTrail(gameObject);
@@ -37,7 +38,6 @@ public class Bomb : ConsumableWeapon
         
         Collider2D coll = gameObject.GetComponent<Collider2D>();
         Rigidbody2D rb = gameObject.GetComponent<Rigidbody2D>();
-
         //stop gravity, stop motion and set collider to trigger and make it bigger so we know what enemies are in range
         rb.simulated = false;
         rb.velocity = Vector2.zero;

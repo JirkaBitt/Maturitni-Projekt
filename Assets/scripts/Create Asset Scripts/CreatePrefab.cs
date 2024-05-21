@@ -588,7 +588,7 @@ public class CreatePrefab : MonoBehaviourPunCallbacks, IOnEventCallback
         //we want to change the texture to the one the player has drawn
         GameObject player = PhotonView.Find(gameobjectID).gameObject;
         //we have to set the size to the default before resizing it
-        player.transform.localScale = new Vector3(0.4f, 0.4f, 1);
+        player.transform.localScale = new Vector3(0.6f, 0.6f, 1);
         //convert to 2d array
         int length = colors1D.Length;
         int height =  length/ width;

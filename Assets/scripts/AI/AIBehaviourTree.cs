@@ -17,6 +17,10 @@ public class AIBehaviourTree : MonoBehaviour
     public string name = "bot";
     void Start()
     {
+        if (!gameObject.GetPhotonView().IsMine)
+        {
+            this.enabled = false;
+        }
         //remove the number of max players when spawning a bot
         PhotonNetwork.CurrentRoom.MaxPlayers--;
         //assign variables
@@ -124,9 +128,11 @@ public class AIBehaviourTree : MonoBehaviour
                 LoseWeapon();
                 yield break;
             }
+            
             //attack player based on the radius of weapon 
             float proximity = currentWeapon.name.Contains("Gun") ? 6 : 2.2f;
             proximity = currentWeapon.name.Contains("Bomb") ? 4 : proximity;
+            yield return new WaitForSeconds(0.1f);
             yield return new WaitUntil((() => CheckProximity(proximity, players)));
             //we are in a proximity of a player
             if (currentWeapon != null)
@@ -138,7 +144,7 @@ public class AIBehaviourTree : MonoBehaviour
             {
                 LoseWeapon();
             }
-            yield return new WaitForSeconds(0.8f);
+            yield return new WaitForSeconds(0.6f);
         }
     }
 

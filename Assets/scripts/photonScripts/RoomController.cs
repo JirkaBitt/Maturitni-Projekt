@@ -158,7 +158,7 @@ public class RoomController : MonoBehaviourPunCallbacks
            GameObject weapon = PhotonNetwork.InstantiateRoomObject(WeaponNames[randomWeaponIndex],
                spawnPoint[randomSpawnIndex],
                Quaternion.identity, 0);
-           int randomWait = Random.Range(5, 10);
+           int randomWait = Random.Range(3, 6);
            yield return new WaitForSeconds(randomWait);
         }
     }
@@ -269,7 +269,8 @@ public class RoomController : MonoBehaviourPunCallbacks
     {
         //AllViaServer should call it on all clients at the same time
         photonView.RPC("StartGame",RpcTarget.AllViaServer);
-        int playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
+      //  int playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
+        int playerCount = GameObject.FindGameObjectsWithTag("Player").Length;
         //spawn a weapon for every player
         for (int i = 0; i < playerCount; i++)
         {

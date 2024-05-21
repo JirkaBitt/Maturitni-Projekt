@@ -37,7 +37,7 @@ public class Bullet : MonoBehaviour
                 //hit the player
                 PhotonView enemyPhotonView = hit.GetPhotonView();
                 float RandomMult = Random.Range(5, 10) / 10f;
-                photonView.RPC("AddForceBullet", RpcTarget.AllViaServer, enemyPhotonView.ViewID, launchVector, 20f * RandomMult);
+                photonView.RPC("AddForceBullet", RpcTarget.All, enemyPhotonView.ViewID, launchVector, 20f * RandomMult);
                 
             }
             if (hit.CompareTag("ground"))
@@ -45,6 +45,7 @@ public class Bullet : MonoBehaviour
                 //we hit the ground, delete the bullet
                 //only set the bullet to false, bcs it will trigger the checkgamebounds to delete it
                 gameObject.SetActive(false);
+                //PhotonNetwork.Destroy(gameObject);
             }
         }
     }
@@ -64,6 +65,7 @@ public class Bullet : MonoBehaviour
         {
             //this will ensure that CheckGameBounds deletes the bullet
             gameObject.SetActive(false);
+            //PhotonNetwork.Destroy(gameObject);
         }
     }
 }
